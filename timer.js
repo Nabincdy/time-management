@@ -3,6 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const addTimerBtn = document.getElementById("addTimerBtn");
   const defaultTimeInput = document.getElementById("defaultTime");
   const notifyCheckbox = document.getElementById("notifyCheckbox");
+  const voteDataDiv = document.getElementById("voteData"); // Total vote display
+  const resetVotesBtn = document.getElementById("resetVotesBtn"); // Reset vote button
+  
+  let totalVotes = 0; // Global vote count to track total votes
+
   addTimerBtn.style.color = "green"; // Optional: Set the color to green
 
   notifyCheckbox.addEventListener("change", function () {
@@ -12,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   addTimerBtn.addEventListener("click", addTimer);
+  resetVotesBtn.addEventListener("click", resetVotes); // Add listener for reset vote button
 
   function createTimerComponent(defaultTime) {
     const timerComponent = document.createElement("div");
@@ -24,19 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="reset-initial-btn">⏏️</button>
         <button class="reset-default-btn">⤵️</button>
         <button class="remove-btn">❌</button>
-         <button class="form-btn">Form</button>
-          <button class="content-btn">Content</button>
-          <button class="people-btn">People</button>
-          <button class="vote-btn">Vote</button>
+        <button class="form-btn">Form</button>
+        <button class="content-btn">Content</button>
+        <button class="people-btn">People</button>
+        <button class="vote-btn">Vote</button>
       </div>
-
-        <div class="form-dropdown hidden">
-          <p class="dropdown-item" data-time="2:00">Turns Time = 2 minutes</p>
-          <p class="dropdown-item" data-time="10:00">Free Flow = 10 minutes</p>
-          <p class="dropdown-item" data-time="5:00">God Mode = 5 minutes</p>
-        </div>
-
-
     `;
     timerList.appendChild(timerComponent);
     return timerComponent;
@@ -57,6 +55,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const removeBtn = timerComponent.querySelector(".remove-btn");
     let intervalId = null;
     let wasRunning = false;
+
+    // Vote button functionality
+    const voteBtn = timerComponent.querySelector(".vote-btn");
+    let hasVoted = false; // Track if this timer has already voted
+
+    voteBtn.addEventListener("click", () => {
+      if (!hasVoted) {
+        totalVotes++; // Increment total vote count
+        hasVoted = true; // Mark this timer as voted
+        voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the total votes displayed
+
+        // Change button color to green and disable it
+        voteBtn.style.backgroundColor = "green"; // Green color for voted button
+        voteBtn.disabled = true; // Disable the button so the user can't vote again
+      } else {
+        alert("You can only vote once for this timer.");
+      }
+    });
 
     function toggleTimer(shouldStart) {
       if (shouldStart) {
@@ -174,5 +190,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     }
+  }
+
+  function resetVotes() {
+    totalVotes = 0; // Reset the vote count to 0
+    voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
+    // Reset all vote buttons' color to default (no vote)
+    const voteBtns = document.querySelectorAll(".vote-btn");
+    voteBtns.forEach(voteBtn => {
+      voteBtn.style.backgroundColor = ""; // Remove background color
+      voteBtn.disabled = false; // Enable voting again
+    });
   }
 });
