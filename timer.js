@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const notifyCheckbox = document.getElementById("notifyCheckbox");
   const voteDataDiv = document.getElementById("voteData"); // Total vote display
   const resetVotesBtn = document.getElementById("resetVotesBtn"); // Reset vote button
-  
+
   let totalVotes = 0; // Global vote count to track total votes
   let currentRunningTimer = null; // Track the currently running timer
 
@@ -38,6 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
     timerList.appendChild(timerComponent);
+
+    // Create dropdown menu inside content-btn
+    const contentBtn = timerComponent.querySelector(".content-btn");
+    const dropdownMenu = document.createElement("div");
+    dropdownMenu.classList.add("dropdown-menu");
+    dropdownMenu.innerHTML = `
+      <button class="dropdown-item">Option 1</button>
+      <button class="dropdown-item">Option 2</button>
+      <button class="dropdown-item">Option 3</button>
+    `;
+    contentBtn.appendChild(dropdownMenu);
+
+    // Toggle dropdown visibility
+    contentBtn.addEventListener("click", () => {
+      dropdownMenu.classList.toggle("show-dropdown");
+    });
+
     return timerComponent;
   }
 

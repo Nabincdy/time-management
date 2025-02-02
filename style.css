@@ -43,6 +43,7 @@
     background-color: #f9f9f8;
     border-radius: 8px 20px 20px 8px;
     width: max-content;
+    margin: 10px 0px;
   }
 
   .timer-title {
@@ -152,3 +153,63 @@
     padding-left: 48px;
     padding-right: 48px;
   }
+
+
+
+   /* Add your styles here */
+    .timer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: #f9f9f8;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  
+    .timer-title {
+      font-size: 18px;
+      font-weight: bold;
+      width: 150px;
+      text-align: center;
+      border: none;
+      background-color: #f0f0f0;
+    }
+  
+    .timer-value {
+      width: 80px;
+      font-size: 24px;
+      text-align: center;
+      border: none;
+    }
+  
+    button {
+      padding: 5px 10px;
+      font-size: 16px;
+    }
+
+
+
+    /* content */
+
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    
+    .show-dropdown {
+      display: flex;
+    }
+    
+    .dropdown-item {
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    
+    .dropdown-item:hover {
+      background-color: #f0f0f0;
+    }
+    
