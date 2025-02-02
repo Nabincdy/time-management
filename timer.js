@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetVotesBtn = document.getElementById("resetVotesBtn"); // Reset vote button
   
   let totalVotes = 0; // Global vote count to track total votes
+  let currentRunningTimer = null; // Track the currently running timer
 
   addTimerBtn.style.color = "green"; // Optional: Set the color to green
 
@@ -76,6 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function toggleTimer(shouldStart) {
       if (shouldStart) {
+        if (currentRunningTimer && currentRunningTimer !== timerComponent) {
+          currentRunningTimer.querySelector(".start-pause-btn").click(); // Stop the other timer
+        }
         startTimer();
       } else {
         clearInterval(intervalId);
@@ -108,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
         timerValue.value = `${mins}:${secs}`;
       }, 1000);
 
+      currentRunningTimer = timerComponent; // Set the current running timer
       startPauseBtn.textContent = "⏸️";
     }
 
@@ -152,6 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
     removeBtn.addEventListener("click", () => {
       clearInterval(intervalId);
       timerComponent.remove();
+      if (currentRunningTimer === timerComponent) {
+        currentRunningTimer = null; // Reset if this was the running timer
+      }
     });
 
     function playSound() {
