@@ -371,14 +371,14 @@
   </div>
   <div id="timerList"></div>
 
-  <div class="websocket-container">
+  <!-- <div class="websocket-container">
     <h3>Send Message to Server</h3>
     <input type="text" id="messageInput" placeholder="Enter your message..." />
     <button id="sendMessageBtn">Send</button>
-  </div>
+  </div> -->
 
 
-  <div id="messageDisplay"></div>
+  <!-- <div id="messageDisplay"></div> -->
 
   <!-- <script src="server2.js"></script> -->
   <!-- <script src="main-timer.js"></script> -->
@@ -412,7 +412,7 @@
 
     function updateTimerTitle() {
       const title = document.getElementById("timerTitle").value;
-     
+
       console.log("Timer title updated to: " + title);
     }
 
@@ -462,55 +462,63 @@
   <script>
     const socket = new WebSocket("ws://localhost:8082");
 
-socket.onopen = function () {
-  console.log("Connected to WebSocket server");
-};
+    socket.onopen = function () {
+      console.log("Connected to WebSocket server");
+    };
 
-socket.onmessage = function (event) {
-  const data = JSON.parse(event.data);
-  console.log("Received update:", data);
 
-  // Update UI elements dynamically
-  document.getElementById("mainTimer").value = data.mainTimer;
-  document.getElementById("voteData").textContent = `Total Votes: ${data.totalVotes}`;
-  document.getElementById("individualCount").innerText = data.counters.Individual;
-  document.getElementById("particularCount").innerText = data.counters.Particular;
-  document.getElementById("universalCount").innerText = data.counters.Universal;
-};
+    socket.onmessage = function (event) {
+      const data = JSON.parse(event.data);
+      console.log("Received update:", data);
 
-socket.onclose = function () {
-  console.log("Disconnected from WebSocket server. Reconnecting...");
-  setTimeout(() => {
-    location.reload();
-  }, 2000);
-};
+      // Update UI elements dynamically
+      document.getElementById("mainTimer").value = data.mainTimer;
+      document.getElementById("voteData").textContent = `Total Votes: ${data.totalVotes}`;
+      document.getElementById("individualCount").innerText = data.counters.Individual;
+      document.getElementById("particularCount").innerText = data.counters.Particular;
+      document.getElementById("universalCount").innerText = data.counters.Universal;
+    };
 
-socket.onerror = function (error) {
-  console.error("WebSocket Error:", error);
-};
+    socket.onclose = function () {
+      console.log("Disconnected from WebSocket server. Reconnecting...");
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+    };
 
-// Function to send updated timer data to WebSocket server
-function sendTimerUpdate() {
-  const updatedData = {
-    mainTimer: document.getElementById("mainTimer").value,
-    totalVotes: parseInt(document.getElementById("voteData").textContent.replace(/\D/g, ""), 10),
-    counters: {
-      Individual: parseInt(document.getElementById("individualCount").innerText, 10),
-      Particular: parseInt(document.getElementById("particularCount").innerText, 10),
-      Universal: parseInt(document.getElementById("universalCount").innerText, 10),
-    },
-  };
-  socket.send(JSON.stringify(updatedData));
-}
+    socket.onerror = function (error) {
+      console.error("WebSocket Error:", error);
+    };
 
-// Attach event listener to timer input field
-document.getElementById("mainTimer").addEventListener("input", sendTimerUpdate);
+    // Function to send updated timer data to WebSocket server
+    function sendTimerUpdate() {
+      socket.send(JSON.stringify("inside of send find update"));
 
-// Attach event listener to vote reset button
-document.getElementById("resetVotesBtn").addEventListener("click", () => {
-  document.getElementById("voteData").textContent = "Total Votes: 0";
-  sendTimerUpdate();
-});
+      const updatedData = {
+        mainTimer: document.getElementById("mainTimer").value,
+        totalVotes: parseInt(document.getElementById("voteData").textContent.replace(/\D/g, ""), 10),
+        counters: {
+          Individual: parseInt(document.getElementById("individualCount").innerText, 10),
+          Particular: parseInt(document.getElementById("particularCount").innerText, 10),
+          Universal: parseInt(document.getElementById("universalCount").innerText, 10),
+        },
+      };
+      socket.send(JSON.stringify(updatedData));
+    }
+
+    // Attach event listener to timer input field
+    document.getElementById("mainTimer").addEventListener("input", sendTimerUpdate);
+
+    // Attach event listener to vote reset button
+    document.getElementById("resetVotesBtn").addEventListener("click", () => {
+      document.getElementById("voteData").textContent = "Total Votes: 0";
+      // socket.send(JSON.stringify("does it reatch timer"));
+
+      sendTimerUpdate();
+      socket.send(JSON.stringify("nabin"));
+
+    });
+
 
   </script>
 
@@ -558,6 +566,12 @@ document.getElementById("resetVotesBtn").addEventListener("click", () => {
       function createTimerComponent(defaultTime) {
         const timerComponent = document.createElement("div");
         timerComponent.className = "timer";
+        timerComponent.flow = "flow timer default";
+        timerComponent.content = "content timer default";
+        timerComponent.people = "people timer default";
+        timerComponent.votesubmit = "votesubmit timer default";
+
+
         timerComponent.innerHTML = `
         <input type="text" placeholder="Timer Title" class="timer-title"/>
               <input type="text" value="${defaultTime}" class="timer-value"/>
@@ -567,7 +581,7 @@ document.getElementById("resetVotesBtn").addEventListener("click", () => {
           <button class="reset-initial-btn">⏏️</button>
           <button class="reset-default-btn">⤵️</button>
           <button class="remove-btn">❌</button>
-          <button class="form-btn">Form</button>
+          <button class="form-btn" id="formbtn">Form</button>
           <button class="content-btn">Content</button>
           <button class="people-btn">People</button>
           <button class="vote-btn">Vote</button>
@@ -616,21 +630,21 @@ document.getElementById("resetVotesBtn").addEventListener("click", () => {
 
         // Create Main Menu Items
         formDropdownMenu.innerHTML = `
-        <div class="dropdown-item">1. Turn
+        <div class="dropdown-item" id="turnbutton">1. Turn
           <div class="submenu">
-            <button class="submenu-item">Straight Turn</button>
-            <button class="submenu-item">Directive Turn</button>
-            <button class="submenu-item">Popcorn Turn</button>
+            <button class="submenu-item" id="straightturn">Straight Turn</button>
+            <button class="submenu-item" id="directiveTurn">Directive Turn</button>
+            <button class="submenu-item" id="popcornTurn">Popcorn Turn</button>
           </div>
         </div>
-        <div class="dropdown-item">2. Free Flow
+        <div class="dropdown-item" id="freeflowbutton">2. Free Flow
           <div class="submenu">
             <button class="submenu-item">Fast Free Flow</button>
             <button class="submenu-item">Team Free Flow</button>
             <button class="submenu-item">Spread Free Flow</button>
           </div>
         </div>
-        <div class="dropdown-item">3. God Mode
+        <div class="dropdown-item" id="godmodebutton">3. God Mode
           <div class="submenu">
             <button class="submenu-item">Same People</button>
             <button class="submenu-item">Remove People</button>
@@ -644,12 +658,58 @@ document.getElementById("resetVotesBtn").addEventListener("click", () => {
         formBtn.addEventListener("click", () => {
           formDropdownMenu.classList.toggle("show-dropdown");
         });
+        
 
         document.addEventListener("click", (event) => {
           if (!formBtn.contains(event.target) && !formDropdownMenu.contains(event.target)) {
             formDropdownMenu.classList.remove("show-dropdown");
           }
         });
+
+
+
+        document.getElementById("straightturn").addEventListener("click", () => {
+          console.log("Straight Turn clicked");
+                    formbtn.style.backgroundColor = "green";
+
+          // socket.send(JSON.stringify("straight turn"));
+          turnbutton.style.backgroundColor = "green"; // Green color for voted button
+          straightturn.style.backgroundColor = "green"; // Green color for voted button
+
+          timerComponent.flow = "straight time";
+        });
+
+
+        document.getElementById("directiveTurn").addEventListener("click", () => {
+          console.log("Directive Turn clicked");
+          formbtn.style.backgroundColor = "green";
+
+          turnbutton.style.backgroundColor = "green"; // Green color for voted button
+          directiveTurn.style.backgroundColor = "green"; // Green color for voted button
+          timerComponent.flow = "directive  time";
+
+        });
+
+
+
+
+
+        document.getElementById("popcornTurn").addEventListener("click", () => {
+          console.log("Popcorn Turn clicked");
+          formbtn.style.backgroundColor = "green";
+          turnbutton.style.backgroundColor = "green";
+          popcornTurn.style.backgroundColor = "green";
+
+          socket.send(JSON.stringify("Popcorn turn"));
+
+        });
+
+
+
+
+
+
+
 
         return timerComponent;
       }
@@ -688,6 +748,11 @@ document.getElementById("resetVotesBtn").addEventListener("click", () => {
           }
         });
       }
+
+
+
+
+
 
       function addContentSection(type, title, time) {
         const contentSection = document.createElement("div");
@@ -746,8 +811,10 @@ document.getElementById("resetVotesBtn").addEventListener("click", () => {
         const defaultTime = defaultTimeInput.value;
         const timerComponent = createTimerComponent(defaultTime);
         setupTimerControls(timerComponent, defaultTime);
-
       }
+
+
+
 
       function setupTimerControls(timerComponent, initialTime) {
         const timerTitle = timerComponent.querySelector(".timer-title");

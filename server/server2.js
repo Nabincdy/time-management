@@ -85,9 +85,37 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const WebSocket = require("ws");
-let votertime =  'votertime';
+let votertime = 'votertime';
 let votetype = 'votetype';
 let voteresult = 'voteresult';
+
+// let voteResult = { 'cmd', 
+//     { "voteType", "Form",
+//          "voteString", "StraightTime",
+//           "voteCycleTime", "5 min"}}
+
+// let voteResult = {'cmd',
+//      "returnVoteResult",
+//       "msg",
+//     {"voteType", "Form",
+//          "voteString", "StraightTime",
+//           "voteCycleTime", "5 min"
+//         }}
+
+// let voteResult = {
+//     "returnVoteResult",
+//     "cmd" : {
+//         "voteType": "Form",
+//         "voteString": "StraightTime",
+//         "voteCycleType": "5 min"
+//     },
+
+//     "returnVoteResult" : {
+//         "voteType": "Form",
+//         "voteString": "StraightTime",
+//         "voteCycleType": "5 min"
+//     }
+// }
 
 
 
@@ -96,7 +124,7 @@ const server = http.createServer((req, res) => {
     let filePath = path.join(__dirname, "../server2.html");
     console.log('disconected by nabin');
 
-    
+
     // Serve the HTML file
     fs.readFile(filePath, (err, data) => {
         if (err) {
