@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Dynamic Timer Components with Voice Recorder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400..800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="config">
+    <label>
+      <input type="checkbox" id="notifyCheckbox" />
+      Enable System Notifications
+    </label>
+    <br />
+    <label class="defaultTimeLabel">
+      Default Time:
+      <input type="text" id="defaultTime" value="5:00" placeholder="Default Time M:SS" />
+    </label>
+    <div class="btn-container inline-block">
+      <button id="addTimerBtn" title="Add A Timer">➕</button>
+    </div>
+    <div id="voteData">Total Votes: 0</div>
+    <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button>
+
+    <div id="mainTimerContainer" class="timer">
+      <input type="text" id="timerTitle" class="timer-title" value="Total Time" oninput="updateTimerTitle()" />
+      <input type="text" id="mainTimer" class="timer-value" value="10:00" oninput="updateMainTimerFromInput()" />
+      <button id="toggleStartPauseBtn" onclick="toggleStartPause()">▶️</button>
+      <button onclick="resetMainTimer()">🔄</button>
+    </div>
+  </div>
+
+  <div id="timerList">
+    <!-- Timer components will be added here dynamically -->
+  </div>
+
+  <!-- Voice Recorder Section -->
+  <div class="voice-recorder">
+    <h3>Voice Recorder</h3>
+    <button id="startRecord">🎙️ Start Recording</button>
+    <button id="stopRecord" disabled>⏹️ Stop Recording</button>
+    <a id="downloadLink" style="display:none;">Download Recording</a>
+  </div>
+
+  <script src="timer2.js"></script>
+  <script src="main-timer.js"></script>
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    document.getElementById("startRecord").addEventListener("click", async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.start();
+
+      document.getElementById("startRecord").disabled = true;
+      document.getElementById("stopRecord").disabled = false;
+      audioChunks = [];
+
+      mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);
+      };
+    });
+
+    document.getElementById("stopRecord").addEventListener("click", () => {
+  mediaRecorder.stop();
+  document.getElementById("startRecord").disabled = false;
+  document.getElementById("stopRecord").disabled = true;
+
+  mediaRecorder.onstop = () => {
+    const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+    const audioUrl = URL.createObjectURL(audioBlob);
+    
+    const a = document.createElement("a");
+    a.href = audioUrl;
+    a.download = "recording.wav";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+});
+
+  </script>
+</body>
+
+</html>
+
+
+mark has send Team Free Flow

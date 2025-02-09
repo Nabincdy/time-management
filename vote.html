@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Titles and Votes CRUD</title>
+    <style>
+        .item {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .item h3 {
+            display: inline;
+        }
+        .item button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manage Multiple Titles and Votes</h1>
+
+    <button id="addItemButton">Add New Item</button>
+
+    <div id="itemsContainer"></div>
+
+    <script>
+        // Create WebSocket connection
+        const socket = new WebSocket('ws://your-websocket-server-url'); // Replace with your WebSocket server URL
+
+        // Function to generate a unique ID for each item
+        function generateId() {
+            return 'item-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Function to create a new item
+        function createItem(title = "New Item", voteCount = 0) {
+            // Generate a unique ID for the item
+            const itemId = generateId();
+
+            // Create item container
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('item');
+            itemDiv.id = itemId;
+
+            // Title input
+            const titleInput = document.createElement('input');
+            titleInput.value = title;
+            titleInput.addEventListener('input', () => updateItem(itemId));
+
+            // Vote count
+            const voteCountElement = document.createElement('span');
+            voteCountElement.textContent = voteCount;
+
+            // Vote/Unvote button
+            const voteButton = document.createElement('button');
+            voteButton.textContent = 'Vote';
+            let hasVoted = false;
+
+            // Toggle vote/unvote
+            voteButton.addEventListener('click', () => {
+                if (hasVoted) {
+                    voteCount--;
+                    voteButton.textContent = 'Vote';
+                    hasVoted = false;
+                } else {
+                    voteCount++;
+                    voteButton.textContent = 'Unvote';
+                    hasVoted = true;
+                }
+
+                voteCountElement.textContent = voteCount;
+                updateItem(itemId);
+                sendVoteUpdate(itemId, voteCount, hasVoted); // Send vote update to server
+            });
+
+            // Remove button
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Remove';
+            removeButton.addEventListener('click', () => {
+                itemDiv.remove();
+                removeItem(itemId);
+                sendRemoveItem(itemId); // Send remove request to server
+            });
+
+            // Append everything to item container
+            itemDiv.appendChild(titleInput);
+            itemDiv.appendChild(voteCountElement);
+            itemDiv.appendChild(voteButton);
+            itemDiv.appendChild(removeButton);
+
+            // Add item to container
+            document.getElementById('itemsContainer').appendChild(itemDiv);
+
+            // Save item data
+            saveItem(itemId, title, voteCount, hasVoted);
+            sendNewItem(itemId, title, voteCount); // Send new item to server
+        }
+
+        // Function to update item in localStorage
+        function updateItem(itemId) {
+            const itemDiv = document.getElementById(itemId);
+            const titleInput = itemDiv.querySelector('input');
+            const voteCountElement = itemDiv.querySelector('span');
+            const voteButton = itemDiv.querySelector('button');
+
+            const title = titleInput.value;
+            const voteCount = parseInt(voteCountElement.textContent);
+            const hasVoted = voteButton.textContent === 'Unvote';
+
+            saveItem(itemId, title, voteCount, hasVoted);
+        }
+
+        // Function to save item data in localStorage
+        function saveItem(itemId, title, voteCount, hasVoted) {
+            const itemData = { title, voteCount, hasVoted };
+            localStorage.setItem(itemId, JSON.stringify(itemData));
+        }
+
+        // Function to remove item from localStorage
+        function removeItem(itemId) {
+            localStorage.removeItem(itemId);
+        }
+
+        // Function to load items from localStorage on page load
+        function loadItems() {
+            const savedItems = Object.keys(localStorage);
+            savedItems.forEach(itemId => {
+                const itemData = JSON.parse(localStorage.getItem(itemId));
+                createItem(itemData.title, itemData.voteCount);
+            });
+        }
+
+        // Send a new item to the WebSocket server
+        function sendNewItem(itemId, title, voteCount) {
+            socket.send(JSON.stringify({
+                type: 'new_item',
+                itemId,
+                title,
+                voteCount
+            }));
+        }
+
+        // Send updated vote count to the WebSocket server
+        function sendVoteUpdate(itemId, voteCount, hasVoted) {
+            socket.send(JSON.stringify({
+                type: 'vote_update',
+                itemId,
+                voteCount,
+                hasVoted
+            }));
+        }
+
+        // Send remove item request to the WebSocket server
+        function sendRemoveItem(itemId) {
+            socket.send(JSON.stringify({
+                type: 'remove_item',
+                itemId
+            }));
+        }
+
+        // Event listener to add a new item
+        document.getElementById('addItemButton').addEventListener('click', () => {
+            createItem();
+        });
+
+        // Load items from localStorage when the page loads
+        window.addEventListener('load', loadItems);
+
+        // Listen for messages from the WebSocket server
+        socket.addEventListener('message', function(event) {
+            const data = JSON.parse(event.data);
+            
+            switch (data.type) {
+                case 'new_item':
+                    createItem(data.title, data.voteCount);
+                    break;
+                case 'vote_update':
+                    const itemDiv = document.getElementById(data.itemId);
+                    if (itemDiv) {
+                        const voteCountElement = itemDiv.querySelector('span');
+                        const voteButton = itemDiv.querySelector('button');
+                        voteCountElement.textContent = data.voteCount;
+                        voteButton.textContent = data.hasVoted ? 'Unvote' : 'Vote';
+                    }
+                    break;
+                case 'remove_item':
+                    const itemToRemove = document.getElementById(data.itemId);
+                    if (itemToRemove) {
+                        itemToRemove.remove();
+                    }
+                    break;
+                default:
+                    console.log('Unknown message type:', data.type);
+            }
+        });
+    </script>
+</body>
+</html>

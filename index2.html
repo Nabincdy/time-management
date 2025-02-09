@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Dynamic Timer Components</title>
+  <title>Dynamic Timer Components with Voice Recorder</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400..800&display=swap" rel="stylesheet" />
@@ -25,30 +25,39 @@
       <button id="addTimerBtn" title="Add A Timer">➕</button>
     </div>
     <div id="voteData">Total Votes: 0</div>
-    <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button> <!-- Reset vote button -->
-
+    <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button>
 
     <div id="mainTimerContainer" class="timer">
-        <input type="text" id="timerTitle" class="timer-title" value="Total Time" oninput="updateTimerTitle()" />
-        <input type="text" id="mainTimer" class="timer-value" value="10:00" oninput="updateMainTimerFromInput()" />
-        <button id="toggleStartPauseBtn" onclick="toggleStartPause()">
-        ▶️
-        </button>
-        <button onclick="resetMainTimer()">🔄</button>
-      </div>
-    <div>
-      <!-- add main timer over here -->
+      <input type="text" id="timerTitle" class="timer-title" value="Total Time" oninput="updateTimerTitle()" />
+      <input type="text" id="mainTimer" class="timer-value" value="10:00" oninput="updateMainTimerFromInput()" />
+      <button id="toggleStartPauseBtn" onclick="toggleStartPause()">▶️</button>
+      <button onclick="resetMainTimer()">🔄</button>
     </div>
   </div>
+
   <div id="timerList">
     <!-- Timer components will be added here dynamically -->
   </div>
 
+  <div id="contentDisplayContainer">
+    <h2>Content Display</h2>
+  </div>
+
+
+  <div id="counterDisplay">
+    Individual: <span id="individualCount">0</span> | 
+    Particular: <span id="particularCount">0</span> | 
+    Universal: <span id="universalCount">0</span>
+  </div>
+  <div id="timerList"></div>
+
+
   <script src="timer2.js"></script>
   <script src="main-timer.js"></script>
+  
 
+  
 
 </body>
-  
 
 </html>
