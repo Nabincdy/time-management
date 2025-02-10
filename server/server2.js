@@ -233,7 +233,7 @@ wss.on("connection", (ws) => {
                     let addVoteForm = addVoteMessage.form;
                     let addVoteFormString = addVoteMessage.formString;
                     let addVoteFormTime = addVoteMessage.formTime;
-
+                    //test comment for GIT. Hi Nabin!
 
                     //update globalELMxArray
                     globalELMxArray[addVoteELMxID] = {"voting": {"test":"test"}} //add all fields
