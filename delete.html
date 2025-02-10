@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Timer</title>
+    <style>
+        .timer-container { display: flex; flex-direction: column; gap: 10px; }
+        .timer { display: flex; align-items: center; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="timer-container" id="timers"></div>
+    <button onclick="addTimer()">Add Timer</button>
+
+    <script>
+        let timers = JSON.parse(localStorage.getItem('timers')) || [];
+        console.log("Loaded timers:", timers);
+
+        function saveTimers() {
+            localStorage.setItem('timers', JSON.stringify(timers));
+            console.log("Saved timers:", timers);
+        }
+
+        function addTimer() {
+            const timer = { id: Date.now(), time: 60, running: false, interval: null };
+            timers.push(timer);
+            saveTimers();
+            renderTimers();
+        }
+
+        function startTimer(id) {
+            const timer = timers.find(t => t.id === id);
+            if (timer && !timer.running) {
+                timer.running = true;
+                timer.interval = setInterval(() => {
+                    if (timer.time > 0) {
+                        timer.time--;
+                        saveTimers();
+                        renderTimers();
+                    } else {
+                        clearInterval(timer.interval);
+                        timer.running = false;
+                    }
+                }, 1000);
+            }
+        }
+
+        function stopTimer(id) {
+            const timer = timers.find(t => t.id === id);
+            if (timer && timer.running) {
+                clearInterval(timer.interval);
+                timer.running = false;
+                saveTimers();
+                renderTimers();
+            }
+        }
+
+        function resetTimer(id) {
+            const timer = timers.find(t => t.id === id);
+            if (timer) {
+                timer.time = 60;
+                stopTimer(id);
+                saveTimers();
+                renderTimers();
+            }
+        }
+
+        function deleteTimer(id) {
+            timers = timers.filter(t => t.id !== id);
+            saveTimers();
+            renderTimers();
+        }
+
+        function renderTimers() {
+            console.log("Rendering timers:", timers);
+            const container = document.getElementById('timers');
+            container.innerHTML = '';
+            timers.forEach(timer => {
+                const timerEl = document.createElement('div');
+                timerEl.className = 'timer';
+                timerEl.innerHTML = `
+                    <span>${timer.time}s</span>
+                    <button onclick="startTimer(${timer.id})">Start</button>
+                    <button onclick="stopTimer(${timer.id})">Stop</button>
+                    <button onclick="resetTimer(${timer.id})">Reset</button>
+                    <button onclick="deleteTimer(${timer.id})">Delete</button>
+                `;
+                container.appendChild(timerEl);
+            });
+        }
+
+        renderTimers();
+    </script>
+</body>
+</html>

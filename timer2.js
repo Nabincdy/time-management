@@ -4,12 +4,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaultTimeInput = document.getElementById("defaultTime");
   const notifyCheckbox = document.getElementById("notifyCheckbox");
   const voteDataDiv = document.getElementById("voteData"); // Total vote display
-  const resetVotesBtn = document.getElementById("resetVotesBtn"); // Reset vote button
+
+  const contentDisplayContainer = document.getElementById("contentDisplayContainer");
+
+      const counters = {
+        Individual: 0,
+        Particular: 0,
+        Universal: 0
+      };
 
   let totalVotes = 0; // Global vote count to track total votes
   let currentRunningTimer = null; // Track the currently running timer
 
   addTimerBtn.style.color = "green"; // Optional: Set the color to green
+
+
+  function updateCounterDisplay() {
+    document.getElementById("individualCount").innerText = counters.Individual;
+    document.getElementById("particularCount").innerText = counters.Particular;
+    document.getElementById("universalCount").innerText = counters.Universal;
+  }
+
+  addTimerBtn.addEventListener("click", addTimer);
+
 
   notifyCheckbox.addEventListener("change", function () {
     if (this.checked) {
@@ -25,7 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
     timerComponent.className = "timer";
     timerComponent.innerHTML = `
       <input type="text" placeholder="Timer Title" class="timer-title"/>
-      <input type="text" value="${defaultTime}" class="timer-value"/>
+            <input type="text" value="${defaultTime}" class="timer-value"/>
+
       <div class="flex-row">
         <button class="start-pause-btn">▶️</button>
         <button class="reset-initial-btn">⏏️</button>
@@ -43,25 +61,179 @@ document.addEventListener("DOMContentLoaded", () => {
     const contentBtn = timerComponent.querySelector(".content-btn");
     const dropdownMenu = document.createElement("div");
     dropdownMenu.classList.add("dropdown-menu");
-    dropdownMenu.innerHTML = `
-      <button class="dropdown-item">Individual</button>
-      <button class="dropdown-item">Particular</button>
-      <button class="dropdown-item">Universal</button>
-    `;
-    contentBtn.appendChild(dropdownMenu);
+ dropdownMenu.innerHTML = `
+          <button class="dropdown-item" data-type="Individual">Individual</button>
+          <button class="dropdown-item" data-type="Particular">Particular</button>
+          <button class="dropdown-item" data-type="Universal">Universal</button>
+        `;
+
+        // confisuan
+        timerComponent.appendChild(dropdownMenu);
+
+    // contentBtn.appendChild(dropdownMenu);
 
     // Toggle dropdown visibility
+    // contentBtn.addEventListener("click", () => {
+    //   dropdownMenu.classList.toggle("show-dropdown");
+    // });
+
+    let assignedCategories = new Set();
+
     contentBtn.addEventListener("click", () => {
       dropdownMenu.classList.toggle("show-dropdown");
     });
 
+    dropdownMenu.addEventListener("click", (e) => {
+      const selectedContent = e.target.dataset.type;
+      openContentForm(selectedContent, timerComponent, assignedCategories);
+    });
+
+
+
+    document.addEventListener("click", (event) => {
+      if (!contentBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.classList.remove("show-dropdown");
+      }
+    });
+
+    // Create dropdown menu inside form-btn
+    const formBtn = timerComponent.querySelector(".form-btn");
+    const formDropdownMenu = document.createElement("div");
+    formDropdownMenu.classList.add("dropdown-menu");
+
+    // Create Main Menu Items
+    formDropdownMenu.innerHTML = `
+      <div class="dropdown-item">1. Turn
+        <div class="submenu">
+          <button class="submenu-item">Straight Turn</button>
+          <button class="submenu-item">Directive Turn</button>
+          <button class="submenu-item">Popcorn Turn</button>
+        </div>
+      </div>
+      <div class="dropdown-item">2. Free Flow
+        <div class="submenu">
+          <button class="submenu-item">Fast Free Flow</button>
+          <button class="submenu-item">Team Free Flow</button>
+          <button class="submenu-item">Spread Free Flow</button>
+        </div>
+      </div>
+      <div class="dropdown-item">3. God Mode
+        <div class="submenu">
+          <button class="submenu-item">Same People</button>
+          <button class="submenu-item">Remove People</button>
+          <button class="submenu-item">Add People</button>
+        </div>
+      </div>
+    `;
+    formBtn.appendChild(formDropdownMenu);
+
+    // Toggle dropdown visibility
+    formBtn.addEventListener("click", () => {
+      formDropdownMenu.classList.toggle("show-dropdown");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!formBtn.contains(event.target) && !formDropdownMenu.contains(event.target)) {
+        formDropdownMenu.classList.remove("show-dropdown");
+      }
+    });
+
     return timerComponent;
+  }
+
+
+
+  function openContentForm(contentType, timerComponent, assignedCategories) {
+    const existingForm = document.getElementById("contentForm");
+    if (existingForm) {
+      existingForm.remove();
+    }
+
+    const formHTML = `
+      <div id="contentForm">
+        <input type="text" id="topicName" placeholder="Enter Topic Name"/>
+        <input type="text" id="topicTime" value="2:00" placeholder="Enter Time (e.g., 2 min)"/>
+        <button id="submitContentBtn">Submit</button>
+      </div>
+    `;
+
+    const contentForm = document.createElement("div");
+    contentForm.innerHTML = formHTML;
+    document.body.appendChild(contentForm);
+
+    const submitContentBtn = contentForm.querySelector("#submitContentBtn");
+    submitContentBtn.addEventListener("click", () => {
+      const topicName = document.getElementById("topicName").value;
+      const topicTime = document.getElementById("topicTime").value;
+
+      if (topicName && topicTime) {
+        addContentSection(contentType, topicName, topicTime);
+        assignedCategories.add(contentType);
+        counters[contentType]++;
+        updateCounterDisplay();
+        contentForm.remove();
+      }
+    });
+  }
+
+  function addContentSection(type, title, time) {
+    const contentSection = document.createElement("div");
+    contentSection.className = "content-section";
+    
+    let timerRunning = false;
+    let timerInterval;
+    let currentTime = time; // Save the original time for later use
+
+    contentSection.innerHTML = `
+      <strong>${type}:</strong> ${title} - Time: <span class="time-display" contenteditable="true">${time}</span>
+      <button class="remove-content-btn">❌</button>
+      <button class="play-pause-btn">▶️</button>
+    `;
+    
+    contentDisplayContainer.appendChild(contentSection);
+
+    const removeContentBtn = contentSection.querySelector(".remove-content-btn");
+    removeContentBtn.addEventListener("click", () => {
+      contentSection.remove();
+      counters[type]--;
+      updateCounterDisplay();
+    });
+
+    const playPauseBtn = contentSection.querySelector(".play-pause-btn");
+    const timeDisplay = contentSection.querySelector(".time-display");
+
+    playPauseBtn.addEventListener("click", () => {
+      if (timerRunning) {
+        clearInterval(timerInterval);
+        playPauseBtn.innerText = "▶️";
+      } else {
+        // When starting, get the time from the contenteditable element
+        let editedTime = timeDisplay.innerText;
+        let [minutes, seconds] = editedTime.split(":").map(Number);
+
+        timerInterval = setInterval(() => {
+          if (seconds > 0) {
+            seconds--;
+          } else if (minutes > 0) {
+            minutes--;
+            seconds = 59;
+          } else {
+            clearInterval(timerInterval);
+          }
+          editedTime = `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+          timeDisplay.innerText = editedTime;
+        }, 1000);
+        playPauseBtn.innerText = "⏸️";
+      }
+      timerRunning = !timerRunning;
+    });
   }
 
   function addTimer() {
     const defaultTime = defaultTimeInput.value;
     const timerComponent = createTimerComponent(defaultTime);
     setupTimerControls(timerComponent, defaultTime);
+
   }
 
   function setupTimerControls(timerComponent, initialTime) {
@@ -84,11 +256,17 @@ document.addEventListener("DOMContentLoaded", () => {
         hasVoted = true; // Mark this timer as voted
         voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the total votes displayed
 
-        // Change button color to green and disable it
+        // Change button text and color to unvote for subsequent clicks
+        voteBtn.textContent = "Unvote"; // Change text to Unvote
         voteBtn.style.backgroundColor = "green"; // Green color for voted button
-        voteBtn.disabled = true; // Disable the button so the user can't vote again
       } else {
-        alert("You can only vote once for this timer.");
+        totalVotes--; // Decrement total vote count
+        hasVoted = false; // Mark this timer as unvoted
+        voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the total votes displayed
+
+        // Change button text and color to vote again
+        voteBtn.textContent = "Vote"; // Change text to Vote
+        voteBtn.style.backgroundColor = ""; // Reset button color to default
       }
     });
 
