@@ -389,6 +389,77 @@
 
 
 
+  <!-- <script>
+    let mainTimerInterval;
+    let mainTimerSeconds = 600;
+    let isTimerRunning = false;
+
+    function updateMainTimerDisplay() {
+      let minutes = Math.floor(mainTimerSeconds / 60);
+      let seconds = mainTimerSeconds % 60;
+      document.getElementById("mainTimer").value = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function updateMainTimerFromInput() {
+      const input = document.getElementById("mainTimer").value;
+      const parts = input.split(":");
+      if (parts.length === 2) {
+        let mins = parseInt(parts[0], 10);
+        let secs = parseInt(parts[1], 10);
+        if (!isNaN(mins) && !isNaN(secs) && secs >= 0 && secs < 60) {
+          mainTimerSeconds = mins * 60 + secs;
+        }
+      }
+    }
+
+    function updateTimerTitle() {
+      const title = document.getElementById("timerTitle").value;
+
+      console.log("Timer title updated to: " + title);
+    }
+
+    function toggleStartPause() {
+      if (isTimerRunning) {
+        clearInterval(mainTimerInterval);
+        mainTimerInterval = null;
+        isTimerRunning = false;
+        document.getElementById("toggleStartPauseBtn").textContent = "▶️"; // Change button to start icon
+      } else {
+        startMainTimer();
+        document.getElementById("toggleStartPauseBtn").textContent = "⏸️"; // Change button to pause icon
+      }
+    }
+
+    function startMainTimer() {
+      if (!mainTimerInterval) {
+        mainTimerInterval = setInterval(() => {
+          if (mainTimerSeconds > 0) {
+            mainTimerSeconds--;
+            updateMainTimerDisplay();
+          } else {
+            clearInterval(mainTimerInterval);
+            mainTimerInterval = null;
+            isTimerRunning = false;
+            document.getElementById("toggleStartPauseBtn").textContent = "▶"; // Reset button to start
+          }
+        }, 1000);
+        isTimerRunning = true;
+      }
+    }
+
+    function resetMainTimer() {
+      clearInterval(mainTimerInterval);
+      mainTimerInterval = null;
+      isTimerRunning = false;
+      mainTimerSeconds = 600;
+      updateMainTimerDisplay();
+      document.getElementById("toggleStartPauseBtn").textContent = "▶"; // Reset button to start
+    }
+
+    updateMainTimerDisplay();
+  </script> -->
+
+
   <script>
     let mainTimerInterval;
     let mainTimerSeconds = 600; // Timer starts at 10 minutes (600 seconds)
@@ -705,42 +776,102 @@
 
 
 
-        document.getElementById("straightturn").addEventListener("click", () => {
-          console.log("Straight Turn clicked");
-          formbtn.style.backgroundColor = "green";
+        // document.getElementById("straightturn").addEventListener("click", () => {
+        //   console.log("Straight Turn clicked");
+        //   formbtn.style.backgroundColor = "green";
 
-          // socket.send(JSON.stringify("straight turn"));
-          turnbutton.style.backgroundColor = "green"; // Green color for voted button
-          straightturn.style.backgroundColor = "green"; // Green color for voted button
+        //   // socket.send(JSON.stringify("straight turn"));
+        //   turnbutton.style.backgroundColor = "green"; // Green color for voted button
+        //   straightturn.style.backgroundColor = "green"; // Green color for voted button
 
-          timerComponent.flow = "straight time";
+        //   timerComponent.flow = "straight time";
+        // });
+
+
+        // document.getElementById("directiveTurn").addEventListener("click", () => {
+        //   console.log("Directive Turn clicked");
+        //   formbtn.style.backgroundColor = "green";
+
+        //   turnbutton.style.backgroundColor = "green"; // Green color for voted button
+        //   directiveTurn.style.backgroundColor = "green"; // Green color for voted button
+        //   timerComponent.flow = "directive  time";
+
+        // });
+
+
+
+
+
+        // document.getElementById("popcornTurn").addEventListener("click", () => {
+        //   console.log("Popcorn Turn clicked");
+        //   formbtn.style.backgroundColor = "green";
+        //   turnbutton.style.backgroundColor = "green";
+        //   popcornTurn.style.backgroundColor = "green";
+
+        //   socket.send(JSON.stringify("Popcorn turn"));
+
+        // });
+
+
+        function setupDropdown(dropdownMenu) {
+        // const formbtn = document.getElementById("formbtn");
+
+        // Select all parent buttons within this specific dropdown
+        const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
+
+        // Select all submenu buttons within this dropdown
+        const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
+
+        function resetButtons() {
+            allButtons.forEach(button => button.style.backgroundColor = ""); // Reset submenu buttons
+            parentButtons.forEach(parent => parent.style.backgroundColor = ""); // Reset parent buttons
+            // if (formbtn) formbtn.style.backgroundColor = "";
+                    //   formbtn.style.backgroundColor = "green";
+
+        }
+
+        function activateButton(selectedButton) {
+            resetButtons(); // Deactivate all buttons first
+            selectedButton.style.backgroundColor = "green"; // Activate clicked submenu button
+            // if (formbtn) formbtn.style.backgroundColor = "green";
+
+            // Find and activate the parent button
+            const parentButton = selectedButton.closest(".dropdown-item");
+            if (parentButton) parentButton.style.backgroundColor = "green";
+
+            // Update timerComponent.flow based on selected button text
+            timerComponent.flow = selectedButton.innerText + " selected";
+        }
+
+        // Attach event listeners dynamically for the current dropdown
+        allButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                activateButton(button);
+            });
         });
+    }
 
+    // Initial setup for existing dropdowns
+    document.querySelectorAll(".dropdown-menu").forEach(setupDropdown);
 
-        document.getElementById("directiveTurn").addEventListener("click", () => {
-          console.log("Directive Turn clicked");
-          formbtn.style.backgroundColor = "green";
-
-          turnbutton.style.backgroundColor = "green"; // Green color for voted button
-          directiveTurn.style.backgroundColor = "green"; // Green color for voted button
-          timerComponent.flow = "directive  time";
-
+    // Observe for new dropdowns being added dynamically
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.classList && node.classList.contains("dropdown-menu")) {
+                    setupDropdown(node); // Setup event listeners for new dropdown
+                }
+            });
         });
+    });
+
+    // Start observing the document for new dropdowns
+    observer.observe(document.body, { childList: true, subtree: true });
 
 
 
 
-
-        document.getElementById("popcornTurn").addEventListener("click", () => {
-          console.log("Popcorn Turn clicked");
-          formbtn.style.backgroundColor = "green";
-          turnbutton.style.backgroundColor = "green";
-          popcornTurn.style.backgroundColor = "green";
-
-          socket.send(JSON.stringify("Popcorn turn"));
-
-        });
-
+    
 
         //Change the Reset Button Colour in case in mid vote, colours will update
         // Get the button DOM element
