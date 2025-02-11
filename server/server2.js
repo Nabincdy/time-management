@@ -4,7 +4,7 @@
 
 // const WebSocket = require("ws");
 
-// const wss = new WebSocket.Server({ port: 8082 });
+// const wss = new WebSocket.Server({ port: 8080 });
 
 // wss.on("connection", ws => {
 //     console.log("New Client Connected");
@@ -26,7 +26,7 @@
 //     });
 // });
 
-// console.log("WebSocket Server running on ws://localhost:8082");
+// console.log("WebSocket Server running on ws://localhost:8080");
 
 // const http = require("http");
 // const fs = require("fs");
@@ -74,8 +74,8 @@
 //     });
 // });
 
-// server.listen(8082, () => {
-//     console.log("Server running at http://localhost:8082/");
+// server.listen(8080, () => {
+//     console.log("Server running at http://localhost:8080/");
 // });
 
 
@@ -91,7 +91,7 @@ let voteresult = 'voteresult';
 let meetingID = 0;
 let numberOfELMs = 0;
 let globalELMxArray = {};//this object contains each meetings data and it can be operated on from other meetings (ELM) too
-    globalELMxArray = {"1": {, //ELMxID..this is an example instantiation
+    globalELMxArray = {"1": { //ELMxID..this is an example instantiation
                         "flow roles": {
                             "executorName": "spiritman",
                             "influencerName": "spiritman",
@@ -227,7 +227,72 @@ wss.on("connection", (ws) => {
                 }//end if forEach Broadcasting
             }); //end forEach Broadcasting
 
-            switch(message.cmd){
+            // switch(message.cmd){
+            //     case 'addVote':
+            //         let addVoteMessage = message.msg;
+            //         let addVoteELMxID = addVoteMessage.ELMxID;
+            //         let addVoteParticipantID = addVoteMessage.participantID;
+            //         let addVoteForm = addVoteMessage.form;
+            //         let addVoteFormString = addVoteMessage.formString;
+            //         let addVoteFormTime = addVoteMessage.formTime;
+            //         //test comment for GIT. Hi Nabin!
+
+            //         let participantInfo = globalELMxArray[addVoteELMxID].vote.individualParticipantVotes[addVoteParticipantID]
+            //         let totalAddVoteForm =globalELMxArray[addVoteELMxID].vote.totalVoteForm[addvoteForm]
+            //         totalAddVoteForm = totalVoteForm[addvoteForm]+1; //incredment this form type (Turn, FreeFlow, GodMode)
+            //         participantInfo.currentVoting.voteForm=addVoteForm; 
+            //         : {
+            //                 "isVotingHappening": "not yet",
+            //                 "totalVoteForm": "not yet",
+            //                 "totalVoteFormString": "not yet",
+            //                 "totalVoteFormTime": "not yet",
+
+            //                 "totalVoteContent": "not yet",
+            //                 "totalVoteContentNotion": "not yet",//Individual, Particular, Univerasl
+            //                 "totalVoteContentString": "not yet",
+            //                 "totalVoteContentTime": "not yet",
+
+            //                 "totalVotePeople": "not yet",
+            //                 "totalVotePeopleString": "not yet",
+            //                 "totalVotePeopleTime": "not yet",
+            //                 "individualParticipantVotes": {
+            //                     "participant1": {
+            //                     "participant1CurrentVoting": {
+            //                         "VoteForm": "not yet",
+            //                         "voteFormString": "not yet",
+            //                         "voteFormTime": "not yet",
+
+            //                         "voteContent": "not yet",
+            //                         "voteContentNotion": "not yet",//Individual, Particular, Univerasl
+            //                         "voteContentString": "not yet",
+            //                         "voteContentTime": "not yet",
+
+            //                         "votePeople": "not yet",
+            //                         "votePeopleString": "not yet",
+            //                         "votePeopleTime": "not yet",
+
+            //                     },//end participant1CurrentVoting
+
+            //         //update globalELMxArray
+            //         globalELMxArray[addVoteELMxID] = {"voting": {"test":"test"}} //add all fields
+            //         client.send(JSON.stringify(message));
+            //     break;
+            //     case 'changeVote':
+      
+            //     break;
+            //     case 'removeVote':
+      
+            //     break;
+            //     case 'voteSubmitted':
+      
+            //     break;
+
+            // }//end switch
+
+
+
+
+            switch (message.cmd) {
                 case 'addVote':
                     let addVoteMessage = message.msg;
                     let addVoteELMxID = addVoteMessage.ELMxID;
@@ -236,58 +301,112 @@ wss.on("connection", (ws) => {
                     let addVoteFormString = addVoteMessage.formString;
                     let addVoteFormTime = addVoteMessage.formTime;
                     //test comment for GIT. Hi Nabin!
-
-                    let participantInfo = globalELMxArray[addVoteELMxID].vote.individualParticipantVotes[addVoteParticipantID]
-                    let totalAddVoteForm =globalELMxArray[addVoteELMxID].vote.totalVoteForm[addvoteForm]
-                    totalAddVoteForm = totalVoteForm[addvoteForm]+1; //incredment this form type (Turn, FreeFlow, GodMode)
-                    participantInfo.currentVoting.voteForm=addVoteForm; 
-                    : {
-                            "isVotingHappening": "not yet",
-                            "totalVoteForm": "not yet",
-                            "totalVoteFormString": "not yet",
-                            "totalVoteFormTime": "not yet",
-
-                            "totalVoteContent": "not yet",
-                            "totalVoteContentNotion": "not yet",//Individual, Particular, Univerasl
-                            "totalVoteContentString": "not yet",
-                            "totalVoteContentTime": "not yet",
-
-                            "totalVotePeople": "not yet",
-                            "totalVotePeopleString": "not yet",
-                            "totalVotePeopleTime": "not yet",
-                            "individualParticipantVotes": {
-                                "participant1": {
-                                "participant1CurrentVoting": {
-                                    "VoteForm": "not yet",
-                                    "voteFormString": "not yet",
-                                    "voteFormTime": "not yet",
-
-                                    "voteContent": "not yet",
-                                    "voteContentNotion": "not yet",//Individual, Particular, Univerasl
-                                    "voteContentString": "not yet",
-                                    "voteContentTime": "not yet",
-
-                                    "votePeople": "not yet",
-                                    "votePeopleString": "not yet",
-                                    "votePeopleTime": "not yet",
-
-                                },//end participant1CurrentVoting
-
-                    //update globalELMxArray
-                    globalELMxArray[addVoteELMxID] = {"voting": {"test":"test"}} //add all fields
-                    client.send(JSON.stringify(message));
-                break;
+            
+                    let participantInfo = globalELMxArray[addVoteELMxID].vote.individualParticipantVotes[addVoteParticipantID];
+                    let totalAddVoteForm = globalELMxArray[addVoteELMxID].vote.totalVoteForm[addVoteForm];
+                    
+                    // Increment this form type (Turn, FreeFlow, GodMode)
+                    globalELMxArray[addVoteELMxID].vote.totalVoteForm[addVoteForm] = totalAddVoteForm + 1;
+            
+                    participantInfo.currentVoting = {
+                        voteForm: addVoteForm,
+                        voteFormString: addVoteFormString,
+                        voteFormTime: addVoteFormTime
+                    };
+            
+                    // Update globalELMxArray correctly
+                    globalELMxArray[addVoteELMxID] = {
+                        ...globalELMxArray[addVoteELMxID], // Preserve existing data
+                        vote: {
+                            test: "test",
+                            isVotingHappening: "not yet",
+                            totalVoteForm: "not yet",
+                            totalVoteFormString: "not yet",
+                            totalVoteFormTime: "not yet",
+                            totalVoteContent: "not yet",
+                            totalVoteContentNotion: "not yet", // Individual, Particular, Universal
+                            totalVoteContentString: "not yet",
+                            totalVoteContentTime: "not yet",
+                            totalVotePeople: "not yet",
+                            totalVotePeopleString: "not yet",
+                            totalVotePeopleTime: "not yet",
+                            individualParticipantVotes: {
+                                participant1: {
+                                    participant1CurrentVoting: {
+                                        VoteForm: "not yet",
+                                        voteFormString: "not yet",
+                                        voteFormTime: "not yet",
+                                        voteContent: "not yet",
+                                        voteContentNotion: "not yet", // Individual, Particular, Universal
+                                        voteContentString: "not yet",
+                                        voteContentTime: "not yet",
+                                        votePeople: "not yet",
+                                        votePeopleString: "not yet",
+                                        votePeopleTime: "not yet",
+                                    }
+                                }
+                            }
+                        }
+                    };
+            
+                    ws.send(JSON.stringify(message)); // Send response to the client
+                    break;
+            
                 case 'changeVote':
-      
-                break;
+                    // Handle changeVote logic
+                    break;
+            
                 case 'removeVote':
-      
-                break;
+                    // Handle removeVote logic
+                    break;
+            
                 case 'voteSubmitted':
-      
-                break;
+                    // Handle voteSubmitted logic
+                    break;
+            } // End switch
+            
 
-            }//end switch
+
+
+            // switch (message.cmd) {
+            //     case 'addVote':
+            //         let addVoteMessage = message.msg;
+            //         let addVoteELMxID = addVoteMessage.ELMxID;
+            //         let addVoteParticipantID = addVoteMessage.participantID;
+            //         let addVoteForm = addVoteMessage.form;
+            //         let addVoteFormString = addVoteMessage.formString;
+            //         let addVoteFormTime = addVoteMessage.formTime;
+            
+            //         let participantInfo = globalELMxArray[addVoteELMxID].vote.individualParticipantVotes[addVoteParticipantID];
+            
+            //         // Correcting the total vote count update
+            //         globalELMxArray[addVoteELMxID].vote.totalVoteForm[addVoteForm] += 1;
+            
+            //         participantInfo.currentVoting = {
+            //             voteForm: addVoteForm,
+            //             voteFormString: addVoteFormString,
+            //             voteFormTime: addVoteFormTime
+            //         };
+            
+            //         // Ensuring we do not overwrite the whole object
+            //         globalELMxArray[addVoteELMxID].voting = {
+            //             test: "test",
+            //             ...globalELMxArray[addVoteELMxID].voting
+            //         };
+            
+            //         client.send(JSON.stringify(message));
+            //         break;
+            
+            //     case 'changeVote':
+            //         break;
+            
+            //     case 'removeVote':
+            //         break;
+            
+            //     case 'voteSubmitted':
+            //         break;
+            // }
+            
 
 
 
@@ -308,7 +427,7 @@ wss.on("connection", (ws) => {
 });
 
 // Start the server
-const PORT = 8082;
+const PORT = 8080;
 server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}/`);
 });
