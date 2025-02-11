@@ -465,14 +465,14 @@
     let mainTimerSeconds = 600; // Timer starts at 10 minutes (600 seconds)
     let isTimerRunning = false;
     let numberCitizenTimers = 0;
-  
+
     // Function to update the timer display
     function updateMainTimerDisplay() {
       let minutes = Math.floor(mainTimerSeconds / 60);
       let seconds = mainTimerSeconds % 60;
       document.getElementById("mainTimer").value = `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }
-  
+
     // Function to update the timer value from user input
     function updateMainTimerFromInput() {
       const input = document.getElementById("mainTimer").value;
@@ -487,13 +487,13 @@
         }
       }
     }
-  
+
     // Function to update the timer title (if needed)
     function updateTimerTitle() {
       const title = document.getElementById("timerTitle").value;
       console.log("Timer title updated to: " + title);
     }
-  
+
     // Toggle between start and pause button
     function toggleStartPause() {
       if (isTimerRunning) {
@@ -506,7 +506,7 @@
         document.getElementById("toggleStartPauseBtn").textContent = "⏸️"; // Pause icon
       }
     }
-  
+
     // Function to start the main timer
     function startMainTimer() {
       if (!mainTimerInterval && mainTimerSeconds > 0) {
@@ -524,7 +524,7 @@
         isTimerRunning = true;
       }
     }
-  
+
     // Function to reset the timer
     function resetMainTimer() {
       clearInterval(mainTimerInterval);
@@ -534,7 +534,7 @@
       updateMainTimerDisplay();
       document.getElementById("toggleStartPauseBtn").textContent = "▶️"; // Start icon
     }
-  
+
     // Event listener to pause the timer when editing the input
     document.getElementById("mainTimer").addEventListener("focus", () => {
       if (isTimerRunning) {
@@ -544,14 +544,14 @@
         document.getElementById("toggleStartPauseBtn").textContent = "▶️"; // Change button to start icon
       }
     });
-  
+
     // Event listener to update the timer when input loses focus
     document.getElementById("mainTimer").addEventListener("blur", updateMainTimerFromInput);
-  
+
     // Initialize display
     updateMainTimerDisplay();
   </script>
-  
+
 
 
   <script>
@@ -814,26 +814,28 @@
 
 
         function setupDropdown(dropdownMenu) {
-        // const formbtn = document.getElementById("formbtn");
+          const formbtn = document.getElementById("formbtn");
 
-        // Select all parent buttons within this specific dropdown
-        const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
+          // Select all parent buttons within this specific dropdown
+          const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
 
-        // Select all submenu buttons within this dropdown
-        const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
+          // Select all submenu buttons within this dropdown
+          const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
 
-        function resetButtons() {
+          function resetButtons() {
             allButtons.forEach(button => button.style.backgroundColor = ""); // Reset submenu buttons
             parentButtons.forEach(parent => parent.style.backgroundColor = ""); // Reset parent buttons
-            // if (formbtn) formbtn.style.backgroundColor = "";
-                    //   formbtn.style.backgroundColor = "green";
+            if (formbtn) formbtn.style.backgroundColor = "";
 
-        }
+          }
 
-        function activateButton(selectedButton) {
+          function activateButton(selectedButton) {
             resetButtons(); // Deactivate all buttons first
             selectedButton.style.backgroundColor = "green"; // Activate clicked submenu button
-            // if (formbtn) formbtn.style.backgroundColor = "green";
+            const formbtn = selectedButton.closest(".form-btn");
+            formBtn.style.backgroundColor = "green"; // Activate the form-btn
+
+            if (formbtn) formbtn.style.backgroundColor = "green";
 
             // Find and activate the parent button
             const parentButton = selectedButton.closest(".dropdown-item");
@@ -841,41 +843,44 @@
 
             // Update timerComponent.flow based on selected button text
             timerComponent.flow = selectedButton.innerText + " selected";
+          }
+
+          // Attach event listeners dynamically for the current dropdown
+          allButtons.forEach(button => {
+            button.addEventListener("click", () => {
+              activateButton(button);
+            });
+          });
         }
 
-        // Attach event listeners dynamically for the current dropdown
-        allButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                activateButton(button);
-            });
-        });
-    }
+        // Initial setup for existing dropdowns
+        document.querySelectorAll(".dropdown-menu").forEach(setupDropdown);
 
-    // Initial setup for existing dropdowns
-    document.querySelectorAll(".dropdown-menu").forEach(setupDropdown);
-
-    // Observe for new dropdowns being added dynamically
-    const observer = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
+        // Observe for new dropdowns being added dynamically
+        const observer = new MutationObserver(mutations => {
+          mutations.forEach(mutation => {
             mutation.addedNodes.forEach(node => {
-                if (node.classList && node.classList.contains("dropdown-menu")) {
-                    setupDropdown(node); // Setup event listeners for new dropdown
-                }
+              if (node.classList && node.classList.contains("dropdown-menu")) {
+                setupDropdown(node); // Setup event listeners for new dropdown
+              }
             });
+          });
         });
-    });
 
-    // Start observing the document for new dropdowns
-    observer.observe(document.body, { childList: true, subtree: true });
-
+        // Start observing the document for new dropdowns
+        observer.observe(document.body, { childList: true, subtree: true });
 
 
 
-    
+
+
 
         //Change the Reset Button Colour in case in mid vote, colours will update
         // Get the button DOM element
         const resetVotesBtn = document.getElementById("resetVotesBtn");
+
+
+
 
         // Calculate the percentage of totalVotes compared to numberCitizenTimers
         const votePercentage = (totalVotes / numberCitizenTimers) * 100;
@@ -972,7 +977,7 @@
         const timeDisplay = contentSection.querySelector(".time-display");
 
         playPauseBtn.addEventListener("click", () => {
-          if (timerRunning) {   
+          if (timerRunning) {
             clearInterval(timerInterval);
             playPauseBtn.innerText = "▶️";
           } else {
@@ -1023,54 +1028,51 @@
 
         // Vote button functionality
         const voteBtn = timerComponent.querySelector(".vote-btn");
-        let hasVoted = false; // Track if this timer has already voted
+        // Function to handle voting
+voteBtn.addEventListener("click", () => {
+    let hasVoted = voteBtn.getAttribute("data-voted") === "true"; // Track vote per button
 
-        voteBtn.addEventListener("click", () => {
-          if (!hasVoted) {
-            totalVotes++; // Increment total vote count
-            hasVoted = true; // Mark this timer as voted
-            voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the total votes displayed
+    if (!hasVoted) {
+        totalVotes++; // Increment total vote count
+        voteBtn.setAttribute("data-voted", "true"); // Mark as voted
+        voteBtn.textContent = "Unvote"; // Change text
+        voteBtn.style.backgroundColor = "green"; // Green color for voted button
+        socket.send(JSON.stringify({ cmd: "addVote", msg: "Vote added" }));
+    } else {
+        totalVotes = Math.max(0, totalVotes - 1); // Prevent negative votes
+        voteBtn.setAttribute("data-voted", "false"); // Mark as unvoted
+        voteBtn.textContent = "Vote"; // Reset text
+        voteBtn.style.backgroundColor = ""; // Reset color
+    }
 
-            // Change button text and color to unvote for subsequent clicks
-            voteBtn.textContent = "Unvote"; // Change text to Unvote
-            voteBtn.style.backgroundColor = "green"; // Green color for voted button
-            socket.send(JSON.stringify("cmd", "addVote", "msg",));
-          } else {
-            totalVotes--; // Decrement total vote count
-            hasVoted = false; // Mark this timer as unvoted
-            voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the total votes displayed
+    // Update the vote count display
+    voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
 
-            // Change button text and color to vote again
-            voteBtn.textContent = "Vote"; // Change text to Vote
-            voteBtn.style.backgroundColor = ""; // Reset button color to default
-          }
+    // Get the reset vote button
+    const resetVotesBtn = document.getElementById("resetVotesBtn");
 
-          //Markhere
+    // Prevent division by zero error
+    const votePercentage = numberCitizenTimers > 0 ? (totalVotes / numberCitizenTimers) * 100 : 0;
 
-          // Get the button DOM element
-          const resetVotesBtn = document.getElementById("resetVotesBtn");
+    // Update the button color based on the vote percentage
+    if (votePercentage === 0) {
+        resetVotesBtn.style.backgroundColor = 'black';
+        resetVotesBtn.style.color = 'white';
+    } else if (votePercentage < 10) {
+        resetVotesBtn.style.backgroundColor = 'black';
+        resetVotesBtn.style.color = 'white';
+    } else if (votePercentage >= 10 && votePercentage < 70) {
+        resetVotesBtn.style.backgroundColor = 'red';
+        resetVotesBtn.style.color = 'black';
+    } else if (votePercentage >= 70 && votePercentage < 100) {
+        resetVotesBtn.style.backgroundColor = 'orange';
+        resetVotesBtn.style.color = 'black';
+    } else if (votePercentage === 100) {
+        resetVotesBtn.style.backgroundColor = 'green';
+        resetVotesBtn.style.color = 'black';
+    }
+});
 
-          // Calculate the percentage of totalVotes compared to numberCitizenTimers
-          const votePercentage = (totalVotes / numberCitizenTimers) * 100;
-
-          // Use a switch-case style logic to determine the button's color
-          if (totalVotes == 0 && numberCitizenTimers == 0) {
-            resetVotesBtn.style.backgroundColor = 'black';
-            resetVotesBtn.style.color = 'white';
-          } else if (votePercentage < 10) {
-            resetVotesBtn.style.backgroundColor = 'black';
-            resetVotesBtn.style.color = 'white';
-          } else if (votePercentage >= 10 && votePercentage < 70) {
-            resetVotesBtn.style.backgroundColor = 'red';
-            resetVotesBtn.style.color = 'black';
-          } else if (votePercentage >= 70 && votePercentage < 100) {
-            resetVotesBtn.style.backgroundColor = 'orange';
-            resetVotesBtn.style.color = 'black';
-          } else if (votePercentage === 100) {
-            resetVotesBtn.style.backgroundColor = 'green';
-            resetVotesBtn.style.color = 'black';
-          }
-        });
 
         function toggleTimer(shouldStart) {
           if (shouldStart) {
@@ -1236,16 +1238,35 @@
         }
       }
 
+      // function resetVotes() {
+      //   totalVotes = 0; // Reset the vote count to 0
+      //   voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
+      //   // Reset all vote buttons' color to default (no vote)
+      //   const voteBtns = document.querySelectorAll(".vote-btn");
+      //   voteBtns.forEach(voteBtn => {
+      //     voteBtn.style.backgroundColor = ""; // Remove background color
+      //     voteBtn.textContent = "Vote"; // Change text to Unvote
+      //     voteBtn.disabled = false; // Enable voting again
+      //   });
+      // }
+
       function resetVotes() {
-        totalVotes = 0; // Reset the vote count to 0
+        totalVotes = 0; // Reset total vote count
         voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
-        // Reset all vote buttons' color to default (no vote)
+
+        // Reset all vote buttons
         const voteBtns = document.querySelectorAll(".vote-btn");
         voteBtns.forEach(voteBtn => {
           voteBtn.style.backgroundColor = ""; // Remove background color
+          voteBtn.textContent = "Vote"; // Reset text to "Vote"
+          voteBtn.setAttribute("data-voted", "false"); // Reset vote state
           voteBtn.disabled = false; // Enable voting again
         });
+
+        sendTimerUpdate(); // Ensure the update is sent via WebSocket
+        socket.send(JSON.stringify("vote is reset"));
       }
+
 
 
 
