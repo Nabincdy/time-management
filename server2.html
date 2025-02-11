@@ -555,7 +555,7 @@
 
 
   <script>
-    const socket = new WebSocket("ws://localhost:8082");
+    const socket = new WebSocket("ws://localhost:8080");
 
     socket.onopen = function () {
       console.log("Connected to   WebSocket server");
@@ -776,41 +776,6 @@
 
 
 
-        // document.getElementById("straightturn").addEventListener("click", () => {
-        //   console.log("Straight Turn clicked");
-        //   formbtn.style.backgroundColor = "green";
-
-        //   // socket.send(JSON.stringify("straight turn"));
-        //   turnbutton.style.backgroundColor = "green"; // Green color for voted button
-        //   straightturn.style.backgroundColor = "green"; // Green color for voted button
-
-        //   timerComponent.flow = "straight time";
-        // });
-
-
-        // document.getElementById("directiveTurn").addEventListener("click", () => {
-        //   console.log("Directive Turn clicked");
-        //   formbtn.style.backgroundColor = "green";
-
-        //   turnbutton.style.backgroundColor = "green"; // Green color for voted button
-        //   directiveTurn.style.backgroundColor = "green"; // Green color for voted button
-        //   timerComponent.flow = "directive  time";
-
-        // });
-
-
-
-
-
-        // document.getElementById("popcornTurn").addEventListener("click", () => {
-        //   console.log("Popcorn Turn clicked");
-        //   formbtn.style.backgroundColor = "green";
-        //   turnbutton.style.backgroundColor = "green";
-        //   popcornTurn.style.backgroundColor = "green";
-
-        //   socket.send(JSON.stringify("Popcorn turn"));
-
-        // });
 
 
         function setupDropdown(dropdownMenu) {
@@ -825,16 +790,15 @@
           function resetButtons() {
             allButtons.forEach(button => button.style.backgroundColor = ""); // Reset submenu buttons
             parentButtons.forEach(parent => parent.style.backgroundColor = ""); // Reset parent buttons
-            if (formbtn) formbtn.style.backgroundColor = "";
-
+            // if (formbtn) formbtn.style.backgroundColor = "";
           }
+
+
 
           function activateButton(selectedButton) {
             resetButtons(); // Deactivate all buttons first
             selectedButton.style.backgroundColor = "green"; // Activate clicked submenu button
             const formbtn = selectedButton.closest(".form-btn");
-            formBtn.style.backgroundColor = "green"; // Activate the form-btn
-
             if (formbtn) formbtn.style.backgroundColor = "green";
 
             // Find and activate the parent button
@@ -843,12 +807,14 @@
 
             // Update timerComponent.flow based on selected button text
             timerComponent.flow = selectedButton.innerText + " selected";
+            console.log(`${selectedButton.innerText} clicked`); // Print the specific submenu item clicked
           }
 
           // Attach event listeners dynamically for the current dropdown
           allButtons.forEach(button => {
             button.addEventListener("click", () => {
               activateButton(button);
+              console.log('sub item');
             });
           });
         }
@@ -1029,49 +995,49 @@
         // Vote button functionality
         const voteBtn = timerComponent.querySelector(".vote-btn");
         // Function to handle voting
-voteBtn.addEventListener("click", () => {
-    let hasVoted = voteBtn.getAttribute("data-voted") === "true"; // Track vote per button
+        voteBtn.addEventListener("click", () => {
+          let hasVoted = voteBtn.getAttribute("data-voted") === "true"; // Track vote per button
 
-    if (!hasVoted) {
-        totalVotes++; // Increment total vote count
-        voteBtn.setAttribute("data-voted", "true"); // Mark as voted
-        voteBtn.textContent = "Unvote"; // Change text
-        voteBtn.style.backgroundColor = "green"; // Green color for voted button
-        socket.send(JSON.stringify({ cmd: "addVote", msg: "Vote added" }));
-    } else {
-        totalVotes = Math.max(0, totalVotes - 1); // Prevent negative votes
-        voteBtn.setAttribute("data-voted", "false"); // Mark as unvoted
-        voteBtn.textContent = "Vote"; // Reset text
-        voteBtn.style.backgroundColor = ""; // Reset color
-    }
+          if (!hasVoted) {
+            totalVotes++; // Increment total vote count
+            voteBtn.setAttribute("data-voted", "true"); // Mark as voted
+            voteBtn.textContent = "Unvote"; // Change text
+            voteBtn.style.backgroundColor = "green"; // Green color for voted button
+            socket.send(JSON.stringify({ cmd: "addVote", msg: "Vote added" }));
+          } else {
+            totalVotes = Math.max(0, totalVotes - 1); // Prevent negative votes
+            voteBtn.setAttribute("data-voted", "false"); // Mark as unvoted
+            voteBtn.textContent = "Vote"; // Reset text
+            voteBtn.style.backgroundColor = ""; // Reset color
+          }
 
-    // Update the vote count display
-    voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
+          // Update the vote count display
+          voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
 
-    // Get the reset vote button
-    const resetVotesBtn = document.getElementById("resetVotesBtn");
+          // Get the reset vote button
+          const resetVotesBtn = document.getElementById("resetVotesBtn");
 
-    // Prevent division by zero error
-    const votePercentage = numberCitizenTimers > 0 ? (totalVotes / numberCitizenTimers) * 100 : 0;
+          // Prevent division by zero error
+          const votePercentage = numberCitizenTimers > 0 ? (totalVotes / numberCitizenTimers) * 100 : 0;
 
-    // Update the button color based on the vote percentage
-    if (votePercentage === 0) {
-        resetVotesBtn.style.backgroundColor = 'black';
-        resetVotesBtn.style.color = 'white';
-    } else if (votePercentage < 10) {
-        resetVotesBtn.style.backgroundColor = 'black';
-        resetVotesBtn.style.color = 'white';
-    } else if (votePercentage >= 10 && votePercentage < 70) {
-        resetVotesBtn.style.backgroundColor = 'red';
-        resetVotesBtn.style.color = 'black';
-    } else if (votePercentage >= 70 && votePercentage < 100) {
-        resetVotesBtn.style.backgroundColor = 'orange';
-        resetVotesBtn.style.color = 'black';
-    } else if (votePercentage === 100) {
-        resetVotesBtn.style.backgroundColor = 'green';
-        resetVotesBtn.style.color = 'black';
-    }
-});
+          // Update the button color based on the vote percentage
+          if (votePercentage === 0) {
+            resetVotesBtn.style.backgroundColor = 'black';
+            resetVotesBtn.style.color = 'white';
+          } else if (votePercentage < 10) {
+            resetVotesBtn.style.backgroundColor = 'black';
+            resetVotesBtn.style.color = 'white';
+          } else if (votePercentage >= 10 && votePercentage < 70) {
+            resetVotesBtn.style.backgroundColor = 'red';
+            resetVotesBtn.style.color = 'black';
+          } else if (votePercentage >= 70 && votePercentage < 100) {
+            resetVotesBtn.style.backgroundColor = 'orange';
+            resetVotesBtn.style.color = 'black';
+          } else if (votePercentage === 100) {
+            resetVotesBtn.style.backgroundColor = 'green';
+            resetVotesBtn.style.color = 'black';
+          }
+        });
 
 
         function toggleTimer(shouldStart) {
@@ -1294,7 +1260,6 @@ voteBtn.addEventListener("click", () => {
         return jsonOutput;
       }
 
-      //document.getElementById("jsonOutput").textContent = getTimersAsJson();
 
 
 
