@@ -91,7 +91,7 @@ let voteresult = 'voteresult';
 let meetingID = 0;
 let numberOfELMs = 0;
 let globalELMxArray = {};//this object contains each meetings data and it can be operated on from other meetings (ELM) too
-    globalELMxArray = {"ELMxID": 1, //this is an example instantiation
+    globalELMxArray = {"1": {, //ELMxID..this is an example instantiation
                         "flow roles": {
                             "executorName": "spiritman",
                             "influencerName": "spiritman",
@@ -136,14 +136,14 @@ let globalELMxArray = {};//this object contains each meetings data and it can be
                                     "voteFormString": "not yet",
                                     "voteFormTime": "not yet",
 
-                                    "totalVoteContent": "not yet",
-                                    "totalVoteContentNotion": "not yet",//Individual, Particular, Univerasl
-                                    "totalVoteContentString": "not yet",
-                                    "totalVoteContentTime": "not yet",
+                                    "voteContent": "not yet",
+                                    "voteContentNotion": "not yet",//Individual, Particular, Univerasl
+                                    "voteContentString": "not yet",
+                                    "voteContentTime": "not yet",
 
-                                    "totalVotePeople": "not yet",
-                                    "totalVotePeopleString": "not yet",
-                                    "totalVotePeopleTime": "not yet",
+                                    "votePeople": "not yet",
+                                    "votePeopleString": "not yet",
+                                    "votePeopleTime": "not yet",
 
                                 },//end participant1CurrentVoting
                                 "participant1CurrentMeetingVotingHistory": {
@@ -153,7 +153,8 @@ let globalELMxArray = {};//this object contains each meetings data and it can be
                                 }//end participant1CurrentMeetingVotingHistory
                             },//end participant1
                             },//end individualParticipantVotes
-                               }//end voting
+                               },//end voting
+                            } //end ELMxID 1
                        };//end globalELMxArray
 // let voteResult = { 'cmd', 
 //     { "voteType", "Form",
@@ -230,13 +231,51 @@ wss.on("connection", (ws) => {
                 case 'addVote':
                     let addVoteMessage = message.msg;
                     let addVoteELMxID = addVoteMessage.ELMxID;
+                    let addVoteParticipantID = addVoteMessage.participantID;
                     let addVoteForm = addVoteMessage.form;
                     let addVoteFormString = addVoteMessage.formString;
                     let addVoteFormTime = addVoteMessage.formTime;
                     //test comment for GIT. Hi Nabin!
 
+                    let participantInfo = globalELMxArray[addVoteELMxID].vote.individualParticipantVotes[addVoteParticipantID]
+                    let totalAddVoteForm =globalELMxArray[addVoteELMxID].vote.totalVoteForm[addvoteForm]
+                    totalAddVoteForm = totalVoteForm[addvoteForm]+1; //incredment this form type (Turn, FreeFlow, GodMode)
+                    participantInfo.currentVoting.voteForm=addVoteForm; 
+                    : {
+                            "isVotingHappening": "not yet",
+                            "totalVoteForm": "not yet",
+                            "totalVoteFormString": "not yet",
+                            "totalVoteFormTime": "not yet",
+
+                            "totalVoteContent": "not yet",
+                            "totalVoteContentNotion": "not yet",//Individual, Particular, Univerasl
+                            "totalVoteContentString": "not yet",
+                            "totalVoteContentTime": "not yet",
+
+                            "totalVotePeople": "not yet",
+                            "totalVotePeopleString": "not yet",
+                            "totalVotePeopleTime": "not yet",
+                            "individualParticipantVotes": {
+                                "participant1": {
+                                "participant1CurrentVoting": {
+                                    "VoteForm": "not yet",
+                                    "voteFormString": "not yet",
+                                    "voteFormTime": "not yet",
+
+                                    "voteContent": "not yet",
+                                    "voteContentNotion": "not yet",//Individual, Particular, Univerasl
+                                    "voteContentString": "not yet",
+                                    "voteContentTime": "not yet",
+
+                                    "votePeople": "not yet",
+                                    "votePeopleString": "not yet",
+                                    "votePeopleTime": "not yet",
+
+                                },//end participant1CurrentVoting
+
                     //update globalELMxArray
                     globalELMxArray[addVoteELMxID] = {"voting": {"test":"test"}} //add all fields
+                    client.send(JSON.stringify(message));
                 break;
                 case 'changeVote':
       
