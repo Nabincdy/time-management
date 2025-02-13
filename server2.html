@@ -373,93 +373,6 @@
   </div>
   <div id="timerList"></div>
 
-  <!-- <div class="websocket-container">
-    <h3>Send Message to Server</h3>
-    <input type="text" id="messageInput" placeholder="Enter your message..." />
-    <button id="sendMessageBtn">Send</button>
-  </div> -->
-
-
-  <!-- <div id="messageDisplay"></div> -->
-
-  <!-- <script src="server2.js"></script> -->
-  <!-- <script src="main-timer.js"></script> -->
-
-
-
-
-
-  <!-- <script>
-    let mainTimerInterval;
-    let mainTimerSeconds = 600;
-    let isTimerRunning = false;
-
-    function updateMainTimerDisplay() {
-      let minutes = Math.floor(mainTimerSeconds / 60);
-      let seconds = mainTimerSeconds % 60;
-      document.getElementById("mainTimer").value = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    }
-
-    function updateMainTimerFromInput() {
-      const input = document.getElementById("mainTimer").value;
-      const parts = input.split(":");
-      if (parts.length === 2) {
-        let mins = parseInt(parts[0], 10);
-        let secs = parseInt(parts[1], 10);
-        if (!isNaN(mins) && !isNaN(secs) && secs >= 0 && secs < 60) {
-          mainTimerSeconds = mins * 60 + secs;
-        }
-      }
-    }
-
-    function updateTimerTitle() {
-      const title = document.getElementById("timerTitle").value;
-
-      console.log("Timer title updated to: " + title);
-    }
-
-    function toggleStartPause() {
-      if (isTimerRunning) {
-        clearInterval(mainTimerInterval);
-        mainTimerInterval = null;
-        isTimerRunning = false;
-        document.getElementById("toggleStartPauseBtn").textContent = "▶️"; // Change button to start icon
-      } else {
-        startMainTimer();
-        document.getElementById("toggleStartPauseBtn").textContent = "⏸️"; // Change button to pause icon
-      }
-    }
-
-    function startMainTimer() {
-      if (!mainTimerInterval) {
-        mainTimerInterval = setInterval(() => {
-          if (mainTimerSeconds > 0) {
-            mainTimerSeconds--;
-            updateMainTimerDisplay();
-          } else {
-            clearInterval(mainTimerInterval);
-            mainTimerInterval = null;
-            isTimerRunning = false;
-            document.getElementById("toggleStartPauseBtn").textContent = "▶"; // Reset button to start
-          }
-        }, 1000);
-        isTimerRunning = true;
-      }
-    }
-
-    function resetMainTimer() {
-      clearInterval(mainTimerInterval);
-      mainTimerInterval = null;
-      isTimerRunning = false;
-      mainTimerSeconds = 600;
-      updateMainTimerDisplay();
-      document.getElementById("toggleStartPauseBtn").textContent = "▶"; // Reset button to start
-    }
-
-    updateMainTimerDisplay();
-  </script> -->
-
-
   <script>
     let mainTimerInterval;
     let mainTimerSeconds = 600; // Timer starts at 10 minutes (600 seconds)
@@ -1204,35 +1117,7 @@
         }
       }
 
-      // function resetVotes() {
-      //   totalVotes = 0; // Reset the vote count to 0
-      //   voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
-      //   // Reset all vote buttons' color to default (no vote)
-      //   const voteBtns = document.querySelectorAll(".vote-btn");
-      //   voteBtns.forEach(voteBtn => {
-      //     voteBtn.style.backgroundColor = ""; // Remove background color
-      //     voteBtn.textContent = "Vote"; // Change text to Unvote
-      //     voteBtn.disabled = false; // Enable voting again
-      //   });
-      // }
-
-      // function resetVotes() {
-      //   totalVotes = 0; // Reset total vote count
-      //   voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
-
-      //   // Reset all vote buttons
-      //   const voteBtns = document.querySelectorAll(".vote-btn");
-      //   voteBtns.forEach(voteBtn => {
-      //     voteBtn.style.backgroundColor = ""; // Remove background color
-      //     voteBtn.textContent = "Vote"; // Reset text to "Vote"
-      //     voteBtn.setAttribute("data-voted", "false"); // Reset vote state
-      //     voteBtn.disabled = false; // Enable voting again
-      //   });
-
-      //   sendTimerUpdate(); // Ensure the update is sent via WebSocket
-      //   socket.send(JSON.stringify("vote is reset"));
-      // }
-
+     
 
       function resetDropdownButtons() {
         const buttons = document.querySelectorAll("#formbtn, .dropdown-item, .submenu-item");
@@ -1290,14 +1175,6 @@
         console.log(jsonOutput); // Display in console
         return jsonOutput;
       }
-
-
-
-
-
-
-
-
     });
 
 

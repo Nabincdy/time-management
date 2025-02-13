@@ -1,86 +1,3 @@
-
-// this is server code dont edit over here their is another file name index.js
-
-
-// const WebSocket = require("ws");
-
-// const wss = new WebSocket.Server({ port: 8082 });
-
-// wss.on("connection", ws => {
-//     console.log("New Client Connected");
-
-//     ws.on("message", data => {
-//         const message = data instanceof Buffer ? data.toString() : data; // Convert buffer to string if needed
-//         console.log(`Client sent: ${message}`);
-
-//         // Broadcast message to all connected clients (including sender)
-//         wss.clients.forEach(client => {
-//             if (client.readyState === WebSocket.OPEN) {
-//                 client.send(message);
-//             }
-//         });
-//     });
-
-//     ws.on("close", () => {
-//         console.log("Client Disconnected");
-//     });
-// });
-
-// console.log("WebSocket Server running on ws://localhost:8082");
-
-// const http = require("http");
-// const fs = require("fs");
-// const path = require("path");
-// const WebSocket = require("ws");
-
-// // Create an HTTP server
-// const server = http.createServer((req, res) => {
-//     if (req.url === "/") {
-//         fs.readFile(path.join(__dirname, "../server2.html"), (err, data) => {
-//             if (err) {
-//                 res.writeHead(500);
-//                 res.end("Error loading server2.html");
-//             } else {
-//                 res.writeHead(200, { "Content-Type": "text/html" });
-//                 res.end(data);
-//             }
-//         });
-//     } else {
-//         res.writeHead(404);
-//         res.end("Not Found");
-//     }
-// });
-
-// // Attach WebSocket to the HTTP server
-// const wss = new WebSocket.Server({ server });
-
-// wss.on("connection", ws => {
-//     console.log("New Client Connected");
-
-//     ws.on("message", data => {
-//         const message = data instanceof Buffer ? data.toString() : data; // Convert buffer to string if needed
-//         console.log(`Client sent: ${message}`);
-
-//         // Broadcast message to all connected clients
-//         wss.clients.forEach(client => {
-//             if (client.readyState === WebSocket.OPEN) {
-//                 client.send(message);
-//             }
-//         });
-//     });
-
-//     ws.on("close", () => {
-//         console.log("Client Disconnected");
-//     });
-// });
-
-// server.listen(8082, () => {
-//     console.log("Server running at http://localhost:8082/");
-// });
-
-
-
-
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -157,33 +74,6 @@ let globalELMxArray = {};//this object contains each meetings data and it can be
                                },//end voting
                             } //end ELMxID 1
                        };//end globalELMxArray
-// let voteResult = { 'cmd', 
-//     { "voteType", "Form",
-//          "voteString", "StraightTime",
-//           "voteCycleTime", "5 min"}}
-
-// let voteResult = {'cmd',
-//      "returnVoteResult",
-//       "msg",
-//     {"voteType", "Form",
-//          "voteString", "StraightTime",
-//           "voteCycleTime", "5 min"
-//         }}
-
-// let voteResult = {
-//     "returnVoteResult",
-//     "cmd" : {
-//         "voteType": "Form",
-//         "voteString": "StraightTime",
-//         "voteCycleType": "5 min"
-//     },
-
-//     "returnVoteResult" : {
-//         "voteType": "Form",
-//         "voteString": "StraightTime",
-//         "voteCycleType": "5 min"
-//     }
-// }
 
 
 
@@ -228,69 +118,7 @@ wss.on("connection", (ws) => {
                 }//end if forEach Broadcasting
             }); //end forEach Broadcasting
 
-            // switch(message.cmd){
-            //     case 'addVote':
-            //         let addVoteMessage = message.msg;
-            //         let addVoteELMxID = addVoteMessage.ELMxID;
-            //         let addVoteParticipantID = addVoteMessage.participantID;
-            //         let addVoteForm = addVoteMessage.form;
-            //         let addVoteFormString = addVoteMessage.formString;
-            //         let addVoteFormTime = addVoteMessage.formTime;
-            //         //test comment for GIT. Hi Nabin!
-
-            //         let participantInfo = globalELMxArray[addVoteELMxID].vote.individualParticipantVotes[addVoteParticipantID]
-            //         let totalAddVoteForm =globalELMxArray[addVoteELMxID].vote.totalVoteForm[addvoteForm]
-            //         totalAddVoteForm = totalVoteForm[addvoteForm]+1; //incredment this form type (Turn, FreeFlow, GodMode)
-            //         participantInfo.currentVoting.voteForm=addVoteForm; 
-            //         : {
-            //                 "isVotingHappening": "not yet",
-            //                 "totalVoteForm": "not yet",
-            //                 "totalVoteFormString": "not yet",
-            //                 "totalVoteFormTime": "not yet",
-
-            //                 "totalVoteContent": "not yet",
-            //                 "totalVoteContentNotion": "not yet",//Individual, Particular, Univerasl
-            //                 "totalVoteContentString": "not yet",
-            //                 "totalVoteContentTime": "not yet",
-
-            //                 "totalVotePeople": "not yet",
-            //                 "totalVotePeopleString": "not yet",
-            //                 "totalVotePeopleTime": "not yet",
-            //                 "individualParticipantVotes": {
-            //                     "participant1": {
-            //                     "participant1CurrentVoting": {
-            //                         "VoteForm": "not yet",
-            //                         "voteFormString": "not yet",
-            //                         "voteFormTime": "not yet",
-
-            //                         "voteContent": "not yet",
-            //                         "voteContentNotion": "not yet",//Individual, Particular, Univerasl
-            //                         "voteContentString": "not yet",
-            //                         "voteContentTime": "not yet",
-
-            //                         "votePeople": "not yet",
-            //                         "votePeopleString": "not yet",
-            //                         "votePeopleTime": "not yet",
-
-            //                     },//end participant1CurrentVoting
-
-            //         //update globalELMxArray
-            //         globalELMxArray[addVoteELMxID] = {"voting": {"test":"test"}} //add all fields
-            //         client.send(JSON.stringify(message));
-            //     break;
-            //     case 'changeVote':
-      
-            //     break;
-            //     case 'removeVote':
-      
-            //     break;
-            //     case 'voteSubmitted':
-      
-            //     break;
-
-            // }//end switch
-
-
+           
 
 
             switch (message.cmd) {//FLAG: Nabin bind on client side (created 9:50am mst Feb 11 2025)
@@ -305,19 +133,7 @@ wss.on("connection", (ws) => {
                     break;
                 
                 case 'addVote':
-                    ///input object form: 
-                    // {"cmd": "addVote", "msg": 
-                    // {"participantID": 2, 
-                    // "theirTimerIDOnBrowser": 4
-                    // "vote": {
-                    //      individualParticipantVotes: {
-                    //         participant: {
-                    //            participantCurrentVoting: {
-                    //            voteForm: "not yet",
-                    //            voteFormString: "not yet",
-                    //            voteFormTime: "not yet",
-                    //}}}
-                    //
+                   
                     let addVoteMessage = message.msg;
                     let addVoteELMxID = addVoteMessage.ELMxID;
                     let addVoteParticipantID = addVoteMessage.participantID;
@@ -390,51 +206,7 @@ wss.on("connection", (ws) => {
                     // Handle voteSubmitted logic
                     break;
             } // End switch
-            
-
-
-
-            // switch (message.cmd) {
-            //     case 'addVote':
-            //         let addVoteMessage = message.msg;
-            //         let addVoteELMxID = addVoteMessage.ELMxID;
-            //         let addVoteParticipantID = addVoteMessage.participantID;
-            //         let addVoteForm = addVoteMessage.form;
-            //         let addVoteFormString = addVoteMessage.formString;
-            //         let addVoteFormTime = addVoteMessage.formTime;
-            
-            //         let participantInfo = globalELMxArray[addVoteELMxID].vote.individualParticipantVotes[addVoteParticipantID];
-            
-            //         // Correcting the total vote count update
-            //         globalELMxArray[addVoteELMxID].vote.totalVoteForm[addVoteForm] += 1;
-            
-            //         participantInfo.currentVoting = {
-            //             voteForm: addVoteForm,
-            //             voteFormString: addVoteFormString,
-            //             voteFormTime: addVoteFormTime
-            //         };
-            
-            //         // Ensuring we do not overwrite the whole object
-            //         globalELMxArray[addVoteELMxID].voting = {
-            //             test: "test",
-            //             ...globalELMxArray[addVoteELMxID].voting
-            //         };
-            
-            //         client.send(JSON.stringify(message));
-            //         break;
-            
-            //     case 'changeVote':
-            //         break;
-            
-            //     case 'removeVote':
-            //         break;
-            
-            //     case 'voteSubmitted':
-            //         break;
-            // }
-            
-
-
+ 
 
 
         } catch (error) {
@@ -459,18 +231,37 @@ server.listen(PORT, () => {
 });
 
 
-////////////LIBRARY///////////////
-function sendToWho(listDesired){
-    switch(listDesired){
-        case "universalAll":
-            ws.send(JSON.stringify(message)); // Send response to the client
-            break;
-        case "particularSome":
-            break;
-        case "individualOne":
-            break;
+// ////////////LIBRARY///////////////
+// function sendToWho(listDesired){
+//     switch(listDesired){
+//         case "universalAll":
+//             ws.send(JSON.stringify(message)); // Send response to the client
+//             break;
+//         case "particularSome":
+//             break;
+//         case "individualOne":
+//             break;
 
 
-    }//end switch
+//     }//end switch
 
-}//end sendToWho
+// }//end sendToWho
+
+
+function sendToWho(listDesired, message) {
+    clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            switch (listDesired) {
+                case "universalAll":
+                    client.send(JSON.stringify(message)); // Broadcast to all clients
+                    break;
+                case "particularSome":
+                    // Define logic for sending to specific clients
+                    break;
+                case "individualOne":
+                    // Define logic for sending to a single client
+                    break;
+            }
+        }
+    });
+}
