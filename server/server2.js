@@ -7,18 +7,24 @@ let votetype = 'votetype';
 let voteresult = 'voteresult';
 let meetingID = 0;
 let numberOfELMs = 0;
+let globalTimerIDs=0;//not yet used Feb 13 2025 can delete
+let globalTimerIDsWebsocketObject = {}; //not yet used Feb 13 2025 can delete
 let globalUserIDs=0;
+let globaUserIDsWebsocketObject = {};
 let globalELMxArray = {};//this object contains each meetings data and it can be operated on from other meetings (ELM) too
-    globalELMxArray = {"1": { //ELMxID..this is an example instantiation
+    globalELMxArray = {"0": { //ELMxID..this is an example instantiation
                         "flow roles": {
-                            "executorName": "spiritman",
+                            "executorName": "spiritman/ID",
                             "influencerName": "spiritman",
                             "strategistName": "spiritman",
                             "relationshipsName": "spiritman"
+                            
                         }, //end flow roles
+                       "arrayOfAttendanceIDs": {"ID1":"ID1", "ID2": "ID2", "ID3":"ID3"},
                        "participants": {
-                            "NumberOfParticipants": 2, 
-                            "paretoCategories": {
+                            "NumberOfParticipants": 2,
+                            "paretoCategories": {  
+
                                 "participant1":{"aesthetic":6, "social":6, "wealth":4, "body":5, "culturedness": 8, "IQ":9, "UQ":1},
                                 "participant2":{"aesthetic":2, "social":9, "wealth":5, "body":3, "culturedness": 7, "IQ":4, "UQ":1}
 
@@ -33,6 +39,12 @@ let globalELMxArray = {};//this object contains each meetings data and it can be
                                     "cycle2": {"form": "God Mode: Josh", "content": "particular-cohesion", "people": "same"}
                                 },//end cycleVotingResults
                             },//cycles
+                        "timers": {
+                                "timer1TotalMeetTimer": {"name": "Total Meet Timer", "remainingTime": 59},
+                                "FudgeTimer": {"name": "Fudge Timer", "remainingTime": 9},
+                                "timerID1": {"name": "Ben", "remainingTime": 10, "personAssignedID": "ID2"}
+                                
+                            },//end timers
                             "vote": {
                             "isVotingHappening": "not yet",
                             "totalVoteForm": "not yet",
@@ -105,6 +117,8 @@ const clients = new Set();
 wss.on("connection", (ws) => {
     console.log("New Client Connected");
     clients.add(ws);
+    let hardcodedMeetingIDTest = "0"
+    createUserTimerIDFunction(wss, ws, hardcodedMeetingIDTest);
 
     ws.on("message", (data) => {
         try {
@@ -120,16 +134,23 @@ wss.on("connection", (ws) => {
 
            
 
-
+            //MAIN SWITCH
             switch (message.cmd) {//FLAG: Nabin bind on client side (created 9:50am mst Feb 11 2025)
-                case 'createUserTimerID':
-                    //input Object Form: {"cmd": "createUserTimerID", "msg": {"timerIDFromBrowser": 2}}
+                case 'createTimerComponent(wait)':
+                    //input Object Form: {"cmd": "createUserTimerID", "msg": {"ELMxID": 1, "timerIDFromBrowser": 2}}
+                    //if(gidClients[decoded.acc]!=undefined){delete gidClients[];}
+                    let createUserTimerIDELMxID = message.msg.ELMxID;
                     let timerIDFromBrowser = message.msg.timerIDFromBrowser;
                     let newUserID = globalUserIDs+1;
                     globalUserIDs++;
+                    globaUserIDsWebsocketObject[newUserID] = ws;
 
-                    let createUserResponseObject= {"cmd": "returnNewUserID","msg": timerIDFromBrowser}
-                    ws.send(JSON.stringify(createUserResponseObject)); // Send response to the client
+                    globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs[newUserID]=newUserID;
+
+                    let createUserResponseObject= {"cmd": "returnNewUserID","msg": {"newID": newUserID, "timerBrowserID": timerIDFromBrowser}};
+                    let desiredList= ["particularSome", globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs]; 
+                    sendToWho(wss, ws, desiredList, createUserResponseObject)
+                    //ws.send(JSON.stringify(createUserResponseObject)); // Send response to the client
                     break;
                 
                 case 'addVote':
@@ -233,15 +254,69 @@ server.listen(PORT, () => {
 
 // ////////////LIBRARY///////////////
 
-function sendToWho(listDesired, message) {
+function createUserTimerIDFunction(wss, ws, message){
+//input Object Form: {"cmd": "createUserTimerID", "msg": {"ELMxID": 1, "timerIDFromBrowser": 2}}
+                    //if(gidClients[decoded.acc]!=undefined){delete gidClients[];}
+                    let createUserTimerIDELMxID = message;//message.msg.ELMxID;
+                    
+                    let newUserID = globalUserIDs+1;
+                    globalUserIDs++;
+                    console.log("ELMXMEETING ID SHOULD BE 0"+" "+newUserID+ JSON.stringify(globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs));
+                    globaUserIDsWebsocketObject[newUserID] = ws;
+                    globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs[newUserID]=newUserID;
+
+                    //userData updating done
+
+                    let allMeetingData = globalELMxArray[createUserTimerIDELMxID];
+                    let existingTimerData = allMeetingData.timers;
+
+                    let createUserResponseObject= {"cmd": "returnNewUserIDWithScreenCatchUp","msg": {"newID": newUserID, "existingTimerData": existingTimerData}};
+                    let desiredList= ["particularSome", globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs]; 
+                    sendToWho(wss, ws, desiredList, createUserResponseObject)
+
+} //end createUserTimerIDFunction
+
+
+
+function sendToWho(wss,ws, listDesired, messageToBrowser) {
+    //listDesired let desiredList= ["particular", globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs]
     clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
-            switch (listDesired) {
+            switch (listDesired[0]) {
                 case "universalAll":
                     client.send(JSON.stringify(message)); // Broadcast to all clients
                     break;
                 case "particularSome":
-                    // Define logic for sending to specific clients
+                    // Define logic for sending to specific clients in a specific meeting (the "send to some")
+                    let userWS = {};
+                    let socketID = 0; //initialize
+                     
+                    for (const key in listDesired[1]) {
+                        if (listDesired[1].hasOwnProperty(key)) {
+                            // Get the WebSocket associated with the key
+                            userWS = globaUserIDsWebsocketObject[listDesired[1][key]];
+                            
+                            // Find the index of the user in the WebSocket clients
+                           // socketID = wss.clients.indexOf(userWS);
+                           wss.clients.forEach((client, index) => {
+                            if (client === userWS) {
+                                socketID = index;  // Set the index when a match is found
+                            }
+                        });
+                        
+                        if (socketID !== -1) {
+                            // socketID found, proceed with sending the message
+                            client.send(JSON.stringify(messageToBrowser));
+                        } else {
+                            console.log("WebSocket client not found.");
+                        }
+                            
+                            // Send the message to the client
+                            console.log("sending particularSOME to:"+key +" "+ socketID)
+                            client.send(JSON.stringify(messageToBrowser));
+                        }
+                    }
+
                     break;
                 case "individualOne":
                     // Define logic for sending to a single client
