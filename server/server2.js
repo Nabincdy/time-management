@@ -4,7 +4,7 @@
 
 // const WebSocket = require("ws");
 
-// const wss = new WebSocket.Server({ port: 8080 });
+// const wss = new WebSocket.Server({ port: 8082 });
 
 // wss.on("connection", ws => {
 //     console.log("New Client Connected");
@@ -26,7 +26,7 @@
 //     });
 // });
 
-// console.log("WebSocket Server running on ws://localhost:8080");
+// console.log("WebSocket Server running on ws://localhost:8082");
 
 // const http = require("http");
 // const fs = require("fs");
@@ -74,8 +74,8 @@
 //     });
 // });
 
-// server.listen(8080, () => {
-//     console.log("Server running at http://localhost:8080/");
+// server.listen(8082, () => {
+//     console.log("Server running at http://localhost:8082/");
 // });
 
 
@@ -90,6 +90,7 @@ let votetype = 'votetype';
 let voteresult = 'voteresult';
 let meetingID = 0;
 let numberOfELMs = 0;
+let globalUserIDs=0;
 let globalELMxArray = {};//this object contains each meetings data and it can be operated on from other meetings (ELM) too
     globalELMxArray = {"1": { //ELMxID..this is an example instantiation
                         "flow roles": {
@@ -292,14 +293,38 @@ wss.on("connection", (ws) => {
 
 
 
-            switch (message.cmd) {
+            switch (message.cmd) {//FLAG: Nabin bind on client side (created 9:50am mst Feb 11 2025)
+                case 'createUserTimerID':
+                    //input Object Form: {"cmd": "createUserTimerID", "msg": {"timerIDFromBrowser": 2}}
+                    let timerIDFromBrowser = message.msg.timerIDFromBrowser;
+                    let newUserID = globalUserIDs+1;
+                    globalUserIDs++;
+
+                    let createUserResponseObject= {"cmd": "returnNewUserID","msg": timerIDFromBrowser}
+                    ws.send(JSON.stringify(createUserResponseObject)); // Send response to the client
+                    break;
+                
                 case 'addVote':
+                    ///input object form: 
+                    // {"cmd": "addVote", "msg": 
+                    // {"participantID": 2, 
+                    // "theirTimerIDOnBrowser": 4
+                    // "vote": {
+                    //      individualParticipantVotes: {
+                    //         participant: {
+                    //            participantCurrentVoting: {
+                    //            voteForm: "not yet",
+                    //            voteFormString: "not yet",
+                    //            voteFormTime: "not yet",
+                    //}}}
+                    //
                     let addVoteMessage = message.msg;
                     let addVoteELMxID = addVoteMessage.ELMxID;
                     let addVoteParticipantID = addVoteMessage.participantID;
                     let addVoteForm = addVoteMessage.form;
                     let addVoteFormString = addVoteMessage.formString;
                     let addVoteFormTime = addVoteMessage.formTime;
+                    let listDesired = "allInMeeting"
                     //test comment for GIT. Hi Nabin!
             
                     let participantInfo = globalELMxArray[addVoteELMxID].vote.individualParticipantVotes[addVoteParticipantID];
@@ -331,8 +356,8 @@ wss.on("connection", (ws) => {
                             totalVotePeopleString: "not yet",
                             totalVotePeopleTime: "not yet",
                             individualParticipantVotes: {
-                                participant1: {
-                                    participant1CurrentVoting: {
+                                participant: {
+                                    participantCurrentVoting: {
                                         VoteForm: "not yet",
                                         voteFormString: "not yet",
                                         voteFormTime: "not yet",
@@ -350,6 +375,7 @@ wss.on("connection", (ws) => {
                     };
             
                     ws.send(JSON.stringify(message)); // Send response to the client
+                    sendToWho(listDesired);
                     break;
             
                 case 'changeVote':
@@ -427,7 +453,24 @@ wss.on("connection", (ws) => {
 });
 
 // Start the server
-const PORT = 8080;
+const PORT = 8082;
 server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}/`);
 });
+
+
+////////////LIBRARY///////////////
+function sendToWho(listDesired){
+    switch(listDesired){
+        case "universalAll":
+            ws.send(JSON.stringify(message)); // Send response to the client
+            break;
+        case "particularSome":
+            break;
+        case "individualOne":
+            break;
+
+
+    }//end switch
+
+}//end sendToWho

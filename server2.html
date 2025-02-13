@@ -555,7 +555,7 @@
 
 
   <script>
-    const socket = new WebSocket("ws://localhost:8080");
+    const socket = new WebSocket("ws://localhost:8082");
 
     socket.onopen = function () {
       console.log("Connected to   WebSocket server");
@@ -1216,6 +1216,34 @@
       //   });
       // }
 
+      // function resetVotes() {
+      //   totalVotes = 0; // Reset total vote count
+      //   voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
+
+      //   // Reset all vote buttons
+      //   const voteBtns = document.querySelectorAll(".vote-btn");
+      //   voteBtns.forEach(voteBtn => {
+      //     voteBtn.style.backgroundColor = ""; // Remove background color
+      //     voteBtn.textContent = "Vote"; // Reset text to "Vote"
+      //     voteBtn.setAttribute("data-voted", "false"); // Reset vote state
+      //     voteBtn.disabled = false; // Enable voting again
+      //   });
+
+      //   sendTimerUpdate(); // Ensure the update is sent via WebSocket
+      //   socket.send(JSON.stringify("vote is reset"));
+      // }
+
+
+      function resetDropdownButtons() {
+        const buttons = document.querySelectorAll("#formbtn, .dropdown-item, .submenu-item");
+
+        buttons.forEach(button => {
+          button.style.backgroundColor = ""; // Reset background color for all buttons
+        });
+      }
+
+
+
       function resetVotes() {
         totalVotes = 0; // Reset total vote count
         voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
@@ -1228,6 +1256,9 @@
           voteBtn.setAttribute("data-voted", "false"); // Reset vote state
           voteBtn.disabled = false; // Enable voting again
         });
+
+        resetDropdownButtons();
+
 
         sendTimerUpdate(); // Ensure the update is sent via WebSocket
         socket.send(JSON.stringify("vote is reset"));
