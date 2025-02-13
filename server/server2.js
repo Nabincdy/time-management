@@ -232,21 +232,6 @@ server.listen(PORT, () => {
 
 
 // ////////////LIBRARY///////////////
-// function sendToWho(listDesired){
-//     switch(listDesired){
-//         case "universalAll":
-//             ws.send(JSON.stringify(message)); // Send response to the client
-//             break;
-//         case "particularSome":
-//             break;
-//         case "individualOne":
-//             break;
-
-
-//     }//end switch
-
-// }//end sendToWho
-
 
 function sendToWho(listDesired, message) {
     clients.forEach((client) => {

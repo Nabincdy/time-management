@@ -610,6 +610,14 @@
       `;
         timerList.appendChild(timerComponent);
 
+         const message = {
+    type: 'createTimerComponent',
+    htmlContent: timerComponent.outerHTML
+  };
+
+  // Send message to the WebSocket server
+  socket.send(JSON.stringify(message));
+
         // Create dropdown menu inside content-btn
         const contentBtn = timerComponent.querySelector(".content-btn");
         const dropdownMenu = document.createElement("div");
@@ -1052,7 +1060,7 @@
 
           // Calculate the percentage of totalVotes compared to numberCitizenTimers
           const votePercentage = (totalVotes / numberCitizenTimers) * 100;
-          console.log("VotePercentage Of Timers:" + totalVotes + " " + numberCitizenTimers + " " + votePercentage);
+          console.log("VotePercentage Of Timers first:" + totalVotes + " " + numberCitizenTimers + " " + votePercentage);
 
           // Use a switch-case style logic to determine the button's color
           if (totalVotes == 0 && numberCitizenTimers == 0) {
