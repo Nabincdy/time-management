@@ -20,7 +20,7 @@ let globalELMxArray = {};//this object contains each meetings data and it can be
                             "relationshipsName": "spiritman"
                             
                         }, //end flow roles
-                       "arrayOfAttendanceIDs": {"ID1":"ID1", "ID2": "ID2", "ID3":"ID3"},
+                       "arrayOfAttendanceIDs": {},
                        "participants": {
                             "NumberOfParticipants": 2,
                             "paretoCategories": {  
@@ -282,6 +282,7 @@ function sendToWho(wss,ws, listDesired, messageToBrowser) {
     //listDesired let desiredList= ["particular", globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs]
    // clients.forEach((client) => {
         //if (client.readyState === WebSocket.OPEN) {
+        console.log("In sendToWho:"+ JSON.stringify(listDesired));
             switch (listDesired[0]) {
                 case "universalAll":
                     client.send(JSON.stringify(message)); // Broadcast to all clients
@@ -293,28 +294,31 @@ function sendToWho(wss,ws, listDesired, messageToBrowser) {
                      
                     for (const key in listDesired[1]) {
                         if (listDesired[1].hasOwnProperty(key)) {
-                            if (client.readyState === WebSocket.OPEN) {
-                            // Get the WebSocket associated with the key
+                            
                             userWS = globaUserIDsWebsocketObject[listDesired[1][key]];
+                            console.log("Why this not working:"+userWS.readyState)
+                            if (userWS.readyState === WebSocket.OPEN) {
+                            // Get the WebSocket associated with the key
+                            
                             
                             // Find the index of the user in the WebSocket clients
                            // socketID = wss.clients.indexOf(userWS);
-                           wss.clients.forEach((client, index) => {
-                            if (client === userWS) {
-                                socketID = index;  // Set the index when a match is found
-                            }
-                        });
+                          // wss.clients.forEach((client, index) => {
+                          //  if (client === userWS) {
+                            //    socketID = index;  // Set the index when a match is found
+                            //}
+                       // });
                         
                         if (socketID !== -1) {
                             // socketID found, proceed with sending the message
-                            client.send(JSON.stringify(messageToBrowser));
+                            userWS.send(JSON.stringify(messageToBrowser));
                         } else {
                             console.log("WebSocket client not found.");
                         }
                             
                             // Send the message to the client
-                            console.log("sending particularSOME to:"+key +" "+ socketID)
-                            client.send(JSON.stringify(messageToBrowser));
+                            console.log("sending particularSOME to:"+"userID" +key +" "+ "websocketID"+socketID);
+                           // client.send(JSON.stringify(messageToBrowser));
                         }
                     }//end if WEBSOCKET == OPEN
                     }//end if listDesired[1].hasOwnProperty(key)
