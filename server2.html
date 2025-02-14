@@ -610,13 +610,9 @@
       `;
         timerList.appendChild(timerComponent);
 
-         const message = {
-    type: 'createTimerComponent',
-    htmlContent: timerComponent.outerHTML
-  };
+         
 
-  // Send message to the WebSocket server
-  socket.send(JSON.stringify(message));
+
 
         // Create dropdown menu inside content-btn
         const contentBtn = timerComponent.querySelector(".content-btn");
@@ -898,6 +894,12 @@
 
 
         document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+        const message = {
+          cmd: 'createTimerComponent',
+          msg: timerComponent.outerHTML
+        };
+        // Send message to the WebSocket server
+        socket.send(JSON.stringify(message));
       }
 
 

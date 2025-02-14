@@ -280,8 +280,8 @@ function createUserTimerIDFunction(wss, ws, message){
 
 function sendToWho(wss,ws, listDesired, messageToBrowser) {
     //listDesired let desiredList= ["particular", globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs]
-    clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
+   // clients.forEach((client) => {
+        //if (client.readyState === WebSocket.OPEN) {
             switch (listDesired[0]) {
                 case "universalAll":
                     client.send(JSON.stringify(message)); // Broadcast to all clients
@@ -293,6 +293,7 @@ function sendToWho(wss,ws, listDesired, messageToBrowser) {
                      
                     for (const key in listDesired[1]) {
                         if (listDesired[1].hasOwnProperty(key)) {
+                            if (client.readyState === WebSocket.OPEN) {
                             // Get the WebSocket associated with the key
                             userWS = globaUserIDsWebsocketObject[listDesired[1][key]];
                             
@@ -315,7 +316,8 @@ function sendToWho(wss,ws, listDesired, messageToBrowser) {
                             console.log("sending particularSOME to:"+key +" "+ socketID)
                             client.send(JSON.stringify(messageToBrowser));
                         }
-                    }
+                    }//end if WEBSOCKET == OPEN
+                    }//end if listDesired[1].hasOwnProperty(key)
 
                     break;
                 case "individualOne":
@@ -323,5 +325,5 @@ function sendToWho(wss,ws, listDesired, messageToBrowser) {
                     break;
             }
         }
-    });
-}
+ //   });
+//}
