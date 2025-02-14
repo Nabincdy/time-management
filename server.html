@@ -89,8 +89,8 @@
     socket.onclose = function () {
         console.log("Disconnected from WebSocket server. Reconnecting...");
         setTimeout(() => {
-            location.reload(); // Automatically reloads to reconnect
-        }, 2000);
+       //     location.reload(); // Automatically reloads to reconnect
+       // }, 2000);
     };
 
     socket.onerror = function (error) {

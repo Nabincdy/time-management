@@ -478,8 +478,11 @@
     socket.onmessage = function (event) {
       const data = JSON.parse(event.data);
       console.log("Received update:", data);
-
+//Main Switch/Switch Main
       switch (data.cmd) {
+        case "returnNewUserIDWithScreenCatchUp":
+          console.log("In browser returnNewUserIDWithScreenCatchUp");
+          break;
         case 'voteCountReturned':
 
           break;
