@@ -477,9 +477,17 @@
 
     socket.onmessage = function (event) {
       const data = JSON.parse(event.data);
+
       console.log("Received update:", data);
 //Main Switch/Switch Main
       switch (data.cmd) {
+         case "createTimerComponent":
+            // Create the timer component in this browser
+            const timerContainer = document.getElementById("timerList");
+            const newTimerComponent = document.createElement("div");
+            newTimerComponent.innerHTML = data.timerComponent;
+            timerContainer.appendChild(newTimerComponent);
+            break;
         case "returnNewUserIDWithScreenCatchUp":
           console.log("In browser returnNewUserIDWithScreenCatchUp");
           break;
@@ -889,21 +897,43 @@
         });
       }
 
+      // function addTimer() {
+      //   const defaultTime = defaultTimeInput.value;
+      //   numberCitizenTimers++; //update total number for VoteReset and colour
+      //   const timerComponent = createTimerComponent(defaultTime);
+      //   setupTimerControls(timerComponent, defaultTime);
+
+
+      //   document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+      //   const message = {
+      //     cmd: 'createTimerComponent',
+      //     msg: timerComponent.outerHTML
+      //   };
+      //   // Send message to the WebSocket server
+      //   socket.send(JSON.stringify(message));
+      // }
+
+
+      //addbutton
       function addTimer() {
-        const defaultTime = defaultTimeInput.value;
-        numberCitizenTimers++; //update total number for VoteReset and colour
-        const timerComponent = createTimerComponent(defaultTime);
-        setupTimerControls(timerComponent, defaultTime);
+    const defaultTime = defaultTimeInput.value;
+    numberCitizenTimers++; // Update total number for VoteReset and color
 
+    const timerComponent = createTimerComponent(defaultTime);
+    setupTimerControls(timerComponent, defaultTime);
 
-        document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
-        const message = {
-          cmd: 'createTimerComponent',
-          msg: timerComponent.outerHTML
-        };
-        // Send message to the WebSocket server
-        socket.send(JSON.stringify(message));
-      }
+    document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+
+    const message = {
+        cmd: 'createTimerComponent',
+        defaultTime: defaultTime,
+        timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
+    };
+
+    // Send message to WebSocket server
+    socket.send(JSON.stringify(message));
+}
+
 
 
 
