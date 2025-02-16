@@ -348,6 +348,77 @@
       border-radius: 5px;
       padding: 5px 10px;
     }
+
+
+
+
+    /* style section for top star data  */
+
+
+    .info-container {
+        display: flex;
+        flex-wrap: wrap;
+        /* Allows wrapping for smaller screens */
+        gap: 15px;
+        padding: 15px;
+        border-radius: 10px;
+        font-family: Arial, sans-serif;
+        /* justify-content: center; */
+      }
+
+      .info-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 18px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+        white-space: nowrap;
+        /* Prevents breaking text inside */
+      }
+
+      .info-box span {
+        font-weight: bold;
+        color: #333;
+      }
+
+      .info-box p {
+        margin: 0;
+        color: #555;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .info-container {
+          flex-direction: column;
+          /* Stack elements in a column */
+          align-items: center;
+        }
+
+        .info-box {
+          width: 90%;
+          /* Makes boxes take more space on smaller screens */
+          justify-content: center;
+        }
+      }
+
+      button#resetVotesBtn {
+        padding: 5px 10px;
+        border: none;
+        background-color: black;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      #voteData {
+        font-weight: bold;
+        color: #333;
+      }
+
+      /* end star section */
   </style>
 </head>
 
@@ -366,69 +437,6 @@
       <button id="addTimerBtn" title="Add A Timer">➕</button>
     </div>
 
-
-
-    <style>
-     .info-container {
-    display: flex;
-    flex-wrap: wrap; /* Allows wrapping for smaller screens */
-    gap: 15px;
-    padding: 15px;
-    border-radius: 10px;
-    font-family: Arial, sans-serif;
-    /* justify-content: center; */
-  }
-
-  .info-box {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 18px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-    white-space: nowrap; /* Prevents breaking text inside */
-  }
-
-  .info-box span {
-    font-weight: bold;
-    color: #333;
-  }
-
-  .info-box p {
-    margin: 0;
-    color: #555;
-  }
-
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .info-container {
-      flex-direction: column; /* Stack elements in a column */
-      align-items: center;
-    }
-
-    .info-box {
-      width: 90%; /* Makes boxes take more space on smaller screens */
-      justify-content: center;
-    }
-  }
-
-  button#resetVotesBtn {
-    padding: 5px 10px;
-    border: none;
-    background-color: black;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  #voteData {
-    font-weight: bold;
-    color: #333;
-  }
-    </style>
-    
     <div class="info-container">
       <div class="info-box">
         ⭐ <span>Votes:</span>
@@ -442,24 +450,135 @@
         ⭐ <span>Form:</span>
         <p>Straight turn</p>
       </div>
-    
+
       <div class="info-box">
         ⭐ <span>Content:</span>
         <p>Universal-Ai</p>
       </div>
-    
+
       <div class="info-box">
         ⭐ <span>People:</span>
         <p>Same</p>
       </div>
     </div>
-    
+
 
 
     <div id="numberCitizenTimers">Number Citizen Timers: 0</div>
 
     <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button>
+
     <!-- <div id="voteData">Total Votes: 0</div> -->
+
+
+    <style>
+      body {
+          font-family: Arial, sans-serif;
+      }
+
+      .toggle-btn {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 10px 15px;
+          cursor: pointer;
+          font-size: 16px;
+          border-radius: 5px;
+      }
+
+      .toggle-btn:hover {
+          background-color: #0056b3;
+      }
+
+      .table-container {
+          margin-top: 10px;
+          overflow: hidden;
+          transition: max-height 0.4s ease-out;
+      }
+
+      .hidden {
+          max-height: 0;
+          visibility: hidden;
+          transition: max-height 0.4s ease-in, visibility 0.2s ease-in;
+      }
+
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 10px;
+      }
+
+      th, td {
+          border: 1px solid #ddd;
+          padding: 10px;
+          text-align: left;
+      }
+
+      th {
+          background-color: #f4f4f4;
+      }
+  </style>
+
+
+
+
+
+
+
+
+    <button class="toggle-btn" onclick="toggleTable()">Total Cycle</button>
+
+    <div class="table-container hidden" id="tableContainer">
+        <table>
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>Cycle 1</th>
+                    <th>Cycle 2</th>
+                    <th>Cycle 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>John Doe</td>
+                    <td>cycle data</td>
+                    <td>cycle data</td>
+                    <td>cycle data</td>
+
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>cycle data</td>
+                    <td>cycle data</td>
+                    <td>cycle data</td>
+                </tr>
+                <tr>
+                    <td>Michael Brown</td>
+                 <td>cycle data</td>
+                    <td>cycle data</td>
+                    <td>cycle data</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function toggleTable() {
+            let tableContainer = document.getElementById("tableContainer");
+
+            if (tableContainer.classList.contains("hidden")) {
+                tableContainer.classList.remove("hidden");
+                tableContainer.style.maxHeight = tableContainer.scrollHeight + "px";
+            } else {
+                tableContainer.style.maxHeight = "0";
+                setTimeout(() => {
+                    tableContainer.classList.add("hidden");
+                }, 400); // Delay to match transition
+            }
+        }
+    </script>
+
+
 
     <div id="mainTimerContainer" class="timer">
       <input type="text" id="timerTitle" class="timer-title" value="Total Time" oninput="updateTimerTitle()" />
@@ -593,7 +712,7 @@
       switch (data.cmd) {
         case "createTimerComponentToBrowser":
           // Create the timer component in this browser
-         
+
           // Broadcast the new timer to all connected clients
           const browserIndTimerDefault = data.msg.defaultTime;
           console.log("MAIN SWITCH:createTimerComponentToBrowser" + " " + "browserIndTimerDefault:" + browserIndTimerDefault)
@@ -712,11 +831,7 @@
       const contentDisplayContainer = document.getElementById("contentDisplayContainer");
       console.log("DOMContentLoaded: timerList:" + JSON.stringify(timerList));
 
-      //const counters = {
-      //  Individual: 0,
-      //  Particular: 0,
-      //  Universal: 0
-      //};
+
 
       let totalVotes = 0; // Global vote count to track total votes
       let currentRunningTimer = null; // Track the currently running timer
@@ -724,11 +839,7 @@
       addTimerBtn.style.color = "green"; // Optional: Set the color to green
 
 
-      // function updateCounterDisplay() {
-      //   document.getElementById("individualCount").innerText = counters.Individual;
-      //   document.getElementById("particularCount").innerText = counters.Particular;
-      //   document.getElementById("universalCount").innerText = counters.Universal;
-      // }
+
 
       addTimerBtn.addEventListener("click", addTimer);
 
@@ -1143,7 +1254,7 @@
       removeContentBtn.addEventListener("click", () => {
         contentSection.remove();
         counters[type]--;
-        
+
         updateCounterDisplay();
       });
 
@@ -1371,18 +1482,18 @@
 
       dropdownMenu.addEventListener("click", (e) => {
         if (e.target.classList.contains("dropdown-item")) {
-            const selectedContent = e.target.dataset.type;
+          const selectedContent = e.target.dataset.type;
 
-            // Call function to open content form
-            openContentForm(selectedContent, timerComponent, assignedCategories);
+          // Call function to open content form
+          openContentForm(selectedContent, timerComponent, assignedCategories);
 
-            // Change clicked button background color to green
-            e.target.style.backgroundColor = "green";
+          // Change clicked button background color to green
+          e.target.style.backgroundColor = "green";
 
-            // Change content button background to green when content is added
-            contentBtn.style.backgroundColor = "green";
+          // Change content button background to green when content is added
+          contentBtn.style.backgroundColor = "green";
         }
-    });
+      });
 
 
 
