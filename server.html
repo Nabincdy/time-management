@@ -365,10 +365,101 @@
     <div class="btn-container inline-block">
       <button id="addTimerBtn" title="Add A Timer">➕</button>
     </div>
+
+
+
+    <style>
+     .info-container {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping for smaller screens */
+    gap: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    font-family: Arial, sans-serif;
+    /* justify-content: center; */
+  }
+
+  .info-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    white-space: nowrap; /* Prevents breaking text inside */
+  }
+
+  .info-box span {
+    font-weight: bold;
+    color: #333;
+  }
+
+  .info-box p {
+    margin: 0;
+    color: #555;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .info-container {
+      flex-direction: column; /* Stack elements in a column */
+      align-items: center;
+    }
+
+    .info-box {
+      width: 90%; /* Makes boxes take more space on smaller screens */
+      justify-content: center;
+    }
+  }
+
+  button#resetVotesBtn {
+    padding: 5px 10px;
+    border: none;
+    background-color: black;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  #voteData {
+    font-weight: bold;
+    color: #333;
+  }
+    </style>
+    
+    <div class="info-container">
+      <div class="info-box">
+        ⭐ <span>Votes:</span>
+        <p id="voteData">
+          Total Votes: 0
+        </p>
+      </div>
+
+
+      <div class="info-box">
+        ⭐ <span>Form:</span>
+        <p>Straight turn</p>
+      </div>
+    
+      <div class="info-box">
+        ⭐ <span>Content:</span>
+        <p>Universal-Ai</p>
+      </div>
+    
+      <div class="info-box">
+        ⭐ <span>People:</span>
+        <p>Same</p>
+      </div>
+    </div>
+    
+
+
     <div id="numberCitizenTimers">Number Citizen Timers: 0</div>
 
     <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button>
-    <div id="voteData">Total Votes: 0</div>
+    <!-- <div id="voteData">Total Votes: 0</div> -->
 
     <div id="mainTimerContainer" class="timer">
       <input type="text" id="timerTitle" class="timer-title" value="Total Time" oninput="updateTimerTitle()" />
@@ -1020,7 +1111,7 @@
       const message = {
         cmd: 'createTimerComponentToBrowser',
         msg: {
-          defaultTime: "10:23",
+          defaultTime: defaultTime,//10:23
           // timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
         }
       };
@@ -1052,6 +1143,7 @@
       removeContentBtn.addEventListener("click", () => {
         contentSection.remove();
         counters[type]--;
+        
         updateCounterDisplay();
       });
 
