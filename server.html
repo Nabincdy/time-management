@@ -356,69 +356,69 @@
 
 
     .info-container {
-        display: flex;
-        flex-wrap: wrap;
-        /* Allows wrapping for smaller screens */
-        gap: 15px;
-        padding: 15px;
-        border-radius: 10px;
-        font-family: Arial, sans-serif;
-        /* justify-content: center; */
+      display: flex;
+      flex-wrap: wrap;
+      /* Allows wrapping for smaller screens */
+      gap: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      font-family: Arial, sans-serif;
+      /* justify-content: center; */
+    }
+
+    .info-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+      white-space: nowrap;
+      /* Prevents breaking text inside */
+    }
+
+    .info-box span {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .info-box p {
+      margin: 0;
+      color: #555;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .info-container {
+        flex-direction: column;
+        /* Stack elements in a column */
+        align-items: center;
       }
 
       .info-box {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 12px 18px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-        white-space: nowrap;
-        /* Prevents breaking text inside */
+        width: 90%;
+        /* Makes boxes take more space on smaller screens */
+        justify-content: center;
       }
+    }
 
-      .info-box span {
-        font-weight: bold;
-        color: #333;
-      }
+    button#resetVotesBtn {
+      padding: 5px 10px;
+      border: none;
+      background-color: black;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-      .info-box p {
-        margin: 0;
-        color: #555;
-      }
+    #voteData {
+      font-weight: bold;
+      color: #333;
+    }
 
-      /* Responsive Design */
-      @media (max-width: 768px) {
-        .info-container {
-          flex-direction: column;
-          /* Stack elements in a column */
-          align-items: center;
-        }
-
-        .info-box {
-          width: 90%;
-          /* Makes boxes take more space on smaller screens */
-          justify-content: center;
-        }
-      }
-
-      button#resetVotesBtn {
-        padding: 5px 10px;
-        border: none;
-        background-color: black;
-        color: white;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-      }
-
-      #voteData {
-        font-weight: bold;
-        color: #333;
-      }
-
-      /* end star section */
+    /* end star section */
   </style>
 </head>
 
@@ -473,51 +473,52 @@
 
     <style>
       body {
-          font-family: Arial, sans-serif;
+        font-family: Arial, sans-serif;
       }
 
       .toggle-btn {
-          background-color: #007bff;
-          color: white;
-          border: none;
-          padding: 10px 15px;
-          cursor: pointer;
-          font-size: 16px;
-          border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 5px;
       }
 
       .toggle-btn:hover {
-          background-color: #0056b3;
+        background-color: #0056b3;
       }
 
       .table-container {
-          margin-top: 10px;
-          overflow: hidden;
-          transition: max-height 0.4s ease-out;
+        margin-top: 10px;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out;
       }
 
       .hidden {
-          max-height: 0;
-          visibility: hidden;
-          transition: max-height 0.4s ease-in, visibility 0.2s ease-in;
+        max-height: 0;
+        visibility: hidden;
+        transition: max-height 0.4s ease-in, visibility 0.2s ease-in;
       }
 
       table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 10px;
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
       }
 
-      th, td {
-          border: 1px solid #ddd;
-          padding: 10px;
-          text-align: left;
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
       }
 
       th {
-          background-color: #f4f4f4;
+        background-color: #f4f4f4;
       }
-  </style>
+    </style>
 
 
 
@@ -529,53 +530,53 @@
     <button class="toggle-btn" onclick="toggleTable()">Total Cycle</button>
 
     <div class="table-container hidden" id="tableContainer">
-        <table>
-            <thead>
-                <tr>
-                    <th>User Name</th>
-                    <th>Cycle 1</th>
-                    <th>Cycle 2</th>
-                    <th>Cycle 3</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>John Doe</td>
-                    <td>cycle data</td>
-                    <td>cycle data</td>
-                    <td>cycle data</td>
+      <table>
+        <thead>
+          <tr>
+            <th>User Name</th>
+            <th>Cycle 1</th>
+            <th>Cycle 2</th>
+            <th>Cycle 3</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>John Doe</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
 
-                </tr>
-                <tr>
-                    <td>Jane Smith</td>
-                    <td>cycle data</td>
-                    <td>cycle data</td>
-                    <td>cycle data</td>
-                </tr>
-                <tr>
-                    <td>Michael Brown</td>
-                 <td>cycle data</td>
-                    <td>cycle data</td>
-                    <td>cycle data</td>
-                </tr>
-            </tbody>
-        </table>
+          </tr>
+          <tr>
+            <td>Jane Smith</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+          </tr>
+          <tr>
+            <td>Michael Brown</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <script>
-        function toggleTable() {
-            let tableContainer = document.getElementById("tableContainer");
+      function toggleTable() {
+        let tableContainer = document.getElementById("tableContainer");
 
-            if (tableContainer.classList.contains("hidden")) {
-                tableContainer.classList.remove("hidden");
-                tableContainer.style.maxHeight = tableContainer.scrollHeight + "px";
-            } else {
-                tableContainer.style.maxHeight = "0";
-                setTimeout(() => {
-                    tableContainer.classList.add("hidden");
-                }, 400); // Delay to match transition
-            }
+        if (tableContainer.classList.contains("hidden")) {
+          tableContainer.classList.remove("hidden");
+          tableContainer.style.maxHeight = tableContainer.scrollHeight + "px";
+        } else {
+          tableContainer.style.maxHeight = "0";
+          setTimeout(() => {
+            tableContainer.classList.add("hidden");
+          }, 400); // Delay to match transition
         }
+      }
     </script>
 
 
@@ -1366,7 +1367,7 @@
           timerInterval = setInterval(() => {
             if (seconds > 0) {
               seconds--;
-            } else if (minutes > 0) {
+            } else if (minutopicTimetes > 0) {
               minutes--;
               seconds = 59;
             } else {
@@ -1434,8 +1435,10 @@
 
       timerComponent.innerHTML = `
         <input type="text" placeholder="Timer Title" class="timer-title"/>
-              <input type="text" value="${defaultTime}" class="timer-value"/>
+              <input type="text" value="${defaultTime}" class="timer-value"/> 
                       <input type="text" value="00:00" class="timer-asc"/>
+                                            <input type="text" placeholder="vito" class="timer-vito"/>
+
 
         <div class="flex-row">
           <button class="start-pause-btn">▶️</button>
@@ -1443,7 +1446,7 @@
           <button class="reset-default-btn">⤵️</button>
           <button class="remove-btn">❌</button>
           <button class="form-btn" id="formbtn">Form</button>
-          <button class="content-btn">Content</button>
+          <button class="content-btn" id="contentdata">Content</button>
           <button class="people-btn">People</button>
           <button class="vote-btn">Vote</button>
         </div>
@@ -1488,10 +1491,10 @@
           openContentForm(selectedContent, timerComponent, assignedCategories);
 
           // Change clicked button background color to green
-          e.target.style.backgroundColor = "green";
+          e.target.style.backgroundColor = "yellow";
 
-          // Change content button background to green when content is added
-          contentBtn.style.backgroundColor = "green";
+          // Change content button background to yellow when content is added
+          contentBtn.style.backgroundColor = "yellow";
         }
       });
 
@@ -1559,11 +1562,30 @@
         // Select all submenu buttons within this dropdown
         const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
 
+        // function resetButtons() {
+        //   allButtons.forEach(button => button.style.backgroundColor = ""); // Reset submenu buttons
+        //   parentButtons.forEach(parent => parent.style.backgroundColor = ""); // Reset parent buttons
+        //   // if (formbtn) formbtn.style.backgroundColor = "";
+        // }
+
         function resetButtons() {
-          allButtons.forEach(button => button.style.backgroundColor = ""); // Reset submenu buttons
-          parentButtons.forEach(parent => parent.style.backgroundColor = ""); // Reset parent buttons
-          // if (formbtn) formbtn.style.backgroundColor = "";
+          const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
+          const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
+          const contentBtn = document.getElementById("contentdata"); // Ensure correct selection
+
+          // Reset all submenu and parent buttons
+          allButtons.forEach(button => button.style.backgroundColor = "");
+          parentButtons.forEach(parent => parent.style.backgroundColor = "");
+
+          // Change dropdown menu background to red
+          // dropdownMenu.style.backgroundColor = "red";
+
+          // Change Content button background to red properly
+          if (contentBtn) {
+            contentBtn.style.backgroundColor = "red";
+          }
         }
+
 
 
 
@@ -1572,6 +1594,11 @@
           selectedButton.style.backgroundColor = "green"; // Activate clicked submenu button
           const formbtn = selectedButton.closest(".form-btn");
           if (formbtn) formbtn.style.backgroundColor = "green";
+
+
+
+
+
 
           // Find and activate the parent button
           const parentButton = selectedButton.closest(".dropdown-item");
