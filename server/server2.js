@@ -33,7 +33,10 @@ let globalELMxArray = {};//this object contains each meetings data and it can be
                        
                        "cycles": {
                                 "totalCompleteCycles": 2,
-                                "currentCycle": 3,
+                                "currentCycle": {
+                                    "currentCycleNumber": 3,
+                                    "currentSpeaker": "participantID"
+                                },
                                 "cycleVotingResults":{
                                     "cycle1": {"form": "Straight", "content": "universal-war", "people": "same"},
                                     "cycle2": {"form": "God Mode: Josh", "content": "particular-cohesion", "people": "same"}
@@ -128,7 +131,14 @@ wss.on("connection", (ws) => {
 
 
 
-            if (data.cmd === 'createTimerComponent') {
+            if (data.cmd === 'createTimerComponentToBrowser') {
+                //input form 
+            //    cmd: 'createTimerComponentToBrowser',
+            //    msg: {
+            //    defaultTime: defaultTime,
+            //    timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
+            //    }
+            //  };
             // Broadcast the new timer to all connected clients
             wss.clients.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
