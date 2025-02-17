@@ -518,6 +518,9 @@
       th {
         background-color: #f4f4f4;
       }
+      .timer-veto {
+    width: 30px; /* Adjust width as desired */
+}
     </style>
 
 
@@ -769,24 +772,24 @@
         },
       };
       // socket.send(JSON.stringify(updatedData));
-    }
+    
 
     // Attach event listener to timer input field
     document.getElementById("mainTimer").addEventListener("input", sendTimerUpdate);
 
     // Attach event listener to vote reset button
-    document.getElementById("resetVotesBtn").addEventListener("click", () => {
+   // document.getElementById("resetVotesBtn").addEventListener("click", () => {
       document.getElementById("voteData").textContent = "Total Votes: 0";
       totalVotes = 0;
       resetVotesBtn.style.backgroundColor = 'black';
       resetVotesBtn.style.color = 'white';
       // socket.send(JSON.stringify("does it reatch timer"));
+      //resetVotes();
+      //sendTimerUpdate();
+      socket.send(JSON.stringify("vote is reset1"));
 
-      sendTimerUpdate();
-      socket.send(JSON.stringify("vote is reset"));
-
-    });
-
+   // });//end eventListener
+  } //end sendTimerUpdate();
 
   </script>
 
@@ -858,6 +861,7 @@
 
 
     function resetVotes() {
+      console.log("In resetVotes (with colours)");
       totalVotes = 0; // Reset total vote count
       voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
 
@@ -870,11 +874,19 @@
         voteBtn.disabled = false; // Enable voting again
       });
 
+      const contentBtns = document.querySelectorAll(".content-btn"); // Use querySelectorAll to get all content-btn elements
+        contentBtns.forEach(contentBtn => {
+        contentBtn.style.backgroundColor = ""; // Remove background color
+        contentBtn.setAttribute("data-voted", "false"); // Reset vote state
+        contentBtn.disabled = false; // Enable voting again
+        });//contentBtns
+
+
       resetDropdownButtons();
 
 
       sendTimerUpdate(); // Ensure the update is sent via WebSocket
-      socket.send(JSON.stringify("vote is reset"));
+      //socket.send(JSON.stringify("vote is reset"));
     }//end resetVotes
 
 
@@ -1418,8 +1430,27 @@
       });
     }
 
+    /*
+    function resetButtons() {
+          console.log("RESET BUTTON PUSHED:");
+          const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
+          const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
+          const contentBtn = document.getElementById("contentdata"); // Ensure correct selection
 
+          // Reset all submenu and parent buttons
+          allButtons.forEach(button => button.style.backgroundColor = "");
+          parentButtons.forEach(parent => parent.style.backgroundColor = "");
 
+          // Change dropdown menu background to red
+          // dropdownMenu.style.backgroundColor = "red";
+
+          // Change Content button background to red properly
+          if (contentBtn) {
+            contentBtn.style.backgroundColor = "red";
+          }
+        }//end resetButtons
+
+*/
     ///////////////NEXT FUNCTION (they must go in this order. )
 
     function createTimerComponent(defaultTime, timerList, totalVotes) {
@@ -1435,10 +1466,9 @@
 
       timerComponent.innerHTML = `
         <input type="text" placeholder="Timer Title" class="timer-title"/>
-              <input type="text" value="${defaultTime}" class="timer-value"/> 
-                      <input type="text" value="00:00" class="timer-asc"/>
-                                            <input type="text" placeholder="vito" class="timer-vito"/>
-
+        <input type="text" value="${defaultTime}" class="timer-value"/> 
+        <input type="text" value="00:00" class="timer-asc"/>
+        <input type="text" placeholder="veto" class="timer-veto" style="width: 30px;"/> <!-- Shorter width for veto -->
 
         <div class="flex-row">
           <button class="start-pause-btn">▶️</button>
@@ -1451,9 +1481,12 @@
           <button class="vote-btn">Vote</button>
         </div>
       `;
+
+      
+      
       timerList.appendChild(timerComponent);
-
-
+      const contentBtn2 = document.getElementById("contentdata");
+      console.log("CONTENTBUTTON:"+contentBtn2)
 
 
 
@@ -1568,29 +1601,31 @@
         //   // if (formbtn) formbtn.style.backgroundColor = "";
         // }
 
-        function resetButtons() {
-          const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
-          const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
-          const contentBtn = document.getElementById("contentdata"); // Ensure correct selection
+        // function resetButtons() {
+        //   console.log("RESET BUTTON PUSHED:");
+        //   const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
+        //   const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
+        //   const contentBtn = document.getElementById("contentdata"); // Ensure correct selection
 
-          // Reset all submenu and parent buttons
-          allButtons.forEach(button => button.style.backgroundColor = "");
-          parentButtons.forEach(parent => parent.style.backgroundColor = "");
+        //   // Reset all submenu and parent buttons
+        //   allButtons.forEach(button => button.style.backgroundColor = "");
+        //   parentButtons.forEach(parent => parent.style.backgroundColor = "");
 
-          // Change dropdown menu background to red
-          // dropdownMenu.style.backgroundColor = "red";
+        //   // Change dropdown menu background to red
+        //   // dropdownMenu.style.backgroundColor = "red";
 
-          // Change Content button background to red properly
-          if (contentBtn) {
-            contentBtn.style.backgroundColor = "red";
-          }
-        }
+        //   // Change Content button background to red properly
+        //   if (contentBtn) {
+        //     contentBtn.style.backgroundColor = "red";
+        //   }
+        // }//end resetButtons
 
 
 
 
         function activateButton(selectedButton) {
-          resetButtons(); // Deactivate all buttons first
+          console.log("In activateButton");
+          //resetButtons(); // Deactivate all buttons first
           selectedButton.style.backgroundColor = "green"; // Activate clicked submenu button
           const formbtn = selectedButton.closest(".form-btn");
           if (formbtn) formbtn.style.backgroundColor = "green";
@@ -1727,7 +1762,7 @@
       });
 
       addTimerBtn.addEventListener("click", addTimer);
-      resetVotesBtn.addEventListener("click", resetVotes); // Add listener for reset vote button
+      //resetVotesBtn.addEventListener("click", resetVotes); // Add listener for reset vote button
 
     }); ////end DOMContentLoaded
 

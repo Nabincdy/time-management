@@ -234,7 +234,7 @@ wss.on("connection", (ws) => {
                         }
                     };
 
-                    ws.send(JSON.stringify(message)); // Send response to the client
+                    // ws.send(JSON.stringify(message)); // Send response to the client
                     sendToWho(listDesired);
                     break;
 
@@ -246,8 +246,96 @@ wss.on("connection", (ws) => {
                     // Handle removeVote logic
                     break;
 
-                case 'voteSubmitted':
-                    // Handle voteSubmitted logic
+                case 'totalVoteSubmitToAllToStartNextCycle':
+                    // Handle totalVoteSubmitToAllToStartNextCycle logic
+                    let totalVoteMessage = message.msg;
+                    let totalVoteELMxID = addVoteMessage.ELMxID;
+                    let totalVoteParticipantID = addVoteMessage.participantID;
+                    let totalVoteForm = addVoteMessage.form;
+                    let totalVoteFormString = addVoteMessage.formString;
+                    let totalVoteFormTime = addVoteMessage.formTime;
+                    let listDesiredTotal = "allInMeeting";
+                    let totalVoteSubmitResponseObject ={};
+                    totalVoteSubmitResponseObject = {
+                        cmd: "totalVoteSubmitToAllToStartNextCycle",
+                        msg: {
+                            totalVotesNumber: 4,
+                            formMajority: {"numberOfVotes": 3, "formType": "turn", "FormString": "popcorn"},
+                            contentMajority: {"numberOfVotes": 4, "contentType": "individual", "contentString": "AI"},
+                            peopleMajority: {"numberOfVotes": 4, "peopleType": "individual", "peopleString": "same"},
+                            totalFormVote: {
+                                turnBased: {
+                                     straightTurn: 0,
+                                     directiveTurn: 1,
+                                     popcorn: 3,
+                                },//end turn
+                                freeFlow: {
+                                    fast: 0,
+                                    team: 1,
+                                    spread: 3,
+                                },//end freeFlow
+                                godMode: {
+                                    god: 0,
+                                    diety: 1,
+                                    spirit: 3,
+                                },//end God Mode
+
+                            },//end TotalFormVote
+                            totalContentVote: {
+                                individual: {
+                                    self: 0,
+                                    group: 1,
+                                    world: 3,
+                               },//end individual
+                               particular: {
+                                   topic: 0,
+                                   why: 1,
+                                   how: 3,
+                               },//end particular
+                               universal: {
+                                   care: 0,
+                                   coordinate: 1,
+                                   commence: 3,
+                               },//end universal
+
+                            },//end TotalContentVote
+                            totalPeopleVote: {
+                                add: {
+                                    short: 0,
+                                    medium: 1,
+                                    long: 3,
+                               },//end turn
+                               remove: {
+                                   short: 0,
+                                   medium: 1,
+                                   long: 3,
+                               },//end freeFlow
+                               change: {
+                                    same: 3,
+                                    replace: 0,
+                                    pareto: {
+                                        paretoBasic: 0,
+                                        paretoDignity: 1,
+                                        paretoTranscendental: 3,
+                                    },//end pareto
+                               },//end God Mode
+
+                            },//end TotalPeopleVote
+                            vetoes: {
+                                peopleWhoGetToVetoNowInThisCycle: 
+                                {
+                                    userID1: 3,
+                                },//end  peopleWhoGetToVetoNowInThisCycle
+                                whoGotANewVeto: {
+                                userID1: 1,
+                                userID2: 0,
+                                userID3: 1,
+                                userID4: 0,
+                            },//end whoGotANewVeto
+                        },//end vetoes
+                    },//end msg
+                    }//end totalVoteSubmitResponseObject 
+                    sendToWho(wss, ws, listDesired, messageToBrowser);
                     break;
             } // End switch
 
