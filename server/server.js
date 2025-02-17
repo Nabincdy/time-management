@@ -131,6 +131,30 @@ wss.on("connection", (ws) => {
 
 
 
+            if (data.cmd === "voteTimer") {
+                let timerId = data.timerId;
+                
+                if (!voteCounts[timerId]) {
+                    voteCounts[timerId] = 0;
+                }
+            
+                voteCounts[timerId] += 1; // Increase vote count
+            
+                let voteUpdate = {
+                    cmd: "updateVoteCount",
+                    timerId: timerId,
+                    voteCount: voteCounts[timerId]
+                };
+            
+                wss.clients.forEach(client => {
+                    if (client.readyState === WebSocket.OPEN) {
+                        client.send(JSON.stringify(voteUpdate)); // Send vote update to all clients
+                    }
+                });
+            }
+
+            
+
 
             if (data.cmd === 'createTimerComponentToBrowser') {
                 //input form 

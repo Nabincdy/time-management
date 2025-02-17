@@ -463,6 +463,8 @@
     </div>
 
 
+    <h3>Click Counts:</h3>
+    <ul id="click-counts-list"></ul>
 
     <div id="numberCitizenTimers">Number Citizen Timers: 0</div>
 
@@ -518,9 +520,11 @@
       th {
         background-color: #f4f4f4;
       }
+
       .timer-veto {
-    width: 30px; /* Adjust width as desired */
-}
+        width: 30px;
+        /* Adjust width as desired */
+      }
     </style>
 
 
@@ -604,7 +608,6 @@
     Particular: <span id="particularCount">0</span> |
     Universal: <span id="universalCount">0</span>
   </div>
-  <div id="timerList"></div>
 
   <script>
     let mainTimerInterval;
@@ -772,13 +775,13 @@
         },
       };
       // socket.send(JSON.stringify(updatedData));
-    
 
-    // Attach event listener to timer input field
-    document.getElementById("mainTimer").addEventListener("input", sendTimerUpdate);
 
-    // Attach event listener to vote reset button
-   // document.getElementById("resetVotesBtn").addEventListener("click", () => {
+      // Attach event listener to timer input field
+      document.getElementById("mainTimer").addEventListener("input", sendTimerUpdate);
+
+      // Attach event listener to vote reset button
+      // document.getElementById("resetVotesBtn").addEventListener("click", () => {
       document.getElementById("voteData").textContent = "Total Votes: 0";
       totalVotes = 0;
       resetVotesBtn.style.backgroundColor = 'black';
@@ -788,8 +791,8 @@
       //sendTimerUpdate();
       socket.send(JSON.stringify("vote is reset1"));
 
-   // });//end eventListener
-  } //end sendTimerUpdate();
+      // });//end eventListener
+    } //end sendTimerUpdate();
 
   </script>
 
@@ -875,11 +878,11 @@
       });
 
       const contentBtns = document.querySelectorAll(".content-btn"); // Use querySelectorAll to get all content-btn elements
-        contentBtns.forEach(contentBtn => {
+      contentBtns.forEach(contentBtn => {
         contentBtn.style.backgroundColor = ""; // Remove background color
         contentBtn.setAttribute("data-voted", "false"); // Reset vote state
         contentBtn.disabled = false; // Enable voting again
-        });//contentBtns
+      });//contentBtns
 
 
       resetDropdownButtons();
@@ -1482,11 +1485,11 @@
         </div>
       `;
 
-      
-      
+
+
       timerList.appendChild(timerComponent);
       const contentBtn2 = document.getElementById("contentdata");
-      console.log("CONTENTBUTTON:"+contentBtn2)
+      console.log("CONTENTBUTTON:" + contentBtn2)
 
 
 
@@ -1583,72 +1586,79 @@
       });
 
 
-
-
-
       function setupDropdown(dropdownMenu) {
-        const formbtn = document.getElementById("formbtn");
-
-        // Select all parent buttons within this specific dropdown
         const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
-
-        // Select all submenu buttons within this dropdown
         const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
+        const formbtn = document.getElementById("formbtn"); // Get form button
 
-        // function resetButtons() {
-        //   allButtons.forEach(button => button.style.backgroundColor = ""); // Reset submenu buttons
-        //   parentButtons.forEach(parent => parent.style.backgroundColor = ""); // Reset parent buttons
-        //   // if (formbtn) formbtn.style.backgroundColor = "";
+        // Object to store click counts
+        if (!window.submenuClickCounts) {
+          window.submenuClickCounts = {};
+        }
+
+
+  
+
+        function updateClickCountDisplay() {
+          const list = document.getElementById("click-counts-list");
+          list.innerHTML = ""; // Clear previous list
+
+          Object.entries(window.submenuClickCounts).forEach(([item, count]) => {
+            const listItem = document.createElement("li");
+            listItem.innerText = `${item}: ${count} clicks`;
+            list.appendChild(listItem);
+          });
+        }
+
+        //         function updateClickCountDisplay() {
+        //     const list = document.getElementById("click-counts-list");
+        //     list.innerHTML = ""; // Clear previous list
+
+        //     const entries = Object.entries(window.submenuClickCounts);
+        //     for (let i = 0; i < entries.length; i++) {
+        //         const [item, count] = entries[i];
+        //         const listItem = document.createElement("li");
+        //         listItem.innerText = `${item}: ${count} clicks`;
+        //         list.appendChild(listItem);
+        //     }
         // }
-
-        // function resetButtons() {
-        //   console.log("RESET BUTTON PUSHED:");
-        //   const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
-        //   const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
-        //   const contentBtn = document.getElementById("contentdata"); // Ensure correct selection
-
-        //   // Reset all submenu and parent buttons
-        //   allButtons.forEach(button => button.style.backgroundColor = "");
-        //   parentButtons.forEach(parent => parent.style.backgroundColor = "");
-
-        //   // Change dropdown menu background to red
-        //   // dropdownMenu.style.backgroundColor = "red";
-
-        //   // Change Content button background to red properly
-        //   if (contentBtn) {
-        //     contentBtn.style.backgroundColor = "red";
-        //   }
-        // }//end resetButtons
-
-
 
 
         function activateButton(selectedButton) {
           console.log("In activateButton");
-          //resetButtons(); // Deactivate all buttons first
-          selectedButton.style.backgroundColor = "green"; // Activate clicked submenu button
+
+          // Reset the background color for all submenu items
+          parentButtons.forEach(button => button.style.backgroundColor = "");
+          allButtons.forEach(button => button.style.backgroundColor = "");
+
+          // Activate the clicked submenu item
+          selectedButton.style.backgroundColor = "green";
           const formbtn = selectedButton.closest(".form-btn");
-          if (formbtn) formbtn.style.backgroundColor = "green";
-
-
-
-
-
 
           // Find and activate the parent button
           const parentButton = selectedButton.closest(".dropdown-item");
           if (parentButton) parentButton.style.backgroundColor = "green";
+          if (formbtn) formbtn.style.backgroundColor = "green";
 
-          // Update timerComponent.flow based on selected button text
-          timerComponent.flow = selectedButton.innerText + " selected";
-          console.log(`${selectedButton.innerText} clicked`); // Print the specific submenu item clicked
+
+          // Track submenu item clicks
+          const buttonText = selectedButton.innerText.trim();
+          if (!window.submenuClickCounts[buttonText]) {
+            window.submenuClickCounts[buttonText] = 0;
+          }
+          window.submenuClickCounts[buttonText] += 1;
+
+          console.log(`${buttonText} clicked ${window.submenuClickCounts[buttonText]} times`);
+
+          // Update the HTML list
+          updateClickCountDisplay();
         }
 
         // Attach event listeners dynamically for the current dropdown
         allButtons.forEach(button => {
           button.addEventListener("click", () => {
             activateButton(button);
-            console.log('sub item');
+            console.log('Sub item clicked');
           });
         });
       }
@@ -1661,7 +1671,7 @@
         mutations.forEach(mutation => {
           mutation.addedNodes.forEach(node => {
             if (node.classList && node.classList.contains("dropdown-menu")) {
-              setupDropdown(node); // Setup event listeners for new dropdown
+              setupDropdown(node);
             }
           });
         });
@@ -1669,11 +1679,6 @@
 
       // Start observing the document for new dropdowns
       observer.observe(document.body, { childList: true, subtree: true });
-
-
-
-
-
 
       //Change the Reset Button Colour in case in mid vote, colours will update
       // Get the button DOM element
