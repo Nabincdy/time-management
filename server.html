@@ -1030,6 +1030,13 @@
             timerComponent.style.backgroundColor = "orange";
             onComplete();
             startPauseBtn.textContent = "▶️";
+            //stop the ascending timer when the count down reaches
+            if(ascIntervalId){
+              clearInterval(ascIntervalId);
+              ascIntervalId = null;
+            }
+
+
             return;
           }
           totalSeconds--;
@@ -1599,16 +1606,35 @@
 
   
 
-        function updateClickCountDisplay() {
-          const list = document.getElementById("click-counts-list");
-          list.innerHTML = ""; // Clear previous list
+        // function updateClickCountDisplay() {
+        //   const list = document.getElementById("click-counts-list");
+        //   list.innerHTML = ""; // Clear previous list
 
-          Object.entries(window.submenuClickCounts).forEach(([item, count]) => {
-            const listItem = document.createElement("li");
-            listItem.innerText = `${item}: ${count} clicks`;
-            list.appendChild(listItem);
-          });
-        }
+        //   Object.entries(window.submenuClickCounts).forEach(([item, count]) => {
+        //     const listItem = document.createElement("li");
+        //     listItem.innerText = `${item}: ${count} clicks`;
+        //     list.appendChild(listItem);
+        //   });
+        // }
+
+        function updateClickCountDisplay(numberOfCitizens) {
+    const list = document.getElementById("click-counts-list");
+    list.innerHTML = ""; // Clear previous list
+
+    // Sort the counts in descending order
+    const sortedEntries = Object.entries(window.submenuClickCounts).sort((a, b) => b[1] - a[1]);
+
+    // Loop through the sorted entries and display them
+    sortedEntries.forEach(([item, count]) => {
+        // Divide the count by the number of citizens
+        const adjustedCount = numberOfCitizens ? (count / numberOfCitizens).toFixed(2) : count;
+
+        const listItem = document.createElement("li");
+        listItem.innerText = `${item}: ${adjustedCount} clicks per citizen`;
+        list.appendChild(listItem);
+    });
+}
+
 
         //         function updateClickCountDisplay() {
         //     const list = document.getElementById("click-counts-list");
