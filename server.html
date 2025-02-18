@@ -699,6 +699,8 @@
 
     // Initialize display
     updateMainTimerDisplay();
+
+    
   </script>
 
 
@@ -715,11 +717,19 @@
       const data = JSON.parse(event.data);
 
       console.log("Received update:", data);
-      //Main Switch/Switch Main
-      switch (data.cmd) {
-        case "createTimerComponentToBrowser":
-          // Create the timer component in this browser
 
+
+
+      //Main Switch/Switch Main
+      switch (data.cmd) {//messages from server
+        case "returnNewUserIDWithScreenCatchUp":
+          console.log("In browser returnNewUserIDWithScreenCatchUp");
+          
+          
+          break;
+        case "returnedFromServerAddTimer": //this one is from server for the non Optimistic UI draw but the one from the server
+          // Create the timer component in this browser
+          numberCitizenTimers++; // Update total number for VoteReset and color
           // Broadcast the new timer to all connected clients
           const browserIndTimerDefault = data.msg.defaultTime;
           console.log("MAIN SWITCH:createTimerComponentToBrowser" + " " + "browserIndTimerDefault:" + browserIndTimerDefault)
@@ -729,10 +739,13 @@
           //const newTimerComponent = document.createElement("div");
           //newTimerComponent.innerHTML = data.timerComponent;
           //timerContainer.appendChild(newTimerComponent);
-          createTimerComponent(browserIndTimerDefault, timerContainer);
-          break;
-        case "returnNewUserIDWithScreenCatchUp":
-          console.log("In browser returnNewUserIDWithScreenCatchUp");
+          const timerComponent = createTimerComponent(browserIndTimerDefault, timerContainer); //this has no socket.send in it
+          
+          setupTimerControls(timerComponent, browserIndTimerDefault);
+
+      document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+
+          
           break;
         case 'voteCountReturned':
 
@@ -748,7 +761,22 @@
           document.getElementById("universalCount").innerText = data.counters.Universal;
       }//end MAIN SWITCH/SWITCH MAIN
 
-    };
+    };//end socket.message
+
+
+
+
+
+    /////////////////////////////////////////////////////////////////
+    let workerDispatch=(cmd, msg)=>{
+console.log("WorkerDispatch cmd:"+cmd);
+  switch(cmd){
+    case 'getNewAWSCreds':
+console.log("Getting workerDispatch awsCres");
+        //worker.postMessage({'cmd': 'getNewAWSCreds', 'msg': msg});
+        break;
+  }//end cmd 
+};//end workerDispatch
 
     socket.onclose = function () {
       console.log("Disconnected from WebSocket server. Reconnecting...");
@@ -1234,18 +1262,19 @@
     //addbutton
     function addTimer() {
 
-      const defaultTime = defaultTimeInput.value;
-      numberCitizenTimers++; // Update total number for VoteReset and color
-
-      const timerComponent = createTimerComponent(defaultTime, timerList);
-      setupTimerControls(timerComponent, defaultTime);
-
-      document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+       const defaultTime = defaultTimeInput.value;
+      // numberCitizenTimers++; // Update total number for VoteReset and color
+// 
+      // const timerComponent = createTimerComponent(defaultTime, timerList);
+      // setupTimerControls(timerComponent, defaultTime);
+// 
+      // document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
 
       const message = {
-        cmd: 'createTimerComponentToBrowser',
+        cmd: 'addTimerToServer',
         msg: {
           defaultTime: defaultTime,//10:23
+          ELMxID: 0, //this is hardcoded still as of Feb 17 2025
           // timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
         }
       };
