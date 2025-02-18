@@ -487,41 +487,13 @@ function sendToWho(wss, ws, listDesired, messageToBrowser, meetingIDIfNeeded) {
                 individualUserWS.send(JSON.stringify(messageToBrowser));
             } else {
                 console.log("WebSocket client not found. Removing ID from globalUserIDsWebsocketObject and clients ");
-                delete globalUserIDsWebsocketObject[individualUserID].arrayOfAttendanceIDs[individualUserID;
-                delete globalUserIDsWebsocketObject[meetingIDIfNeeded].arrayOfAttendanceIDs[individualUserID;
+                delete globalUserIDsWebsocketObject[individualUserID];
+                delete globalUserIDsWebsocketObject[meetingIDIfNeeded].arrayOfAttendanceIDs[individualUserID];
+                delete globalUserIDsWebsocketObject[meetingIDIfNeeded].arrayOfAttendanceIDs[individualUserID];
+                globalUserIDsWebsocketObject[meetingIDIfNeeded].participants.NumberOfParticipants=globalUserIDsWebsocketObject[meetingIDIfNeeded].participants.NumberOfParticipants -1;
             }
             break;
     }
-}
+}//end sendToWho
 //   });
 //}
-
-
-globalELMxArray = {
-    "0": { //ELMxID..this is an example instantiation
-        "flow roles": {
-            "executorName": "spiritman/ID",
-            "influencerName": "spiritman",
-            "strategistName": "spiritman",
-            "relationshipsName": "spiritman"
-
-        }, //end flow roles
-        "arrayOfAttendanceIDs": {},
-        "participants": {
-            "NumberOfParticipants": 0,
-            "paretoCategories": {
-
-                "participant1": { "aesthetic": 6, "social": 6, "wealth": 4, "body": 5, "culturedness": 8, "IQ": 9, "UQ": 1 },
-                "participant2": { "aesthetic": 2, "social": 9, "wealth": 5, "body": 3, "culturedness": 7, "IQ": 4, "UQ": 1 }
-
-            },//end paretoCategories
-        },//end participants
-
-        
-
-                    }//end participant1CurrentMeetingVotingHistory
-                },//end participant1
-            },//end individualParticipantVotes
-        },//end voting
-    } //end ELMxID 1
-};//end globalELMxArray
