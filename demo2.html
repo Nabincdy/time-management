@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enable Vote Button</title>
+  <style>
+    .disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .active {
+      background-color: green;
+    }
+    .flex-row {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Multiple groups of buttons -->
+  <div class="flex-row">
+    <button class="formbtn">Form Button</button>
+    <button class="contentdata">Content Button</button>
+    <button class="peoplebtn">People Button</button>
+    <button class="vote-btn disabled" disabled>Vote Now</button>
+  </div>
+
+  <div class="flex-row">
+    <button class="formbtn">Form Button</button>
+    <button class="contentdata">Content Button</button>
+    <button class="peoplebtn">People Button</button>
+    <button class="vote-btn disabled" disabled>Vote Now</button>
+  </div>
+
+  <div class="flex-row">
+    <button class="formbtn">Form Button</button>
+    <button class="contentdata">Content Button</button>
+    <button class="peoplebtn">People Button</button>
+    <button class="vote-btn disabled" disabled>Vote Now</button>
+  </div>
+
+  <div class="flex-row">
+    <button class="formbtn">Form Button</button>
+    <button class="contentdata">Content Button</button>
+    <button class="peoplebtn">People Button</button>
+    <button class="vote-btn disabled" disabled>Vote Now</button>
+  </div>
+
+  <div class="flex-row">
+    <button class="formbtn">Form Button</button>
+    <button class="contentdata">Content Button</button>
+    <button class="peoplebtn">People Button</button>
+    <button class="vote-btn disabled" disabled>Vote Now</button>
+  </div>
+
+  <script>
+    // Function to enable the vote button when all buttons in a row are clicked
+    function enableVoteButton() {
+      // Get the parent flex-row that contains the buttons
+    //   const flexRow = this.closest('.flex-row');
+      const buttons = flexRow.querySelectorAll('button');
+      const voteBtn = flexRow.querySelector('.vote-btn');
+
+      // Track which buttons are clicked
+      let allClicked = true;
+
+      // Check if all required buttons (formbtn, contentdata, peoplebtn) are clicked
+      buttons.forEach(button => {
+        if (
+          (button.classList.contains('formbtn') && !button.classList.contains('clicked')) ||
+          (button.classList.contains('contentdata') && !button.classList.contains('clicked')) ||
+          (button.classList.contains('peoplebtn') && !button.classList.contains('clicked'))
+        ) {
+          allClicked = false;
+        }
+      });
+
+      // If all buttons are clicked, enable the vote button
+      if (allClicked) {
+        voteBtn.classList.remove('disabled');
+        voteBtn.disabled = false;
+      } else {
+        voteBtn.classList.add('disabled');
+        voteBtn.disabled = true;
+      }
+    }
+
+    // Add event listeners to track the click state of each button
+    const buttons = document.querySelectorAll('button.formbtn, button.contentdata, button.peoplebtn');
+    buttons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Mark this button as clicked
+        this.classList.add('clicked');
+        // Call the function to check if the vote button should be enabled
+        enableVoteButton.call(this);
+      });
+    });
+  </script>
+</body>
+</html>

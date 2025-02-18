@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List with Timer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <h2>To-Do List with Timer</h2>
+        
+        <!-- Task Input Form -->
+        <div class="task-input">
+            <input type="text" id="task-title" placeholder="Enter Task Title" />
+            <button id="add-task-btn">Add Task</button>
+        </div>
+
+        <!-- Task List Container -->
+        <div id="task-list"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    const taskList = document.getElementById("task-list");
+    const addTaskBtn = document.getElementById("add-task-btn");
+    const taskTitleInput = document.getElementById("task-title");
+
+    // Function to add a new task
+    addTaskBtn.addEventListener("click", function () {
+        const taskTitle = taskTitleInput.value.trim();
+        if (taskTitle === "") return;
+
+        const taskElement = document.createElement("div");
+        taskElement.classList.add("task");
+
+        taskElement.innerHTML = `
+            <span class="task-title">${taskTitle}</span>
+            <input type="text" value="10:00" class="task-timer" readonly/>
+            <input type="text" value="00:00" class="task-elapsed" readonly/>
+            <button class="start-btn">▶️</button>
+            <button class="reset-btn">⏏️</button>
+            <button class="remove-btn">❌</button>
+        `;
+
+        taskList.appendChild(taskElement);
+        taskTitleInput.value = "";
+
+        const startBtn = taskElement.querySelector(".start-btn");
+        const resetBtn = taskElement.querySelector(".reset-btn");
+        const removeBtn = taskElement.querySelector(".remove-btn");
+        let timerInput = taskElement.querySelector(".task-timer");
+        let elapsedInput = taskElement.querySelector(".task-elapsed");
+
+        let defaultTime = "10:00"; 
+        let running = false;
+        let interval;
+        let elapsedTime = 0;
+
+        // Convert time to seconds
+        function timeToSeconds(time) {
+            let [minutes, seconds] = time.split(":").map(Number);
+            return minutes * 60 + seconds;
+        }
+
+        // Convert seconds to MM:SS format
+        function secondsToTime(seconds) {
+            let minutes = Math.floor(seconds / 60);
+            let secs = seconds % 60;
+            return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+        }
+
+        // Start/Pause Timer
+        startBtn.addEventListener("click", function () {
+            if (!running) {
+                let timeLeft = timeToSeconds(timerInput.value);
+
+                interval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        elapsedTime++;
+                        timerInput.value = secondsToTime(timeLeft);
+                        elapsedInput.value = secondsToTime(elapsedTime);
+                    } else {
+                        clearInterval(interval);
+                        running = false;
+                        startBtn.textContent = "▶️";
+                    }
+                }, 1000);
+
+                startBtn.textContent = "⏸️";
+                running = true;
+            } else {
+                clearInterval(interval);
+                startBtn.textContent = "▶️";
+                running = false;
+            }
+        });
+
+        // Reset Timer
+        resetBtn.addEventListener("click", function () {
+            clearInterval(interval);
+            timerInput.value = defaultTime;
+            elapsedInput.value = "00:00";
+            running = false;
+            startBtn.textContent = "▶️";
+        });
+
+        // Remove Task
+        removeBtn.addEventListener("click", function () {
+            taskElement.remove();
+        });
+    });
+});
+
+    </script>
+</body>
+</html>

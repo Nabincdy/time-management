@@ -100,7 +100,7 @@
 
     .timer-value:focus {
       border: initial;
-      color:black;
+      color: black;
       background-color: yellow;
     }
 
@@ -541,34 +541,34 @@
       }
 
       .timer-veto {
-    width: 30px; 
-    padding: 8px 12px;
-    font-size: 14px;
-    border: 2px solid #ccc; 
-    border-radius: 4px;
-    background-color: #f9f9f9; 
-    color: #333; 
-    transition: border-color 0.3s, background-color 0.3s;
-}
+        width: 30px;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+        color: #333;
+        transition: border-color 0.3s, background-color 0.3s;
+      }
 
-/* Change border color when the input field is focused */
-.timer-veto:focus {
-    border-color: #4CAF50; 
-    background-color: #e8f5e9; 
-    outline: none; 
-}
+      /* Change border color when the input field is focused */
+      .timer-veto:focus {
+        border-color: #4CAF50;
+        background-color: #e8f5e9;
+        outline: none;
+      }
 
-/* Add a box shadow effect for better focus */
-.timer-veto:focus {
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
-}
+      /* Add a box shadow effect for better focus */
+      .timer-veto:focus {
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+      }
 
-/* Optional: Add placeholder text styling */
-.timer-veto::placeholder {
-    color: #999; /* Gray placeholder text */
-    font-style: italic;
-}
-
+      /* Optional: Add placeholder text styling */
+      .timer-veto::placeholder {
+        color: #999;
+        /* Gray placeholder text */
+        font-style: italic;
+      }
     </style>
 
 
@@ -1024,7 +1024,7 @@
       let wasRunning = false;
       let ascSeconds = 0;
 
-      
+
 
       // Vote button functionality
       const voteBtn = timerComponent.querySelector(".vote-btn");
@@ -1872,43 +1872,34 @@
 
 
 
-    const voteBtn = document.getElementById('vote-btn');
+      // Function to enable the vote button when all required buttons are clicked
+      function enableVoteButton(flexRow) {
+        const buttons = flexRow.querySelectorAll('.form-btn, .content-btn, .people-btn');
+        const voteBtn = flexRow.querySelector('.vote-btn');
 
-    // Object to track if each button has been clicked
-    const buttonClicks = {
-      formBtnClicked: false,
-      contentBtnClicked: false,
-      peopleBtnClicked: false
-    };
+        // Check if all required buttons are clicked
+        const allClicked = [...buttons].every(button => button.classList.contains('clicked'));
 
-    // Function to enable the vote button when all buttons are clicked
-    function enableVoteButton() {
-      // Mark the respective button as clicked
-      if (this.id === 'formbtn') {
-        buttonClicks.formBtnClicked = true;
-      } else if (this.id === 'contentdata') {
-        buttonClicks.contentBtnClicked = true;
-      } else if (this.id === 'peoplebtn') {
-        buttonClicks.peopleBtnClicked = true;
+        // Enable or disable the vote button accordingly
+        if (allClicked) {
+          voteBtn.classList.remove('disabled');
+          voteBtn.disabled = false;
+        } else {
+          voteBtn.classList.add('disabled');
+          voteBtn.disabled = true;
+        }
       }
 
-      // Check if all buttons have been clicked
-      if (buttonClicks.formBtnClicked && buttonClicks.contentBtnClicked && buttonClicks.peopleBtnClicked) {
-        voteBtn.disabled = false; // Enable the vote button
-        voteBtn.classList.remove('disabled'); // Remove the disabled class
-        voteBtn.classList.add('active'); // Add active class
-      }
-    }
-
-
-    formBtn.addEventListener('click', enableVoteButton);
-    contentBtn.addEventListener('click', enableVoteButton);
-    peopleBtn.addEventListener('click', enableVoteButton);
-
-
-
-
-
+      // Event listener for dynamically added buttons
+      document.addEventListener('click', function (event) {
+        if (event.target.matches('.form-btn, .content-btn, .people-btn')) {
+          event.target.classList.add('clicked');
+          const flexRow = event.target.closest('.flex-row');
+          if (flexRow) {
+            enableVoteButton(flexRow);
+          }
+        }
+      });
 
 
       return timerComponent;
