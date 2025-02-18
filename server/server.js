@@ -10,7 +10,7 @@ let numberOfELMs = 0;
 let globalTimerIDs = 0;//not yet used Feb 13 2025 can delete
 let globalTimerIDsWebsocketObject = {}; //not yet used Feb 13 2025 can delete
 let globalUserIDs = 0;
-let globaUserIDsWebsocketObject = {};
+let globalUserIDsWebsocketObject = {};
 let globalELMxArray = {};//this object contains each meetings data and it can be operated on from other meetings (ELM) too
 globalELMxArray = {
     "0": { //ELMxID..this is an example instantiation
@@ -404,11 +404,11 @@ function createUserTimerIDFunction(wss, ws, message) {
     //input Object Form: {"cmd": "createUserTimerID", "msg": {"ELMxID": 1, "timerIDFromBrowser": 2}}
     //if(gidClients[decoded.acc]!=undefined){delete gidClients[];}
     let createUserTimerIDELMxID = message;//message.msg.ELMxID;
-
+    let newUserSocketID = ws.clientID;//wss.clients.indexOf(ws);
     let newUserID = globalUserIDs + 1;
     globalUserIDs++;
     console.log("ELMXMEETING ID SHOULD BE 0" + " " + newUserID + JSON.stringify(globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs));
-    globaUserIDsWebsocketObject[newUserID] = ws;
+    globalUserIDsWebsocketObject[newUserID] = ws;
     globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs[newUserID] = newUserID;
 
     //userData updating done
@@ -417,7 +417,7 @@ function createUserTimerIDFunction(wss, ws, message) {
     let existingTimerData = allMeetingData.timers;
 
     let createUserResponseObject = { "cmd": "returnNewUserIDWithScreenCatchUp", "msg": { "newID": newUserID, "existingTimerData": existingTimerData } };
-    let desiredList = ["particularSome", globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs];
+    let desiredList = ["IndividualOne", newUserSocketID];
     sendToWho(wss, ws, desiredList, createUserResponseObject)
 
 } //end createUserTimerIDFunction
@@ -441,14 +441,16 @@ function sendToWho(wss, ws, listDesired, messageToBrowser) {
             for (const key in listDesired[1]) {
                 if (listDesired[1].hasOwnProperty(key)) {
 
-                    userWS = globaUserIDsWebsocketObject[listDesired[1][key]];
+                    userWS = globalUserIDsWebsocketObject[listDesired[1][key]];
                     console.log("Why this not working:" + userWS.readyState)
+                    
+                    //this section on websocket.open has only been through through ~60% and could result in errors in more complex situations. Its ok to edit it
                     if (userWS.readyState === WebSocket.OPEN) {
                         // Get the WebSocket associated with the key
 
 
                         // Find the index of the user in the WebSocket clients
-                        // socketID = wss.clients.indexOf(userWS);
+                         //socketID = wss.clients.indexOf(userWS); //this indexOf no longer a function
                         // wss.clients.forEach((client, index) => {
                         //  if (client === userWS) {
                         //    socketID = index;  // Set the index when a match is found
@@ -459,7 +461,7 @@ function sendToWho(wss, ws, listDesired, messageToBrowser) {
                             // socketID found, proceed with sending the message
                             userWS.send(JSON.stringify(messageToBrowser));
                         } else {
-                            console.log("WebSocket client not found.");
+                            console.log("WebSocket client not found. Removing from");
                         }
 
                         // Send the message to the client
@@ -472,6 +474,22 @@ function sendToWho(wss, ws, listDesired, messageToBrowser) {
             break;
         case "individualOne":
             // Define logic for sending to a single client
+            let individualUserWS = ws; //setting this in what appears to be redundent but makes it clear we are in individual and only sending to an individual user
+            //let individualUserID = wss.clients.indexOf(individualUserWS);
+
+            if(globalUserIDsWebsocketObject[individualUserID]!=undefined){//this is here for lost connections. If they lose connection then their websocket isn't closed and will still take up space in the wss array. So when they log back in we check to see if their GID is alrady in gidClients because it shouldn't be. If it is, then we find the socket it used to be registered at, use that socketIndex to delete the old ws information, then re-add their gid to gidClients with the new socketIndex. this way our websocket wss array doesn't get full of millions of unused ws objects from being disconnected. There migth already be some kind clean up mechanism but I'm doing it in case
+                delete globalUserIDsWebsocketObject[individualUserID];
+              }
+
+            if (socketID !== -1) {
+                // socketID found, proceed with sending the message
+                console.log("sendToWho: individualOne: socketID:"+individualUserID)
+                individualUserWS.send(JSON.stringify(messageToBrowser));
+            } else {
+                console.log("WebSocket client not found. Removing ID from globalUserIDsWebsocketObject and clients ");
+                
+                globalUserIDsWebsocketObject
+            }
             break;
     }
 }
