@@ -205,6 +205,12 @@ wss.on("connection", (ws) => {
                     //ws.send(JSON.stringify(createUserResponseObject)); // Send response to the client
                     break;
                 case 'resetTimerName': 
+                    //input {"cmd": "resetTimerName", "msg": {"ELMxID": 0, "timerNewName": name}}
+                    let resetTimerName_meetingID = message.msg.ELMxID
+                    let timerNewName= message.msg.newTimerName
+                    let createUserResponseObject = { "cmd": "returnedFromServerAddTimer", "msg": { "newTimerID": newTimerID, "defaultTime": defaultTimeOfNewlyAddedTimer, "timerBrowserID": timerIDFromBrowser } };
+                    let desiredList = ["particularSome", globalELMxArray[createTimerIDELMxID].arrayOfAttendanceIDs];
+                    sendToWho(wss, ws, desiredList, createUserResponseObject);
                 
                 break;    
 
