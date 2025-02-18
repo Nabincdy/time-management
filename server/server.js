@@ -148,7 +148,7 @@ wss.on("connection", (ws) => {
             
                 wss.clients.forEach(client => {
                     if (client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify(voteUpdate)); // Send vote update to all clients
+                        //client.send(JSON.stringify(voteUpdate)); // Send vote update to all clients
                     }
                 });
             }
@@ -156,28 +156,22 @@ wss.on("connection", (ws) => {
             
 
 
-            if (data.cmd === 'createTimerComponentToBrowser') {
-                //input form 
-                //    cmd: 'createTimerComponentToBrowser',
-                //    msg: {
-                //    defaultTime: defaultTime,
-                //    timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
-                //    }
-                //  };
-                // Broadcast the new timer to all connected clients
-                wss.clients.forEach(client => {
-                    if (client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify(data));
-                    }
-                });
-            }
+        //    if (data.cmd === 'createTimerComponentToBrowser') {
+        //        // input form 
+        //        //    cmd: 'createTimerComponentToBrowser',
+        //        //    msg: {
+        //        //    defaultTime: defaultTime,
+        //        //    timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
+        //        //    }
+        //        //  };
+        //        // Broadcast the new timer to all connected clients
+        //        wss.clients.forEach(client => {
+        //            if (client.readyState === WebSocket.OPEN) {
+        //                client.send(JSON.stringify(data));
+        //            }
+        //        });
+        //    }
 
-            // Broadcast message to all connected clients
-            clients.forEach((client) => {
-                if (client !== ws && client.readyState === WebSocket.OPEN) {
-                    //client.send(JSON.stringify(message));
-                }//end if forEach Broadcasting
-            }); //end forEach Broadcasting
 
 
 
@@ -210,6 +204,24 @@ wss.on("connection", (ws) => {
                     sendToWho(wss, ws, desiredList, createUserResponseObject)
                     //ws.send(JSON.stringify(createUserResponseObject)); // Send response to the client
                     break;
+                case 'resetTimerName': 
+                
+                break;    
+
+                case 'hardcodeNewTimeIntoTimer': 
+                break; 
+
+                case 'pressStart': 
+                break;   
+
+                case 'pressStop': 
+                break; 
+
+                case 'pressResetTimerTime1': 
+                break; 
+
+                case 'pressResetTimerTime2': 
+                break;
 
                 case 'addVote':
 
@@ -219,6 +231,14 @@ wss.on("connection", (ws) => {
                     let addVoteForm = addVoteMessage.form;
                     let addVoteFormString = addVoteMessage.formString;
                     let addVoteFormTime = addVoteMessage.formTime;
+
+                    let addVoteContent = addVoteMessage.form;
+                    let addVoteContentString = addVoteMessage.formString;
+                    let addVoteContentTime = addVoteMessage.formTime;
+
+                    let addVotePeople = addVoteMessage.form;
+                    let addVotePeopleString = addVoteMessage.formString;
+                    let addVotePeopleTime = addVoteMessage.formTime;
                     let listDesired = "allInMeeting"
                     //test comment for GIT. Hi Nabin!
 
