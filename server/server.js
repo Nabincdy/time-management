@@ -404,7 +404,7 @@ function createUserTimerIDFunction(wss, ws, message) {
     //input Object Form: {"cmd": "createUserTimerID", "msg": {"ELMxID": 1, "timerIDFromBrowser": 2}}
     //if(gidClients[decoded.acc]!=undefined){delete gidClients[];}
     let createUserTimerIDELMxID = message;//message.msg.ELMxID;
-    let newUserSocketID = wss.clients.indexOf(ws);
+    let newUserSocketID = ws.clientID;//wss.clients.indexOf(ws);
     let newUserID = globalUserIDs + 1;
     globalUserIDs++;
     console.log("ELMXMEETING ID SHOULD BE 0" + " " + newUserID + JSON.stringify(globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs));
