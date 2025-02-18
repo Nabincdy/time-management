@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enable Vote Button</title>
+  <style>
+    .disabled {
+      cursor: not-allowed;
+      background-color: #ddd;
+    }
+    .active {
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="form-btn" id="formbtn">Form</button>
+  <button class="content-btn" id="contentdata">Content</button>
+  <button class="people-btn" id="peoplebtn">People</button>
+  <button class="vote-btn" id="vote-btn" disabled>Vote</button>
+
+  <script>
+    // Get the buttons by their ids
+    const formBtn = document.getElementById('formbtn');
+    const contentBtn = document.getElementById('contentdata');
+    const peopleBtn = document.getElementById('peoplebtn');
+    const voteBtn = document.getElementById('vote-btn');
+
+    // Object to track if each button has been clicked
+    const buttonClicks = {
+      formBtnClicked: false,
+      contentBtnClicked: false,
+      peopleBtnClicked: false
+    };
+
+    // Function to enable the vote button when all buttons are clicked
+    function enableVoteButton() {
+      // Mark the respective button as clicked
+      if (this.id === 'formbtn') {
+        buttonClicks.formBtnClicked = true;
+      } else if (this.id === 'contentdata') {
+        buttonClicks.contentBtnClicked = true;
+      } else if (this.id === 'peoplebtn') {
+        buttonClicks.peopleBtnClicked = true;
+      }
+
+      // Check if all buttons have been clicked
+      if (buttonClicks.formBtnClicked && buttonClicks.contentBtnClicked && buttonClicks.peopleBtnClicked) {
+        voteBtn.disabled = false; // Enable the vote button
+        voteBtn.classList.remove('disabled'); // Remove the disabled class
+        voteBtn.classList.add('active'); // Add active class
+      }
+    }
+
+    // Add event listeners to the buttons
+    formBtn.addEventListener('click', enableVoteButton);
+    contentBtn.addEventListener('click', enableVoteButton);
+    peopleBtn.addEventListener('click', enableVoteButton);
+  </script>
+
+</body>
+</html>

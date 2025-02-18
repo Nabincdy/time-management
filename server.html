@@ -80,16 +80,20 @@
     }
 
     .timer-value {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       width: 80px;
-      font-size: 24px;
+      font-size: 30px;
       border: none;
-      background: goldenrod;
+      color: gold;
+      font-weight: 600;
+      background: black;
       margin-right: 8px;
+      border-radius: 10px;
     }
 
     .timer-asc {
       width: 80px;
-      font-size: 24px;
+      font-size: 12px;
       text-align: center;
       border: none;
     }
@@ -419,6 +423,17 @@
     }
 
     /* end star section */
+
+
+
+    /* people section */
+    .dropdown-item.active {
+      background-color: green !important;
+      color: white;
+    }
+
+
+    /* people section end */
   </style>
 </head>
 
@@ -699,6 +714,8 @@
 
     // Initialize display
     updateMainTimerDisplay();
+
+
   </script>
 
 
@@ -715,11 +732,18 @@
       const data = JSON.parse(event.data);
 
       console.log("Received update:", data);
-      //Main Switch/Switch Main
-      switch (data.cmd) {
-        case "createTimerComponentToBrowser":
-          // Create the timer component in this browser
 
+
+
+      //Main Switch/Switch Main
+      switch (data.cmd) {//messages from server
+        case "returnNewUserIDWithScreenCatchUp":
+          console.log("In browser returnNewUserIDWithScreenCatchUp");
+
+          break;
+        case "returnedFromServerAddTimer": //this one is from server for the non Optimistic UI draw but the one from the server
+          // Create the timer component in this browser
+          numberCitizenTimers++; // Update total number for VoteReset and color
           // Broadcast the new timer to all connected clients
           const browserIndTimerDefault = data.msg.defaultTime;
           console.log("MAIN SWITCH:createTimerComponentToBrowser" + " " + "browserIndTimerDefault:" + browserIndTimerDefault)
@@ -729,10 +753,13 @@
           //const newTimerComponent = document.createElement("div");
           //newTimerComponent.innerHTML = data.timerComponent;
           //timerContainer.appendChild(newTimerComponent);
-          createTimerComponent(browserIndTimerDefault, timerContainer);
-          break;
-        case "returnNewUserIDWithScreenCatchUp":
-          console.log("In browser returnNewUserIDWithScreenCatchUp");
+          const timerComponent = createTimerComponent(browserIndTimerDefault, timerContainer); //this has no socket.send in it
+
+          setupTimerControls(timerComponent, browserIndTimerDefault);
+
+          document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+
+
           break;
         case 'voteCountReturned':
 
@@ -748,7 +775,22 @@
           document.getElementById("universalCount").innerText = data.counters.Universal;
       }//end MAIN SWITCH/SWITCH MAIN
 
-    };
+    };//end socket.message
+
+
+
+
+
+    /////////////////////////////////////////////////////////////////
+    let workerDispatch = (cmd, msg) => {
+      console.log("WorkerDispatch cmd:" + cmd);
+      switch (cmd) {
+        case 'getNewAWSCreds':
+          console.log("Getting workerDispatch awsCres");
+          //worker.postMessage({'cmd': 'getNewAWSCreds', 'msg': msg});
+          break;
+      }//end cmd 
+    };//end workerDispatch
 
     socket.onclose = function () {
       console.log("Disconnected from WebSocket server. Reconnecting...");
@@ -885,6 +927,12 @@
       });//contentBtns
 
 
+      // Reset the background color for all people-btn elements
+      const peopleBtns = document.querySelectorAll(".people-btn"); // Use querySelectorAll for global selection
+      peopleBtns.forEach(peopleBtn => {
+        peopleBtn.style.backgroundColor = ""; // Reset background color for each people button
+      });
+
       resetDropdownButtons();
 
 
@@ -947,6 +995,7 @@
       let wasRunning = false;
       let ascSeconds = 0;
 
+      
 
       // Vote button functionality
       const voteBtn = timerComponent.querySelector(".vote-btn");
@@ -1031,7 +1080,7 @@
             onComplete();
             startPauseBtn.textContent = "▶️";
             //stop the ascending timer when the count down reaches
-            if(ascIntervalId){
+            if (ascIntervalId) {
               clearInterval(ascIntervalId);
               ascIntervalId = null;
             }
@@ -1235,17 +1284,18 @@
     function addTimer() {
 
       const defaultTime = defaultTimeInput.value;
-      numberCitizenTimers++; // Update total number for VoteReset and color
-
-      const timerComponent = createTimerComponent(defaultTime, timerList);
-      setupTimerControls(timerComponent, defaultTime);
-
-      document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+      // numberCitizenTimers++; // Update total number for VoteReset and color
+      // 
+      // const timerComponent = createTimerComponent(defaultTime, timerList);
+      // setupTimerControls(timerComponent, defaultTime);
+      // 
+      // document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
 
       const message = {
-        cmd: 'createTimerComponentToBrowser',
+        cmd: 'addTimerToServer',
         msg: {
           defaultTime: defaultTime,//10:23
+          ELMxID: 0, //this is hardcoded still as of Feb 17 2025
           // timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
         }
       };
@@ -1487,8 +1537,8 @@
           <button class="remove-btn">❌</button>
           <button class="form-btn" id="formbtn">Form</button>
           <button class="content-btn" id="contentdata">Content</button>
-          <button class="people-btn">People</button>
-          <button class="vote-btn">Vote</button>
+          <button class="people-btn" id="peoplebtn">People</button>
+          <button class="vote-btn" id="vote-btn" disabled>Vote</button>
         </div>
       `;
 
@@ -1547,6 +1597,12 @@
         if (!contentBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
           dropdownMenu.classList.remove("show-dropdown");
         }
+        if (!peopleBtn.contains(event.target) && !peopleDropdownMenu.contains(event.target)) {
+          peopleDropdownMenu.classList.remove("show-dropdown");
+        }
+        if (!formBtn.contains(event.target) && !formDropdownMenu.contains(event.target)) {
+          formDropdownMenu.classList.remove("show-dropdown");
+        }
       });
 
       // Create dropdown menu inside form-btn
@@ -1572,9 +1628,9 @@
         </div>
         <div class="dropdown-item" id="godmodebutton">3. God Mode
           <div class="submenu">
-            <button class="submenu-item">Same People</button>
-            <button class="submenu-item">Remove People</button>
-            <button class="submenu-item">Add People</button>
+            <button class="submenu-item">God</button>
+            <button class="submenu-item">Diety</button>
+            <button class="submenu-item">Spirit</button>
           </div>
         </div>
       `;
@@ -1586,9 +1642,57 @@
       });
 
 
-      document.addEventListener("click", (event) => {
-        if (!formBtn.contains(event.target) && !formDropdownMenu.contains(event.target)) {
-          formDropdownMenu.classList.remove("show-dropdown");
+
+
+
+      // Create dropdown menu inside people-btn
+      const peopleBtn = timerComponent.querySelector(".people-btn");
+      const peopleDropdownMenu = document.createElement("div");
+      peopleDropdownMenu.classList.add("dropdown-menu");
+
+      peopleDropdownMenu.innerHTML = `
+  <button class="dropdown-item" data-action="same">Same People</button>
+  <button class="dropdown-item" data-action="remove">Remove People</button>
+  <button class="dropdown-item" data-action="add">Add People</button>
+`;
+
+      // Append the dropdown to the button
+      peopleBtn.appendChild(peopleDropdownMenu);
+
+      // Toggle dropdown visibility
+      peopleBtn.addEventListener("click", () => {
+        peopleDropdownMenu.classList.toggle("show-dropdown");
+      });
+
+      // Handle click events for people dropdown
+      peopleDropdownMenu.addEventListener("click", (e) => {
+        if (e.target.classList.contains("dropdown-item")) {
+          // Reset the background color for all items
+          const items = peopleDropdownMenu.querySelectorAll(".dropdown-item");
+          items.forEach(item => {
+            item.style.backgroundColor = ""; // Reset all item backgrounds
+          });
+
+          // Apply background color to the clicked item
+          e.target.style.backgroundColor = "green"; // You can change the color as needed
+          peopleBtn.style.backgroundColor = "green"; // Change to desired color
+
+          const action = e.target.dataset.action;
+
+          switch (action) {
+            case "same":
+              console.log("Same People selected");
+              break;
+            case "remove":
+              console.log("Remove People selected");
+              break;
+            case "add":
+              console.log("Add People selected");
+              break;
+          }
+
+          // Close the dropdown after selection
+          peopleDropdownMenu.classList.remove("show-dropdown");
         }
       });
 
@@ -1604,7 +1708,7 @@
         }
 
 
-  
+
 
         // function updateClickCountDisplay() {
         //   const list = document.getElementById("click-counts-list");
@@ -1618,22 +1722,22 @@
         // }
 
         function updateClickCountDisplay(numberOfCitizens) {
-    const list = document.getElementById("click-counts-list");
-    list.innerHTML = ""; // Clear previous list
+          const list = document.getElementById("click-counts-list");
+          list.innerHTML = ""; // Clear previous list
 
-    // Sort the counts in descending order
-    const sortedEntries = Object.entries(window.submenuClickCounts).sort((a, b) => b[1] - a[1]);
+          // Sort the counts in descending order
+          const sortedEntries = Object.entries(window.submenuClickCounts).sort((a, b) => b[1] - a[1]);
 
-    // Loop through the sorted entries and display them
-    sortedEntries.forEach(([item, count]) => {
-        // Divide the count by the number of citizens
-        const adjustedCount = numberOfCitizens ? (count / numberOfCitizens).toFixed(2) : count;
+          // Loop through the sorted entries and display them
+          sortedEntries.forEach(([item, count]) => {
+            // Divide the count by the number of citizens
+            const adjustedCount = numberOfCitizens ? (count / numberOfCitizens).toFixed(2) : count;
 
-        const listItem = document.createElement("li");
-        listItem.innerText = `${item}: ${adjustedCount} clicks per citizen`;
-        list.appendChild(listItem);
-    });
-}
+            const listItem = document.createElement("li");
+            listItem.innerText = `${item}: ${adjustedCount} clicks per citizen`;
+            list.appendChild(listItem);
+          });
+        }
 
 
         //         function updateClickCountDisplay() {
@@ -1734,6 +1838,46 @@
         resetVotesBtn.style.backgroundColor = 'green';
         resetVotesBtn.style.color = 'black';
       }
+
+
+
+
+
+    const voteBtn = document.getElementById('vote-btn');
+
+    // Object to track if each button has been clicked
+    const buttonClicks = {
+      formBtnClicked: false,
+      contentBtnClicked: false,
+      peopleBtnClicked: false
+    };
+
+    // Function to enable the vote button when all buttons are clicked
+    function enableVoteButton() {
+      // Mark the respective button as clicked
+      if (this.id === 'formbtn') {
+        buttonClicks.formBtnClicked = true;
+      } else if (this.id === 'contentdata') {
+        buttonClicks.contentBtnClicked = true;
+      } else if (this.id === 'peoplebtn') {
+        buttonClicks.peopleBtnClicked = true;
+      }
+
+      // Check if all buttons have been clicked
+      if (buttonClicks.formBtnClicked && buttonClicks.contentBtnClicked && buttonClicks.peopleBtnClicked) {
+        voteBtn.disabled = false; // Enable the vote button
+        voteBtn.classList.remove('disabled'); // Remove the disabled class
+        voteBtn.classList.add('active'); // Add active class
+      }
+    }
+
+
+    formBtn.addEventListener('click', enableVoteButton);
+    contentBtn.addEventListener('click', enableVoteButton);
+    peopleBtn.addEventListener('click', enableVoteButton);
+
+
+
 
 
 
