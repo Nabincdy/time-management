@@ -23,7 +23,7 @@ globalELMxArray = {
         }, //end flow roles
         "arrayOfAttendanceIDs": {},
         "participants": {
-            "NumberOfParticipants": 2,
+            "NumberOfParticipants": 0,
             "paretoCategories": {
 
                 "participant1": { "aesthetic": 6, "social": 6, "wealth": 4, "body": 5, "culturedness": 8, "IQ": 9, "UQ": 1 },
@@ -424,7 +424,7 @@ function createUserTimerIDFunction(wss, ws, message) {
 
 
 
-function sendToWho(wss, ws, listDesired, messageToBrowser) {
+function sendToWho(wss, ws, listDesired, messageToBrowser, meetingIDIfNeeded) {
     //listDesired let desiredList= ["particular", globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs]
     // clients.forEach((client) => {
     //if (client.readyState === WebSocket.OPEN) {
@@ -475,11 +475,11 @@ function sendToWho(wss, ws, listDesired, messageToBrowser) {
         case "individualOne":
             // Define logic for sending to a single client
             let individualUserWS = ws; //setting this in what appears to be redundent but makes it clear we are in individual and only sending to an individual user
-            //let individualUserID = wss.clients.indexOf(individualUserWS);
+            let individualUserID = ws.clientID;
 
-            if(globalUserIDsWebsocketObject[individualUserID]!=undefined){//this is here for lost connections. If they lose connection then their websocket isn't closed and will still take up space in the wss array. So when they log back in we check to see if their GID is alrady in gidClients because it shouldn't be. If it is, then we find the socket it used to be registered at, use that socketIndex to delete the old ws information, then re-add their gid to gidClients with the new socketIndex. this way our websocket wss array doesn't get full of millions of unused ws objects from being disconnected. There migth already be some kind clean up mechanism but I'm doing it in case
-                delete globalUserIDsWebsocketObject[individualUserID];
-              }
+          //  if(globalUserIDsWebsocketObject[individualUserID]!=undefined){//this is here for lost connections. If they lose connection then their websocket isn't closed and will still take up space in the wss array. So when they log back in we check to see if their GID is alrady in gidClients because it shouldn't be. If it is, then we find the socket it used to be registered at, use that socketIndex to delete the old ws information, then re-add their gid to gidClients with the new socketIndex. this way our websocket wss array doesn't get full of millions of unused ws objects from being disconnected. There migth already be some kind clean up mechanism but I'm doing it in case
+          //      delete globalUserIDsWebsocketObject[individualUserID];
+          //    }
 
             if (socketID !== -1) {
                 // socketID found, proceed with sending the message
@@ -487,11 +487,41 @@ function sendToWho(wss, ws, listDesired, messageToBrowser) {
                 individualUserWS.send(JSON.stringify(messageToBrowser));
             } else {
                 console.log("WebSocket client not found. Removing ID from globalUserIDsWebsocketObject and clients ");
-                
-                globalUserIDsWebsocketObject
+                delete globalUserIDsWebsocketObject[individualUserID].arrayOfAttendanceIDs[individualUserID;
+                delete globalUserIDsWebsocketObject[meetingIDIfNeeded].arrayOfAttendanceIDs[individualUserID;
             }
             break;
     }
 }
 //   });
 //}
+
+
+globalELMxArray = {
+    "0": { //ELMxID..this is an example instantiation
+        "flow roles": {
+            "executorName": "spiritman/ID",
+            "influencerName": "spiritman",
+            "strategistName": "spiritman",
+            "relationshipsName": "spiritman"
+
+        }, //end flow roles
+        "arrayOfAttendanceIDs": {},
+        "participants": {
+            "NumberOfParticipants": 0,
+            "paretoCategories": {
+
+                "participant1": { "aesthetic": 6, "social": 6, "wealth": 4, "body": 5, "culturedness": 8, "IQ": 9, "UQ": 1 },
+                "participant2": { "aesthetic": 2, "social": 9, "wealth": 5, "body": 3, "culturedness": 7, "IQ": 4, "UQ": 1 }
+
+            },//end paretoCategories
+        },//end participants
+
+        
+
+                    }//end participant1CurrentMeetingVotingHistory
+                },//end participant1
+            },//end individualParticipantVotes
+        },//end voting
+    } //end ELMxID 1
+};//end globalELMxArray
