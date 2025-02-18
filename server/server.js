@@ -175,7 +175,7 @@ wss.on("connection", (ws) => {
             // Broadcast message to all connected clients
             clients.forEach((client) => {
                 if (client !== ws && client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify(message));
+                    //client.send(JSON.stringify(message));
                 }//end if forEach Broadcasting
             }); //end forEach Broadcasting
 
@@ -183,19 +183,30 @@ wss.on("connection", (ws) => {
 
             //MAIN SWITCH
             switch (message.cmd) {//FLAG: Nabin bind on client side (created 9:50am mst Feb 11 2025)
-                case 'createTimerComponent(wait)':
+                //Mark: Feb 17 2025: thefunction for newUserID is in the wss.on, not here.
+                case 'addTimerToServer':
+                    console.log("Main Switch: Inside addTimerToServer");
                     //input Object Form: {"cmd": "createUserTimerID", "msg": {"ELMxID": 1, "timerIDFromBrowser": 2}}
                     //if(gidClients[decoded.acc]!=undefined){delete gidClients[];}
-                    let createUserTimerIDELMxID = message.msg.ELMxID;
+                    let createTimerIDELMxID = message.msg.ELMxID;
                     let timerIDFromBrowser = message.msg.timerIDFromBrowser;
-                    let newUserID = globalUserIDs + 1;
-                    globalUserIDs++;
-                    globaUserIDsWebsocketObject[newUserID] = ws;
+                    let defaultTimeOfNewlyAddedTimer = message.msg.defaultTime;
+                    let newTimerID = globalTimerIDs + 1;
+                    globalTimerIDs++;
+                    console.log("Inside createTimerComponentToBrowser:"+createTimerIDELMxID+" "+newTimerID);
+                    
 
-                    globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs[newUserID] = newUserID;
+                    globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {};//end globalUserIDS
 
-                    let createUserResponseObject = { "cmd": "returnNewUserID", "msg": { "newID": newUserID, "timerBrowserID": timerIDFromBrowser } };
-                    let desiredList = ["particularSome", globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs];
+                    globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {
+                        "name": "Ben", 
+                        "remainingTime": 10, 
+                        "personAssignedID": "ID3"
+            
+                    }//end timers
+                    
+                    let createUserResponseObject = { "cmd": "returnedFromServerAddTimer", "msg": { "newTimerID": newTimerID, "defaultTime": defaultTimeOfNewlyAddedTimer, "timerBrowserID": timerIDFromBrowser } };
+                    let desiredList = ["particularSome", globalELMxArray[createTimerIDELMxID].arrayOfAttendanceIDs];
                     sendToWho(wss, ws, desiredList, createUserResponseObject)
                     //ws.send(JSON.stringify(createUserResponseObject)); // Send response to the client
                     break;
