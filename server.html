@@ -537,9 +537,34 @@
       }
 
       .timer-veto {
-        width: 30px;
-        /* Adjust width as desired */
-      }
+    width: 30px; 
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc; 
+    border-radius: 4px;
+    background-color: #f9f9f9; 
+    color: #333; 
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+/* Change border color when the input field is focused */
+.timer-veto:focus {
+    border-color: #4CAF50; 
+    background-color: #e8f5e9; 
+    outline: none; 
+}
+
+/* Add a box shadow effect for better focus */
+.timer-veto:focus {
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+/* Optional: Add placeholder text styling */
+.timer-veto::placeholder {
+    color: #999; /* Gray placeholder text */
+    font-style: italic;
+}
+
     </style>
 
 
@@ -1528,7 +1553,7 @@
         <input type="text" placeholder="Timer Title" class="timer-title"/>
         <input type="text" value="${defaultTime}" class="timer-value"/> 
         <input type="text" value="00:00" class="timer-asc"/>
-        <input type="text" placeholder="veto" class="timer-veto" style="width: 30px;"/> <!-- Shorter width for veto -->
+        <input type="text" placeholder="veto" class="timer-veto"/> <!-- Shorter width for veto -->
 
         <div class="flex-row">
           <button class="start-pause-btn">▶️</button>
