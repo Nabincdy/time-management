@@ -119,7 +119,23 @@ const wss = new WebSocket.Server({ server });
 const clients = new Set();
 
 wss.on("connection", (ws) => {
-    console.log("New Client Connected");
+
+
+    function safeStringify(obj) {
+        const seen = new Set();
+        return JSON.stringify(obj, (key, value) => {
+          if (typeof value === "object" && value !== null) {
+            if (seen.has(value)) {
+              return; // Prevent circular reference
+            }
+            seen.add(value);
+          }
+          return value;
+        });
+      }
+      
+      console.log("New Client Connected: " + safeStringify(ws));
+    
     clients.add(ws);
     let hardcodedMeetingIDTest = "0"
     createUserTimerIDFunction(wss, ws, hardcodedMeetingIDTest);
