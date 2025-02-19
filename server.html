@@ -799,6 +799,19 @@
       switch (data.cmd) {//messages from server
         case "returnNewUserIDWithScreenCatchUp":
           console.log("In browser returnNewUserIDWithScreenCatchUp");
+          let allELMxData = data.msg; //for this meeting currently hardcoded at ELM "0"
+          let allTimersData = allELMxData.timers 
+
+
+
+                      for (let key in allTimersData) {
+              if (allTimersData.hasOwnProperty(key)) {
+                // Your code to access the key and its value
+                let singleTimer = allTimersData[key];
+                console.log("key:"+key+ " singleTimer:"+JSON.stringify(singleTimer));
+              }//end if statement
+            }//end for loop
+
 
           break;
         case "returnedFromServerAddTimer": //this one is from server for the non Optimistic UI draw but the one from the server
