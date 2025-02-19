@@ -229,7 +229,31 @@ wss.on("connection", (ws) => {
                     let desiredListName = ["particularSome", globalELMxArray[resetTimerName_meetingID].arrayOfAttendanceIDs];
                     sendToWho(wss, ws, desiredListName, createUserResponseObjectName);
                 
-                break;    
+                break;  
+
+
+                case 'resetVetoName': 
+    // Input: {"cmd": "resetVetoName", "msg": {"ELMxID": 0, "vetoNewName": name}}
+    let resetVetoName_meetingID = message.msg.ELMxID;
+    let resetVetoName_vetoNewTitleID = message.msg.vetoNewTitleID;
+    let vetoNewName = message.msg.vetoNewName;
+
+    let createUserResponseObjectVetoName = { 
+        "cmd": "returnedFromServerResetVetoName", 
+        "msg": {
+            "ELMxID": resetVetoName_meetingID, 
+            "vetoElementID": resetVetoName_vetoNewTitleID, 
+            "vetoNewName": vetoNewName
+        } 
+    };
+
+    let desiredListVetoName = ["particularSome", globalELMxArray[resetVetoName_meetingID].arrayOfAttendanceIDs];
+    sendToWho(wss, ws, desiredListVetoName, createUserResponseObjectVetoName);
+
+    break;
+
+
+
 
                 case 'hardcodeNewTimeIntoTimer': 
                 break; 

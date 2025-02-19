@@ -633,7 +633,8 @@
 
 
     <div id="mainTimerContainer" class="timer">
-      <input type="text" id2="mainTimerID2-1" id="timerTitle" class="timer-title" value="Total Time" oninput="updateTimerTitle()" />
+      <input type="text" id2="mainTimerID2-1" id="timerTitle" class="timer-title" value="Total Time"
+        oninput="updateTimerTitle()" />
       <input type="text" id2="mainTimerID2-2" id="mainTimer" class="timer-value" value="60:00" />
       <!-- <input type="text" id="mainTimer" class="timer-value" value="10:00" oninput="updateMainTimerFromInput()" /> -->
 
@@ -660,7 +661,7 @@
     let mainTimerSeconds = 600; // Timer starts at 10 minutes (600 seconds)
     let isTimerRunning = false;
     let numberCitizenTimers = 0;
-    let globalTimerIDs=0 //in createTimerComponent it generates a new ID for each one and each button has a subreference
+    let globalTimerIDs = 0 //in createTimerComponent it generates a new ID for each one and each button has a subreference
 
     // Function to update the timer display
     function updateMainTimerDisplay() {
@@ -679,24 +680,24 @@
 
       //const inputField = document.getElementById('timerTitle'); // The ID of the input field
 
-       // title.addEventListener('blur', function() {
-          const timerNameElement = document.querySelector(`.timer[id2="${timerID}"]`);
-          console.log("timerNameElement in mainTimer:"+JSON.stringify(timerNameElement))
-          //const timerNewName = inputField.value; // Get the value entered by the user
-            const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
-//hereMark
-          const timerNewName = timerNameElement.value; // Get the value entered by the user
-          const timerNewTitleID = timerNameElement.id2; // Get the value entered by the user
-            //const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
-            console.log("Event Listener set in createTimerComponent: " + timerNewName);
+      // title.addEventListener('blur', function() {
+      const timerNameElement = document.querySelector(`.timer[id2="${timerID}"]`);
+      console.log("timerNameElement in mainTimer:" + JSON.stringify(timerNameElement))
+      //const timerNewName = inputField.value; // Get the value entered by the user
+      const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
+      //hereMark
+      const timerNewName = timerNameElement.value; // Get the value entered by the user
+      const timerNewTitleID = timerNameElement.id2; // Get the value entered by the user
+      //const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
+      console.log("Event Listener set in createTimerComponent: " + timerNewName);
 
-            // Send the new timer name to the server when the user unfocuses the input field
-            socket.send(JSON.stringify("inside of blur updateTimerTitleName"));
-            let responseObject = {"cmd": "resetTimerName", "msg": {"ELMxID": ELMxID, "timerNewTitleID": timerNewTitleID, "timerNewName": timerNewName}}
-            socket.send(JSON.stringify(responseObject));
-            console.log("Timer title sending to socket: " + timerNewName);
-        //});//end event handler blur
-      }//end updateTimerTitle
+      // Send the new timer name to the server when the user unfocuses the input field
+      socket.send(JSON.stringify("inside of blur updateTimerTitleName"));
+      let responseObject = { "cmd": "resetTimerName", "msg": { "ELMxID": ELMxID, "timerNewTitleID": timerNewTitleID, "timerNewName": timerNewName } }
+      socket.send(JSON.stringify(responseObject));
+      console.log("Timer title sending to socket: " + timerNewName);
+      //});//end event handler blur
+    }//end updateTimerTitle
 
     // Toggle between start and pause button
     function toggleStartPause() {
@@ -800,17 +801,17 @@
         case "returnNewUserIDWithScreenCatchUp":
           console.log("In browser returnNewUserIDWithScreenCatchUp");
           let allELMxData = data.msg; //for this meeting currently hardcoded at ELM "0"
-          let allTimersData = allELMxData.timers 
+          let allTimersData = allELMxData.timers
 
 
 
-                      for (let key in allTimersData) {
-              if (allTimersData.hasOwnProperty(key)) {
-                // Your code to access the key and its value
-                let singleTimer = allTimersData[key];
-                console.log("key:"+key+ " singleTimer:"+JSON.stringify(singleTimer));
-              }//end if statement
-            }//end for loop
+          for (let key in allTimersData) {
+            if (allTimersData.hasOwnProperty(key)) {
+              // Your code to access the key and its value
+              let singleTimer = allTimersData[key];
+              console.log("key:" + key + " singleTimer:" + JSON.stringify(singleTimer));
+            }//end if statement
+          }//end for loop
 
 
           break;
@@ -835,35 +836,70 @@
 
           break;
 
-          case "returnedFromServerResetTimerName":
-              //input  msg: { ELMxID: 0, timerNewTitleID: '', timerNewName: 'Mark' } }
-              let timerNewName=data.msg.timerNewName;
-              let nameElementID = data.msg.timerElementID;              ;
-              console.log("nameElementID:"+nameElementID);
-              const titleInputField = document.querySelector(`[data-id="${nameElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
+        case "returnedFromServerResetTimerName":
+          //input  msg: { ELMxID: 0, timerNewTitleID: '', timerNewName: 'Mark' } }
+          let timerNewName = data.msg.timerNewName;
+          let nameElementID = data.msg.timerElementID;;
+          console.log("nameElementID:" + nameElementID);
+          const titleInputField = document.querySelector(`[data-id="${nameElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
 
-            console.log("newTimerName:"+timerNewName+" element"+JSON.stringify(titleInputField));
+          console.log("newTimerName:" + timerNewName + " element" + JSON.stringify(titleInputField));
 
-        
+
 
           titleInputField.value = timerNewName;
-              
-            break;
 
-            case "returnedFromServerManualSetTime":
-              //input  msg: { ELMxID: 0, timerNewTitleID: '', timerNewName: 'Mark' } }
-              let timerNewManualTime=data.msg.timerNewName;
-              let manualTimeElementID = data.msg.manualTimeElementID;              ;
-              console.log("nameElementID:"+nameElementID);
-              const manualTimeInputField = document.querySelector(`[data-id="${nameElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
+          break;
 
-            console.log("newTimerName:"+timerNewName+" element"+JSON.stringify(manualTimeInputField));
+        case "returnedFromServerManualSetTime":
+          //input  msg: { ELMxID: 0, timerNewTitleID: '', timerNewName: 'Mark' } }
+          let timerNewManualTime = data.msg.timerNewName;
+          let manualTimeElementID = data.msg.manualTimeElementID;;
+          console.log("nameElementID:" + nameElementID);
+          const manualTimeInputField = document.querySelector(`[data-id="${nameElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
 
-        
+          console.log("newTimerName:" + timerNewName + " element" + JSON.stringify(manualTimeInputField));
 
-            manualTimeInputField.value = timerNewName;
-              
-            break;
+
+          manualTimeInputField.value = timerNewName;
+
+          break;
+
+
+        case "returnedFromServerResetVetoName":
+          // input msg: { ELMxID: 0, vetoNewTitleID: '', vetoNewName: 'Veto Mark' }
+          let vetoNewName = data.msg.vetoNewName;
+          let vetoElementID = data.msg.vetoElementID;
+          console.log("vetoElementID:" + vetoElementID);
+
+          const vetoInputField = document.querySelector(`[data-id="${vetoElementID}"]`); // Select the veto input field
+
+          console.log("newVetoName:" + vetoNewName + " element" + JSON.stringify(vetoInputField));
+
+          if (vetoInputField) {
+            vetoInputField.value = vetoNewName;
+          }
+
+          break;
+
+
+        case "returnedFromServerManualSetVetoTime":
+          // input msg: { ELMxID: 0, vetoManualTimeID: '', vetoNewManualTime: '00:30' }
+          let vetoNewManualTime = data.msg.vetoNewManualTime;
+          let vetoManualTimeElementID = data.msg.vetoManualTimeElementID;
+          console.log("vetoManualTimeElementID:" + vetoManualTimeElementID);
+
+          const vetoManualTimeInputField = document.querySelector(`[data-id="${vetoManualTimeElementID}"]`); // Select the veto time input field
+
+          console.log("newVetoManualTime:" + vetoNewManualTime + " element" + JSON.stringify(vetoManualTimeInputField));
+
+          if (vetoManualTimeInputField) {
+            vetoManualTimeInputField.value = vetoNewManualTime;
+          }
+
+          break;
+
+
         case 'voteCountReturned':
 
           break;
@@ -1627,20 +1663,20 @@
       timerComponent.people = "people timer default";
       timerComponent.votesubmit = "votesubmit timer default";
 
-    // Create the input elements first
-    //const timerTitleInput = document.createElement("input");
-    //timerTitleInput.setAttribute("type", "text");
-    //timerTitleInput.setAttribute("placeholder", "Timer Title");
-    //timerTitleInput.setAttribute("class", "timer-title");
-    //timerTitleInput.setAttribute("id", `${newTimerID}-100`);
-//
-    //timerComponent.appendChild(timerTitleInput);
+      // Create the input elements first
+      //const timerTitleInput = document.createElement("input");
+      //timerTitleInput.setAttribute("type", "text");
+      //timerTitleInput.setAttribute("placeholder", "Timer Title");
+      //timerTitleInput.setAttribute("class", "timer-title");
+      //timerTitleInput.setAttribute("id", `${newTimerID}-100`);
+      //
+      //timerComponent.appendChild(timerTitleInput);
 
       timerComponent.innerHTML = `
         <input data-id="${newTimerID}-1" type="text" placeholder="Timer Title" class="timer-title"/>
         <input id2="${newTimerID}"-2 type="text" value="${defaultTime}" class="timer-value"/> 
         <input id2="${newTimerID}"-3 type="text" value="00:00" class="timer-asc"/>
-        <input id2="${newTimerID}"-4 type="text" placeholder="veto" class="timer-veto"/> <!-- Shorter width for veto -->
+        <input data-id="${newTimerID}-4" type="text" placeholder="veto" class="timer-veto"/> <!-- Shorter width for veto -->
 
         <div class="flex-row">
           <button id2="${newTimerID}"-5 class="start-pause-btn">▶️</button>
@@ -1655,29 +1691,59 @@
       `;
 
 
-      
+
       timerList.appendChild(timerComponent);
 
       console.log("Event Listener set in createTimerComponent: ");
 
       //setTimeout(function() {
-        const titleInputField = timerComponent.querySelector(`[data-id="${newTimerID}-1"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
-        console.log("titleInputField using querySelector:"+JSON.stringify(titleInputField));
-//}, 1000);
+      const titleInputField = timerComponent.querySelector(`[data-id="${newTimerID}-1"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
+      console.log("titleInputField using querySelector:" + JSON.stringify(titleInputField));
+      //}, 1000);
 
-         titleInputField.addEventListener('blur', function() {
-        
-          const timerNewName = titleInputField.value; // Get the value entered by the user
-          const timerNewTitleID = titleInputField.getAttribute('data-id'); // Get the value entered by the user
-            const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
-            console.log("Event Listener set in createTimerComponent: " + timerNewName);
-           // Send the new timer name to the server when the user unfocuses the input field
-            socket.send(JSON.stringify("inside of blur updateTimerTitleName"));
-            let responseObject = {"cmd": "resetTimerName", "msg": {"ELMxID": 0, "timerNewTitleID": timerNewTitleID, "timerNewName": timerNewName}}
-            //workerDispatch(JSON.stringify(responseObject))
-            socket.send(JSON.stringify(responseObject));
-            console.log("Timer title sending to socket: " + timerNewName);
-        });//end event handler blur
+      titleInputField.addEventListener('blur', function () {
+
+        const timerNewName = titleInputField.value; // Get the value entered by the user
+        const timerNewTitleID = titleInputField.getAttribute('data-id'); // Get the value entered by the user
+        const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
+        console.log("Event Listener set in createTimerComponent: " + timerNewName);
+        // Send the new timer name to the server when the user unfocuses the input field
+        socket.send(JSON.stringify("inside of blur updateTimerTitleName"));
+        let responseObject = { "cmd": "resetTimerName", "msg": { "ELMxID": 0, "timerNewTitleID": timerNewTitleID, "timerNewName": timerNewName } }
+        //workerDispatch(JSON.stringify(responseObject))
+        socket.send(JSON.stringify(responseObject));
+        console.log("Timer title sending to socket: " + timerNewName);
+      });//end event handler blur
+
+
+
+      // setTimeout(function() {
+      const vetoInputField = timerComponent.querySelector(`[data-id="${newTimerID}-4"]`);
+      console.log("vetoInputField using querySelector:" + JSON.stringify(vetoInputField));
+      // }, 1000);
+
+      vetoInputField.addEventListener('blur', function () {
+        const vetoNewName = vetoInputField.value; // Get the value entered by the user
+        const vetoNewTitleID = vetoInputField.getAttribute('data-id'); // Get the attribute ID
+        const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
+        console.log("Event Listener set in createTimerComponent: " + vetoNewName);
+
+        // Send the new veto name to the server when the user unfocuses the input field
+        socket.send(JSON.stringify("inside of blur updateVetoName"));
+
+        let responseObject = {
+          "cmd": "resetVetoName",
+          "msg": {
+            "ELMxID": ELMxID,
+            "vetoNewTitleID": vetoNewTitleID,
+            "vetoNewName": vetoNewName
+          }
+        };
+
+        socket.send(JSON.stringify(responseObject));
+        console.log("Veto title sending to socket: " + vetoNewName);
+      });//end event handler blur
+
 
       const contentBtn2 = document.getElementById("contentdata");
       console.log("CONTENTBUTTON:" + contentBtn2)
