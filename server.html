@@ -799,19 +799,39 @@
       //Main Switch/Switch Main
       switch (data.cmd) {//messages from server
         case "returnNewUserIDWithScreenCatchUp":
-          console.log("In browser returnNewUserIDWithScreenCatchUp");
-          let allELMxData = data.msg; //for this meeting currently hardcoded at ELM "0"
-          let allTimersData = allELMxData.timers
+          
+          let allELMxData = data.msg.allMeetingData; //for this meeting currently hardcoded at ELM "0"
+          let allTimersData = allELMxData.timers 
+
+          console.log("In browser returnNewUserIDWithScreenCatchUp:"+JSON.stringify(allTimersData));
+
+                      for (let key in allTimersData) {
+              if (allTimersData.hasOwnProperty(key)) {
+                //NOTE: Feb 19 2025: before you can run these DOM functions, the DOMContentLoaded must load but the websocket starts before it so we must load the variables until DOM is done and grab them.
+                // Your code to access the key and its value
+                let singleTimerData = allTimersData[key];
+                                // Create the timer component in this browser
+                      numberCitizenTimers++; // Update total number for VoteReset and color
+                      // Broadcast the new timer to all connected clients
+                      const browserIndTimerDefault = singleTimerData.defaultTime;
+                      const serverTimerID = singleTimerData.timerServerID;
+                      console.log("MAIN SWITCH:createTimerComponentToBrowser" + " " + "browserIndTimerDefault:" + browserIndTimerDefault)
 
 
+                      const timerContainer = document.getElementById("timerList");
+                      //const newTimerComponent = document.createElement("div");
+                      //newTimerComponent.innerHTML = data.timerComponent;
+                      //timerContainer.appendChild(newTimerComponent);
+                      const timerComponent = createTimerComponent(singleTimerData, timerContainer); //this has no socket.send in it
 
-          for (let key in allTimersData) {
-            if (allTimersData.hasOwnProperty(key)) {
-              // Your code to access the key and its value
-              let singleTimer = allTimersData[key];
-              console.log("key:" + key + " singleTimer:" + JSON.stringify(singleTimer));
-            }//end if statement
-          }//end for loop
+                      setupTimerControls(timerComponent, browserIndTimerDefault);
+
+                      document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+
+
+                console.log("key:"+key+ " singleTimer:"+JSON.stringify(singleTimerData));
+              }//end if statement
+            }//end for loop
 
 
           break;
@@ -819,15 +839,18 @@
           // Create the timer component in this browser
           numberCitizenTimers++; // Update total number for VoteReset and color
           // Broadcast the new timer to all connected clients
-          const browserIndTimerDefault = data.msg.defaultTime;
+          let allThisTimerData= data.msg.allMeetingData
+          const browserIndTimerDefault = data.msg.allMeetingData.defaultTime;
+          const serverTimerID = data.msg.allMeetingData.newTimerID;
+          const timerTitle = data.msg.allMeetingData.name;
           console.log("MAIN SWITCH:createTimerComponentToBrowser" + " " + "browserIndTimerDefault:" + browserIndTimerDefault)
-
+            console.log("MAIN SWITCH:createTimerComponentToBrowser: NAME:"+timerTitle)
 
           const timerContainer = document.getElementById("timerList");
           //const newTimerComponent = document.createElement("div");
           //newTimerComponent.innerHTML = data.timerComponent;
           //timerContainer.appendChild(newTimerComponent);
-          const timerComponent = createTimerComponent(browserIndTimerDefault, timerContainer); //this has no socket.send in it
+          const timerComponent = createTimerComponent(allThisTimerData, timerContainer); //this has no socket.send in it
 
           setupTimerControls(timerComponent, browserIndTimerDefault);
 
@@ -839,7 +862,8 @@
         case "returnedFromServerResetTimerName":
           //input  msg: { ELMxID: 0, timerNewTitleID: '', timerNewName: 'Mark' } }
           let timerNewName = data.msg.timerNewName;
-          let nameElementID = data.msg.timerElementID;;
+          let resetTimerName_timerServerID = data.msg.timerServerID;
+          let nameElementID = resetTimerName_timerServerID+"-1";//Feb 19 2025: where did we get the -1 from? Its just a code we made to differentiaete the elements with custom data-id. It is made by the timer over ID with the component number with a "-" seperating them.
           console.log("nameElementID:" + nameElementID);
           const titleInputField = document.querySelector(`[data-id="${nameElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
 
@@ -1100,6 +1124,7 @@
         Notification.requestPermission().then(permission => {
           if (permission === "granted") {
             new Notification(title, options);
+            
           }
         });
       }
@@ -1652,10 +1677,13 @@
 */
     ///////////////NEXT FUNCTION (they must go in this order. )
 
-    function createTimerComponent(defaultTime, timerList, totalVotes) {
-      let newTimerID = globalTimerIDs;
+    function createTimerComponent(allThisTimerDataFromServer, timerList, totalVotes) {
+      //NOTE: Feb 19 2025: this timer function is called AFTER we return from server with server made global ID for this timer. The server keeps track of the ID not browser.
+      let defaultTime = allThisTimerDataFromServer.defaultTime;
+      let newTimerID = allThisTimerDataFromServer.timerServerID;
+      let timerTitle = allThisTimerDataFromServer.name;
       globalTimerIDs++
-      console.log("Start createTimerComponent defaultTime:" + JSON.stringify(defaultTime) + " " + "timerList:" + JSON.stringify(timerList));
+      console.log("Start createTimerComponent defaultTime:" + JSON.stringify(defaultTime) + ": timerTitle: "+timerTitle + " timerList:" + JSON.stringify(timerList));
       const timerComponent = document.createElement("div");
       timerComponent.className = "timer";
       timerComponent.flow = "flow timer default";
@@ -1673,7 +1701,7 @@
       //timerComponent.appendChild(timerTitleInput);
 
       timerComponent.innerHTML = `
-        <input data-id="${newTimerID}-1" type="text" placeholder="Timer Title" class="timer-title"/>
+        <input data-id="${newTimerID}-1" type="text" value="${timerTitle}" placeholder="${timerTitle}" class="timer-title"/>
         <input id2="${newTimerID}"-2 type="text" value="${defaultTime}" class="timer-value"/> 
         <input id2="${newTimerID}"-3 type="text" value="00:00" class="timer-asc"/>
         <input data-id="${newTimerID}-4" type="text" placeholder="veto" class="timer-veto"/> <!-- Shorter width for veto -->
@@ -1705,11 +1733,16 @@
 
         const timerNewName = titleInputField.value; // Get the value entered by the user
         const timerNewTitleID = titleInputField.getAttribute('data-id'); // Get the value entered by the user
+        let resetTimerName_timerServerID = "";
+                            const parts = timerNewTitleID.split('-');
+                            const firstPart = parts[0]; 
+                            resetTimerName_timerServerID =firstPart;//this firstPart is the timerServerID        
+                            console.log(firstPart);
         const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
         console.log("Event Listener set in createTimerComponent: " + timerNewName);
         // Send the new timer name to the server when the user unfocuses the input field
         socket.send(JSON.stringify("inside of blur updateTimerTitleName"));
-        let responseObject = { "cmd": "resetTimerName", "msg": { "ELMxID": 0, "timerNewTitleID": timerNewTitleID, "timerNewName": timerNewName } }
+        let responseObject = { "cmd": "resetTimerName", "msg": { "ELMxID": 0, "timerServerID": resetTimerName_timerServerID, "timerNewName": timerNewName } }
         //workerDispatch(JSON.stringify(responseObject))
         socket.send(JSON.stringify(responseObject));
         console.log("Timer title sending to socket: " + timerNewName);

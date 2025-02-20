@@ -44,9 +44,9 @@ globalELMxArray = {
             },//end cycleVotingResults
         },//cycles
         "timers": {
-            "timer1TotalMeetTimer": { "name": "Total Meet Timer", "remainingTime": 59 },
-            "FudgeTimer": { "name": "Fudge Timer", "remainingTime": 9 },
-            "timerID1": { "name": "Ben", "remainingTime": 10, "personAssignedID": "ID2" }
+            //"timer1TotalMeetTimer": { "name": "Total Meet Timer", "remainingTime": 59 },
+            //"FudgeTimer": { "name": "Fudge Timer", "remainingTime": 9 },
+            //"timerID1": { "name": "Ben", "remainingTime": 10, "personAssignedID": "ID2" }
 
         },//end timers
         "vote": {
@@ -201,6 +201,7 @@ wss.on("connection", (ws) => {
                     let createTimerIDELMxID = message.msg.ELMxID;
                     let timerIDFromBrowser = message.msg.timerIDFromBrowser;
                     let defaultTimeOfNewlyAddedTimer = message.msg.defaultTime;
+                    let defaultName = "Timer Title";
                     let newTimerID = globalTimerIDs + 1;
                     globalTimerIDs++;
                     console.log("Inside createTimerComponentToBrowser:"+createTimerIDELMxID+" "+newTimerID);
@@ -209,13 +210,14 @@ wss.on("connection", (ws) => {
                     globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {};//end globalUserIDS
 
                     globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {
-                        "name": "Ben", 
-                        "remainingTime": 10, 
-                        "personAssignedID": "ID3"
+                        "timerServerID": newTimerID,
+                        "defaultTime": defaultTimeOfNewlyAddedTimer, 
+                        "personAssignedID": "???",
+                        "name": defaultName,
             
                     }//end timers
                     
-                    let createUserResponseObject = { "cmd": "returnedFromServerAddTimer", "msg": { "newTimerID": newTimerID, "defaultTime": defaultTimeOfNewlyAddedTimer, "timerBrowserID": timerIDFromBrowser } };
+                    let createUserResponseObject = { "cmd": "returnedFromServerAddTimer", "msg": { "timerServerID": newTimerID, "defaultTime": defaultTimeOfNewlyAddedTimer, "timerBrowserID": timerIDFromBrowser, "allMeetingData": globalELMxArray[createTimerIDELMxID].timers[newTimerID]  } };
                     let desiredList = ["particularSome", globalELMxArray[createTimerIDELMxID].arrayOfAttendanceIDs];
                     sendToWho(wss, ws, desiredList, createUserResponseObject)
                     //ws.send(JSON.stringify(createUserResponseObject)); // Send response to the client
@@ -223,9 +225,17 @@ wss.on("connection", (ws) => {
                 case 'resetTimerName': 
                     //input {"cmd": "resetTimerName", "msg": {"ELMxID": 0, "timerNewName": name}}
                     let resetTimerName_meetingID = message.msg.ELMxID
-                    let resetTimerName_timerNewTitleID = message.msg.timerNewTitleID
+                    let resetTimerName_timerServerID = message.msg.timerServerID;
+                    //        const parts = resetTimerName_timerServerID.split('-');
+                    //        const firstPart = parts[0]; 
+                    //        resetTimerName_timerServerID =firstPart;//this firstPart is the timerServerID        
+                    //        console.log(firstPart);
+                    //let resetTimerName_timerNewTitleID = message.msg.timerNewTitleID;
                     let timerNewName= message.msg.timerNewName
-                    let createUserResponseObjectName = { "cmd": "returnedFromServerResetTimerName", "msg": {"ELMxID": resetTimerName_meetingID, "timerElementID": resetTimerName_timerNewTitleID, "timerNewName": timerNewName} };
+                    //globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID]={};
+                    //globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].name=""; 
+                    globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].name=timerNewName;
+                    let createUserResponseObjectName = { "cmd": "returnedFromServerResetTimerName", "msg": {"ELMxID": resetTimerName_meetingID, "timerServerID": resetTimerName_timerServerID, "timerNewName": timerNewName} };
                     let desiredListName = ["particularSome", globalELMxArray[resetTimerName_meetingID].arrayOfAttendanceIDs];
                     sendToWho(wss, ws, desiredListName, createUserResponseObjectName);
                 
@@ -471,10 +481,11 @@ function createUserTimerIDFunction(wss, ws, message) {
     //input Object Form: {"cmd": "createUserTimerID", "msg": {"ELMxID": 1, "timerIDFromBrowser": 2}}
     //if(gidClients[decoded.acc]!=undefined){delete gidClients[];}
     let createUserTimerIDELMxID = message;//message.msg.ELMxID;
-    let newUserSocketID = ws.clientID;//wss.clients.indexOf(ws);
+    let newUserSocketID = ws;//wss.clients.indexOf(ws);
     let newUserID = globalUserIDs + 1;
+    ws.clientID = newUserID;
     globalUserIDs++;
-    console.log("ELMXMEETING ID SHOULD BE 0" + " " + newUserID + JSON.stringify(globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs));
+    console.log("Login ELMXMEETING ID SHOULD BE for meeting 0: newUserID:" + " " + newUserID +" "+ JSON.stringify(globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs));
     globalUserIDsWebsocketObject[newUserID] = ws;
     globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs[newUserID] = newUserID;
 
@@ -482,9 +493,9 @@ function createUserTimerIDFunction(wss, ws, message) {
 
     let allMeetingData = globalELMxArray[createUserTimerIDELMxID];
     let existingTimerData = allMeetingData.timers;
-
-    let createUserResponseObject = { "cmd": "returnNewUserIDWithScreenCatchUp", "msg": { "newID": newUserID, "existingTimerData": existingTimerData } };
-    let desiredList = ["IndividualOne", newUserSocketID];
+    console.log("allMeetingData:"+ allMeetingData);
+    let createUserResponseObject = { "cmd": "returnNewUserIDWithScreenCatchUp", "msg": { "newID": newUserID, "existingTimerData": existingTimerData, "allMeetingData": allMeetingData } };
+    let desiredList = ["individualOne", newUserSocketID];
     sendToWho(wss, ws, desiredList, createUserResponseObject)
 
 } //end createUserTimerIDFunction
@@ -495,7 +506,7 @@ function sendToWho(wss, ws, listDesired, messageToBrowser, meetingIDIfNeeded) {
     //listDesired let desiredList= ["particular", globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs]
     // clients.forEach((client) => {
     //if (client.readyState === WebSocket.OPEN) {
-    console.log("In sendToWho:" + JSON.stringify(listDesired));
+    console.log("In sendToWho:" + JSON.stringify(listDesired[0]));
     switch (listDesired[0]) {
         case "universalAll":
             client.send(JSON.stringify(message)); // Broadcast to all clients
@@ -547,10 +558,11 @@ function sendToWho(wss, ws, listDesired, messageToBrowser, meetingIDIfNeeded) {
           //  if(globalUserIDsWebsocketObject[individualUserID]!=undefined){//this is here for lost connections. If they lose connection then their websocket isn't closed and will still take up space in the wss array. So when they log back in we check to see if their GID is alrady in gidClients because it shouldn't be. If it is, then we find the socket it used to be registered at, use that socketIndex to delete the old ws information, then re-add their gid to gidClients with the new socketIndex. this way our websocket wss array doesn't get full of millions of unused ws objects from being disconnected. There migth already be some kind clean up mechanism but I'm doing it in case
           //      delete globalUserIDsWebsocketObject[individualUserID];
           //    }
-
-            if (socketID !== -1) {
+          console.log("In individualOne sendToWho:")
+          if (individualUserWS.readyState === WebSocket.OPEN) {
+           // if (socketID !== -1) {
                 // socketID found, proceed with sending the message
-                console.log("sendToWho: individualOne: socketID:"+individualUserID)
+                console.log("sendToWho: individualOne now sending in .readyState: socketID:"+individualUserID+ " "+JSON.stringify(messageToBrowser))
                 individualUserWS.send(JSON.stringify(messageToBrowser));
             } else {
                 console.log("WebSocket client not found. Removing ID from globalUserIDsWebsocketObject and clients ");
