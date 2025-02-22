@@ -799,52 +799,50 @@
       //Main Switch/Switch Main
       switch (data.cmd) {//messages from server
         case "returnNewUserIDWithScreenCatchUp":
-          
+
           let allELMxData = data.msg.allMeetingData; //for this meeting currently hardcoded at ELM "0"
-          let allTimersData = allELMxData.timers 
+          let allTimersData = allELMxData.timers
 
-          console.log("In browser returnNewUserIDWithScreenCatchUp:"+JSON.stringify(allTimersData));
+          console.log("In browser returnNewUserIDWithScreenCatchUp:" + JSON.stringify(allTimersData));
 
-                      for (let key in allTimersData) {
-              if (allTimersData.hasOwnProperty(key)) {
-                //NOTE: Feb 19 2025: before you can run these DOM functions, the DOMContentLoaded must load but the websocket starts before it so we must load the variables until DOM is done and grab them.
-                // Your code to access the key and its value
-                let singleTimerData = allTimersData[key];
-                                // Create the timer component in this browser
-                      numberCitizenTimers++; // Update total number for VoteReset and color
-                      // Broadcast the new timer to all connected clients
-                      const browserIndTimerDefault = singleTimerData.defaultTime;
-                      const serverTimerID = singleTimerData.timerServerID;
-                      console.log("MAIN SWITCH:createTimerComponentToBrowser" + " " + "browserIndTimerDefault:" + browserIndTimerDefault)
-
-
-                      const timerContainer = document.getElementById("timerList");
-                      //const newTimerComponent = document.createElement("div");
-                      //newTimerComponent.innerHTML = data.timerComponent;
-                      //timerContainer.appendChild(newTimerComponent);
-                      const timerComponent = createTimerComponent(singleTimerData, timerContainer); //this has no socket.send in it
-
-                      setupTimerControls(timerComponent, browserIndTimerDefault);
-
-                      document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+          for (let key in allTimersData) {
+            if (allTimersData.hasOwnProperty(key)) {
+              //NOTE: Feb 19 2025: before you can run these DOM functions, the DOMContentLoaded must load but the websocket starts before it so we must load the variables until DOM is done and grab them.
+              // Your code to access the key and its value
+              let singleTimerData = allTimersData[key];
+              // Create the timer component in this browser
+              numberCitizenTimers++; // Update total number for VoteReset and color
+              // Broadcast the new timer to all connected clients
+              const browserIndTimerDefault = singleTimerData.defaultTime;
+              const serverTimerID = singleTimerData.timerServerID;
+              console.log("MAIN SWITCH:createTimerComponentToBrowser" + " " + "browserIndTimerDefault:" + browserIndTimerDefault)
 
 
-                console.log("key:"+key+ " singleTimer:"+JSON.stringify(singleTimerData));
-              }//end if statement
-            }//end for loop
+              const timerContainer = document.getElementById("timerList");
+              //const newTimerComponent = document.createElement("div");
+              //newTimerComponent.innerHTML = data.timerComponent;
+              //timerContainer.appendChild(newTimerComponent);
+              const timerComponent = createTimerComponent(singleTimerData, timerContainer); //this has no socket.send in it
+
+              setupTimerControls(timerComponent, browserIndTimerDefault);
+
+              document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
 
 
+              console.log("key:" + key + " singleTimer:" + JSON.stringify(singleTimerData));
+            }//end if statement
+          }//end for loop
           break;
         case "returnedFromServerAddTimer": //this one is from server for the non Optimistic UI draw but the one from the server
           // Create the timer component in this browser
           numberCitizenTimers++; // Update total number for VoteReset and color
           // Broadcast the new timer to all connected clients
-          let allThisTimerData= data.msg.allMeetingData
+          let allThisTimerData = data.msg.allMeetingData
           const browserIndTimerDefault = data.msg.allMeetingData.defaultTime;
           const serverTimerID = data.msg.allMeetingData.newTimerID;
           const timerTitle = data.msg.allMeetingData.name;
           console.log("MAIN SWITCH:createTimerComponentToBrowser" + " " + "browserIndTimerDefault:" + browserIndTimerDefault)
-            console.log("MAIN SWITCH:createTimerComponentToBrowser: NAME:"+timerTitle)
+          console.log("MAIN SWITCH:createTimerComponentToBrowser: NAME:" + timerTitle)
 
           const timerContainer = document.getElementById("timerList");
           //const newTimerComponent = document.createElement("div");
@@ -863,13 +861,11 @@
           //input  msg: { ELMxID: 0, timerNewTitleID: '', timerNewName: 'Mark' } }
           let timerNewName = data.msg.timerNewName;
           let resetTimerName_timerServerID = data.msg.timerServerID;
-          let nameElementID = resetTimerName_timerServerID+"-1";//Feb 19 2025: where did we get the -1 from? Its just a code we made to differentiaete the elements with custom data-id. It is made by the timer over ID with the component number with a "-" seperating them.
+          let nameElementID = resetTimerName_timerServerID + "-1";//Feb 19 2025: where did we get the -1 from? Its just a code we made to differentiaete the elements with custom data-id. It is made by the timer over ID with the component number with a "-" seperating them.
           console.log("nameElementID:" + nameElementID);
           const titleInputField = document.querySelector(`[data-id="${nameElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
 
           console.log("newTimerName:" + timerNewName + " element" + JSON.stringify(titleInputField));
-
-
 
           titleInputField.value = timerNewName;
 
@@ -890,6 +886,70 @@
           break;
 
 
+
+
+
+
+
+        case "returnedFromServerResetDefaultTime":
+
+          console.log("Received resetDefaultTime message: " + data.msg);  // Log the incoming message for debugging
+          //  input  msg: { ELMxID: 0, timerNewTitleID: '', timerDefaultTime: 'Mark' } }
+          let timerDefaultTime = data.msg.newDefaultTime;
+          let resetDefaultTime_timerServerID = data.msg.timerServerID;
+          let defaultTimeElementID = resetDefaultTime_timerServerID + "-2";//Feb 19 2025: where did we get the -1 from? Its just a code we made to differentiaete the elements with custom data-id. It is made by the timer over ID with the component number with a "-" seperating them.
+          console.log("defaultTimeElementID:" + defaultTimeElementID);
+          const defaultTimerInputField = document.querySelector(`[data-id="${defaultTimeElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
+
+          console.log("newTimerName:" + timerDefaultTime + " element" + JSON.stringify(defaultTimerInputField));
+
+          defaultTimerInputField.value = timerDefaultTime;
+
+
+          break;
+
+
+
+
+        case "returnedFromServerResetTimerAsc":
+          // Input: msg: { ELMxID: 0, timerServerID: '123', timerAscValue: '00:01' }
+
+          let timerAscValue = data.msg.timerAscValue;  // Get the updated ascending timer value from the server response
+          let resetTimerAsc_timerServerID = data.msg.timerServerID; // Get the timerServerID
+          let ascElementID = resetTimerAsc_timerServerID + "-3"; // Assuming -3 is used for ascending timer input fields
+
+          console.log("ascElementID: " + ascElementID);  // Log the element ID for debugging
+
+          // Find the input field element using the data-id (same pattern as the previous case)
+          const ascInputField = document.querySelector(`[data-id="${ascElementID}"]`);
+
+          console.log("newTimerAscValue: " + timerAscValue + " element: " + JSON.stringify(ascInputField));
+
+          // Update the value of the input field with the new ascending timer value
+          if (ascInputField) {
+            ascInputField.value = timerAscValue;  // Set the new ascending timer value
+          } else {
+            console.log("Error: Could not find the input field for timer asc value with data-id: " + ascElementID);
+          }
+
+          break;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         case "returnedFromServerResetVetoName":
           // input msg: { ELMxID: 0, vetoNewTitleID: '', vetoNewName: 'Veto Mark' }
           let vetoNewName = data.msg.vetoNewName;
@@ -907,6 +967,32 @@
           break;
 
 
+        case 'updateTimerState':
+          // Input msg: { timerServerID: '', isRunning: true/false }
+          let timerServerID = data.msg.timerServerID;
+          let isRunning = data.msg.isRunning;
+
+          console.log(`Timer ID: ${timerServerID}, isRunning: ${isRunning}`);
+
+          // Select the timer element based on the server-side timerID
+          const timerElement = document.querySelector(`[data-id="${timerServerID}-5"]`); // Assuming you're using `-5` for the button or other element
+
+          console.log("timerElement: " + JSON.stringify(timerElement));
+
+          if (timerElement) {
+            // Update the UI based on whether the timer is running or paused
+            const startPauseBtn = timerElement.querySelector('button'); // Replace with the actual button or element inside the timer element
+
+            if (startPauseBtn) {
+              // Update the button text based on the timer's state
+              startPauseBtn.textContent = isRunning ? "⏸️" : "▶️";
+            }
+          }
+
+          break;
+
+
+
         case "returnedFromServerManualSetVetoTime":
           // input msg: { ELMxID: 0, vetoManualTimeID: '', vetoNewManualTime: '00:30' }
           let vetoNewManualTime = data.msg.vetoNewManualTime;
@@ -922,6 +1008,26 @@
           }
 
           break;
+
+
+
+
+        
+
+
+
+        default:
+          console.log('Unrecognized command:', message.cmd);
+          break;
+
+
+
+
+
+
+
+
+
 
 
         case 'voteCountReturned':
@@ -1124,7 +1230,7 @@
         Notification.requestPermission().then(permission => {
           if (permission === "granted") {
             new Notification(title, options);
-            
+
           }
         });
       }
@@ -1263,6 +1369,79 @@
         startPauseBtn.textContent = "⏸️";
       }
 
+      // function startTimer() {
+      //   console.log({ cmd: "TIMER_START", msg: "Timer started." });
+
+      //   // Clear background color when timer starts
+      //   timerComponent.style.backgroundColor = "#c5eba9"; // Light green
+
+      //   let [minutes, seconds] = timerValue.value.split(":").map(num => parseInt(num, 10));
+      //   let totalSeconds = minutes * 60 + seconds;
+
+      //   intervalId = setInterval(() => {
+      //     if (totalSeconds <= 0) {
+      //       clearInterval(intervalId);
+      //       intervalId = null;
+      //       timerComponent.style.backgroundColor = "orange";
+      //       console.log({ cmd: "TIMER_COMPLETE", msg: "Timer has ended!" });
+
+      //       onComplete();
+      //       startPauseBtn.textContent = "▶️";
+
+      //       // Stop the ascending timer when countdown reaches zero
+      //       if (ascIntervalId) {
+      //         clearInterval(ascIntervalId);
+      //         ascIntervalId = null;
+      //         console.log({ cmd: "ASC_TIMER_STOP", msg: "Ascending timer stopped." });
+      //       }
+
+      //       return;
+      //     }
+
+      //     totalSeconds--;
+      //     const mins = Math.floor(totalSeconds / 60).toString();
+      //     const secs = (totalSeconds % 60).toString().padStart(2, "0");
+      //     timerValue.value = `${mins}:${secs}`;
+
+      //     console.log({ cmd: "TIMER_UPDATE", msg: `Time left: ${mins}:${secs}` });
+
+
+      //     // Get the value entered by the user
+      //     const timerAscValue = timerAscInputField.value;
+
+      //     // Get the data-id attribute value of the input field
+      //     const timerAscElementID = timerAscInputField.getAttribute('data-id');
+
+      //     let resetTimerAsc_timerServerID = "";
+      //     const parts = timerAscElementID.split('-'); // Split the ID to get the timerServerID
+      //     const firstPart = parts[0]; // The first part is the timerServerID
+      //     resetTimerAsc_timerServerID = firstPart; // Set timerServerID to firstPart
+
+      //     console.log("resetTimerAsc_timerServerID: " + resetTimerAsc_timerServerID);
+
+      //     const ELMxID = 0; // You can dynamically set this as needed
+      //     console.log("Event Listener set for ascending timer update: " + timerAscValue);
+
+      //     // Send the updated ascending timer value to the server when the user unfocuses the input field
+      //     socket.send(JSON.stringify("inside of blur updateAscendingTimer"));
+
+      //     // Create a response object to send to the server
+      //     let responseObject = {
+      //       "cmd": "timerUpdate",
+      //       "msg": {
+      //         "ELMxID": ELMxID,
+      //         "timerServerID": resetTimerAsc_timerServerID,
+      //         "timerAscValue": timerAscValue
+      //       }
+      //     };
+      //     // Send the response object to the server (via socket)
+      //     console.log("Response for ascending timer: " + JSON.stringify(responseObject));
+      //     socket.send(JSON.stringify(responseObject));
+      //     console.log("Ascending timer value sent to server: " + timerAscValue);
+      //   }, 1000);
+      //   startPauseBtn.textContent = "⏸️";
+      // }
+
 
       function startAscendingTimer() {
         let [ascMinutes, ascSecondsRaw] = timerAsc.value.split(":").map(num => parseInt(num, 10));
@@ -1311,6 +1490,14 @@
         }
       });
 
+
+      timerAsc.addEventListener("blur", () => {
+        if (wasRunning) {
+          toggleTimer(true);
+          wasRunning = false; // Reset the flag
+        }
+      });
+
       startPauseBtn.addEventListener("click", () => {
         if (intervalId === null) {
           toggleTimer(true);
@@ -1318,6 +1505,31 @@
           toggleTimer(false);
         }
       });
+
+
+
+      // startPauseBtn.addEventListener("click", () => {
+      //   const isStarting = intervalId === null; // Determine if we are starting or pausing
+      //   const timerServerID = startPauseBtn.getAttribute("data-id"); // Extract the timer ID
+
+      //   // Toggle timer locally
+      //   toggleTimer(isStarting);
+
+      //   // Prepare data to send to the server
+      //   let responseObject = {
+      //     cmd: "toggleTimer",
+      //     msg: {
+      //       timerServerID: timerServerID,
+      //       shouldStart: isStarting
+      //     }
+      //   };
+
+      //   // Send the request to the server to update the timer state for all clients
+      //   socket.send(JSON.stringify(responseObject));
+
+      //   console.log("Sent toggleTimer request to server:", responseObject);
+      // });
+
 
       resetDefaultBtn.addEventListener("click", () => {
         clearInterval(intervalId);
@@ -1683,7 +1895,7 @@
       let newTimerID = allThisTimerDataFromServer.timerServerID;
       let timerTitle = allThisTimerDataFromServer.name;
       globalTimerIDs++
-      console.log("Start createTimerComponent defaultTime:" + JSON.stringify(defaultTime) + ": timerTitle: "+timerTitle + " timerList:" + JSON.stringify(timerList));
+      console.log("Start createTimerComponent defaultTime:" + JSON.stringify(defaultTime) + ": timerTitle: " + timerTitle + " timerList:" + JSON.stringify(timerList));
       const timerComponent = document.createElement("div");
       timerComponent.className = "timer";
       timerComponent.flow = "flow timer default";
@@ -1701,16 +1913,17 @@
       //timerComponent.appendChild(timerTitleInput);
 
       timerComponent.innerHTML = `
-        <input data-id="${newTimerID}-1" type="text" value="${timerTitle}" placeholder="${timerTitle}" class="timer-title"/>
-        <input id2="${newTimerID}"-2 type="text" value="${defaultTime}" class="timer-value"/> 
-        <input id2="${newTimerID}"-3 type="text" value="00:00" class="timer-asc"/>
+        <input data-id="${newTimerID}-1" type="text" value="" placeholder="${timerTitle}" class="timer-title"/>
+        <input data-id="${newTimerID}-2" type="text" value="${defaultTime}" class="timer-value"/> 
+        <input data-id="${newTimerID}-3" type="text" value="00:00" class="timer-asc"/>
         <input data-id="${newTimerID}-4" type="text" placeholder="veto" class="timer-veto"/> <!-- Shorter width for veto -->
 
         <div class="flex-row">
-          <button id2="${newTimerID}"-5 class="start-pause-btn">▶️</button>
+      
+          <button data-id="${newTimerID}-5" class="start-pause-btn">▶️</button>
           <button id2="${newTimerID}"-6 class="reset-initial-btn">⏏️</button>
           <button id2="${newTimerID}"-7 class="reset-default-btn">⤵️</button>
-          <button id2="${newTimerID}"-8 class="remove-btn">❌</button>
+          <button id2="${newTimerID}-8" class="remove-btn">❌</button>
           <button id2="${newTimerID}"-9 class="form-btn" id="formbtn">Form</button>
           <button id2="${newTimerID}"-10 class="content-btn" id="contentdata">Content</button>
           <button id2="${newTimerID}"-11 class="people-btn" id="peoplebtn">People</button>
@@ -1729,15 +1942,18 @@
       console.log("titleInputField using querySelector:" + JSON.stringify(titleInputField));
       //}, 1000);
 
+
+
+
       titleInputField.addEventListener('blur', function () {
 
         const timerNewName = titleInputField.value; // Get the value entered by the user
         const timerNewTitleID = titleInputField.getAttribute('data-id'); // Get the value entered by the user
         let resetTimerName_timerServerID = "";
-                            const parts = timerNewTitleID.split('-');
-                            const firstPart = parts[0]; 
-                            resetTimerName_timerServerID =firstPart;//this firstPart is the timerServerID        
-                            console.log(firstPart);
+        const parts = timerNewTitleID.split('-');
+        const firstPart = parts[0];
+        resetTimerName_timerServerID = firstPart;//this firstPart is the timerServerID        
+        console.log(firstPart);
         const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
         console.log("Event Listener set in createTimerComponent: " + timerNewName);
         // Send the new timer name to the server when the user unfocuses the input field
@@ -1748,6 +1964,120 @@
         console.log("Timer title sending to socket: " + timerNewName);
       });//end event handler blur
 
+
+      // Select the input field for default time (assuming this is within a timer component)
+      const defaultTimeInputField = timerComponent.querySelector(`[data-id="${newTimerID}-2"]`); // Use correct data-id for default time
+
+      defaultTimeInputField.addEventListener('blur', function () {
+        // Get the value entered by the user
+        const defaultTime = defaultTimeInputField.value;
+
+        // Get the data-id attribute value of the input field
+        const defaultTimeElementID = defaultTimeInputField.getAttribute('data-id');
+
+        let resetDefaultTime_timerServerID = "";
+        const parts = defaultTimeElementID.split('-'); // Split the ID to get the timerServerID
+        const firstPart = parts[0]; // The first part is the timerServerID
+        resetDefaultTime_timerServerID = firstPart; // Set timerServerID to firstPart
+
+        console.log("resetDefaultTime_timerServerID: " + resetDefaultTime_timerServerID);
+
+        const ELMxID = 0; // You can dynamically set this as needed
+        console.log("Event Listener set for default time update: " + defaultTime);
+
+        // Send the updated default time to the server when the user unfocuses the input field
+        socket.send(JSON.stringify("inside of blur updateDefaultTime"));
+
+        // Create a response object to send to the server
+        let responseObject = {
+          "cmd": "resetDefaultTime",
+          "msg": {
+            "ELMxID": ELMxID,
+            "timerServerID": resetDefaultTime_timerServerID,
+            "defaultTime": defaultTime
+          }
+        };
+
+        // Send the response object to the server (via socket)
+        console.log("responce of default timer" + responseObject);
+        socket.send(JSON.stringify(responseObject));
+
+        console.log("Default time sent to server: " + defaultTime);
+      });
+
+
+
+
+      const timerAscInputField = timerComponent.querySelector(`[data-id="${newTimerID}-3"]`); // Use the correct data-id for the ascending timer
+      console.log("timerAscInputField using querySelector: " + JSON.stringify(timerAscInputField));
+
+      timerAscInputField.addEventListener('blur', function () {
+        // Get the value entered by the user
+        const timerAscValue = timerAscInputField.value;
+
+        // Get the data-id attribute value of the input field
+        const timerAscElementID = timerAscInputField.getAttribute('data-id');
+
+        let resetTimerAsc_timerServerID = "";
+        const parts = timerAscElementID.split('-'); // Split the ID to get the timerServerID
+        const firstPart = parts[0]; // The first part is the timerServerID
+        resetTimerAsc_timerServerID = firstPart; // Set timerServerID to firstPart
+
+        console.log("resetTimerAsc_timerServerID: " + resetTimerAsc_timerServerID);
+
+        const ELMxID = 0; // You can dynamically set this as needed
+        console.log("Event Listener set for ascending timer update: " + timerAscValue);
+
+        // Send the updated ascending timer value to the server when the user unfocuses the input field
+        socket.send(JSON.stringify("inside of blur updateAscendingTimer"));
+
+        // Create a response object to send to the server
+        let responseObject = {
+          "cmd": "resetTimerAsc",
+          "msg": {
+            "ELMxID": ELMxID,
+            "timerServerID": resetTimerAsc_timerServerID,
+            "timerAscValue": timerAscValue
+          }
+        };
+
+        // Send the response object to the server (via socket)
+        console.log("Response for ascending timer: " + JSON.stringify(responseObject));
+        socket.send(JSON.stringify(responseObject));
+
+        console.log("Ascending timer value sent to server: " + timerAscValue);
+      });
+
+
+
+
+
+
+      // console.log("defaultTimeInputField using querySelector:" + JSON.stringify(defaultTimeInputField));
+
+      // defaultTimeInputField.addEventListener('blur', function () {
+      //   const defaultTimeValue = defaultTimeInputField.value; // Get the value entered by the user
+      //   const defaultTimeID = defaultTimeInputField.getAttribute('data-id'); // Get the attribute ID for default time
+      //   const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
+      //   console.log("Event Listener set in createTimerComponent for default time: " + defaultTimeValue);
+
+      //   // Send the new default time to the server when the user unfocuses the input field
+      //   socket.send(JSON.stringify("inside of blur updateDefaultTime"));
+
+      //   let responseObject = {
+      //     "cmd": "resetDefaultTime", // Command to reset default time
+      //     "msg": {
+      //       "ELMxID": ELMxID,
+      //       "timerID": defaultTimeID, // Use the appropriate ID for timer
+      //       "newDefaultTime": defaultTimeValue // The new default time entered by the user
+      //     }
+      //   };
+      //   console.log("Sending default time to server:", responseObject);
+      //   socket.send(JSON.stringify(responseObject));
+      //   socket.send(JSON.stringify(responseObject)); // Send message to the server
+
+      //   console.log("Default time sending to socket: " + defaultTimeValue);
+      // }); // end event handler for blur
 
 
       // setTimeout(function() {
@@ -1776,6 +2106,89 @@
         socket.send(JSON.stringify(responseObject));
         console.log("Veto title sending to socket: " + vetoNewName);
       });//end event handler blur
+
+
+
+      // Ensure intervalId is defined in a higher scope
+
+
+      // Ensure these variables are declared in a scope that covers both functions
+      let intervalId = null;
+      let ascIntervalId = null;
+      let defaultTimeIntervalId = null; // For default time updates
+      let ascSeconds = 0;
+
+      console.log("defaultTimeInputField using querySelector: " + JSON.stringify(defaultTimeInputField));
+
+      const startPauseBtn = timerComponent.querySelector(`[data-id="${newTimerID}-5"]`);
+      console.log("startPauseBtn using querySelector: " + JSON.stringify(startPauseBtn));
+
+      // Define the toggleTimer function
+      function toggleTimer(shouldStart) {
+        if (shouldStart) {
+          console.log("Starting timer...");
+
+          // Start the main timer (example logic; replace with your actual timer functionality)
+          intervalId = setInterval(() => {
+            // console.log("Timer tick...");
+            // Your timer logic here (update UI, decrement time, etc.)
+          }, 1000);
+
+          // Start the ascending timer (example logic)
+          ascIntervalId = setInterval(() => {
+            ascSeconds++;
+            // console.log("Ascending seconds: " + ascSeconds);
+            // Update ascending timer UI if needed
+          }, 1000);
+
+          // Start updating the default time continuously (example: log its current value)
+          defaultTimeIntervalId = setInterval(() => {
+            // You could update the UI or perform other actions here with the default time value
+            // console.log("Default time value: " + defaultTimeInputField.value);
+          }, 1000);
+
+          // Update button text to indicate 'pause'
+          startPauseBtn.textContent = "⏸️";
+        } else {
+          console.log("Pausing timer...");
+
+          // Stop the main timer, ascending timer, and default time update
+          clearInterval(intervalId);
+          intervalId = null;
+          clearInterval(ascIntervalId);
+          ascIntervalId = null;
+          clearInterval(defaultTimeIntervalId);
+          defaultTimeIntervalId = null;
+
+          // Update button text to indicate 'start'
+          startPauseBtn.textContent = "▶️";
+        }
+      }
+
+      // Add the event listener for the start/pause button
+      startPauseBtn.addEventListener('click', function () {
+        const isStarting = intervalId === null; // Determine if we are starting or pausing
+        const timerServerID = startPauseBtn.getAttribute("data-id"); // Extract the timer ID
+        console.log("Event Listener (start/pause): " + isStarting);
+
+        // Toggle timer locally using our defined function
+        toggleTimer(isStarting);
+
+        // Prepare data to send to the server
+        let responseObject = {
+          cmd: "toggleTimer",
+          msg: {
+            timerServerID: timerServerID,
+            shouldStart: isStarting
+          }
+        };
+
+        // Send the request to the server to update the timer state for all clients
+        socket.send(JSON.stringify(responseObject));
+        console.log("Toggle timer sending to socket: " + JSON.stringify(responseObject));
+      });
+
+
 
 
       const contentBtn2 = document.getElementById("contentdata");

@@ -124,18 +124,18 @@ wss.on("connection", (ws) => {
     function safeStringify(obj) {
         const seen = new Set();
         return JSON.stringify(obj, (key, value) => {
-          if (typeof value === "object" && value !== null) {
-            if (seen.has(value)) {
-              return; // Prevent circular reference
+            if (typeof value === "object" && value !== null) {
+                if (seen.has(value)) {
+                    return; // Prevent circular reference
+                }
+                seen.add(value);
             }
-            seen.add(value);
-          }
-          return value;
+            return value;
         });
-      }
-      
-      console.log("New Client Connected: " + safeStringify(ws));
-    
+    }
+
+    console.log("New Client Connected: " + safeStringify(ws));
+
     clients.add(ws);
     let hardcodedMeetingIDTest = "0"
     createUserTimerIDFunction(wss, ws, hardcodedMeetingIDTest);
@@ -149,19 +149,19 @@ wss.on("connection", (ws) => {
 
             if (data.cmd === "voteTimer") {
                 let timerId = data.timerId;
-                
+
                 if (!voteCounts[timerId]) {
                     voteCounts[timerId] = 0;
                 }
-            
+
                 voteCounts[timerId] += 1; // Increase vote count
-            
+
                 let voteUpdate = {
                     cmd: "updateVoteCount",
                     timerId: timerId,
                     voteCount: voteCounts[timerId]
                 };
-            
+
                 wss.clients.forEach(client => {
                     if (client.readyState === WebSocket.OPEN) {
                         //client.send(JSON.stringify(voteUpdate)); // Send vote update to all clients
@@ -169,29 +169,30 @@ wss.on("connection", (ws) => {
                 });
             }
 
-            
 
 
-        //    if (data.cmd === 'createTimerComponentToBrowser') {
-        //        // input form 
-        //        //    cmd: 'createTimerComponentToBrowser',
-        //        //    msg: {
-        //        //    defaultTime: defaultTime,
-        //        //    timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
-        //        //    }
-        //        //  };
-        //        // Broadcast the new timer to all connected clients
-        //        wss.clients.forEach(client => {
-        //            if (client.readyState === WebSocket.OPEN) {
-        //                client.send(JSON.stringify(data));
-        //            }
-        //        });
-        //    }
+
+            //    if (data.cmd === 'createTimerComponentToBrowser') {
+            //        // input form 
+            //        //    cmd: 'createTimerComponentToBrowser',
+            //        //    msg: {
+            //        //    defaultTime: defaultTime,
+            //        //    timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
+            //        //    }
+            //        //  };
+            //        // Broadcast the new timer to all connected clients
+            //        wss.clients.forEach(client => {
+            //            if (client.readyState === WebSocket.OPEN) {
+            //                client.send(JSON.stringify(data));
+            //            }
+            //        });
+            //    }
 
 
 
 
             //MAIN SWITCH
+
             switch (message.cmd) {//FLAG: Nabin bind on client side (created 9:50am mst Feb 11 2025)
                 //Mark: Feb 17 2025: thefunction for newUserID is in the wss.on, not here.
                 case 'addTimerToServer':
@@ -204,25 +205,28 @@ wss.on("connection", (ws) => {
                     let defaultName = "Timer Title";
                     let newTimerID = globalTimerIDs + 1;
                     globalTimerIDs++;
-                    console.log("Inside createTimerComponentToBrowser:"+createTimerIDELMxID+" "+newTimerID);
-                    
+                    console.log("Inside createTimerComponentToBrowser:" + createTimerIDELMxID + " " + newTimerID);
+
 
                     globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {};//end globalUserIDS
 
                     globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {
                         "timerServerID": newTimerID,
-                        "defaultTime": defaultTimeOfNewlyAddedTimer, 
+                        "defaultTime": defaultTimeOfNewlyAddedTimer,
                         "personAssignedID": "???",
                         "name": defaultName,
-            
+
                     }//end timers
-                    
-                    let createUserResponseObject = { "cmd": "returnedFromServerAddTimer", "msg": { "timerServerID": newTimerID, "defaultTime": defaultTimeOfNewlyAddedTimer, "timerBrowserID": timerIDFromBrowser, "allMeetingData": globalELMxArray[createTimerIDELMxID].timers[newTimerID]  } };
+
+                    let createUserResponseObject = { "cmd": "returnedFromServerAddTimer", "msg": { "timerServerID": newTimerID, "defaultTime": defaultTimeOfNewlyAddedTimer, "timerBrowserID": timerIDFromBrowser, "allMeetingData": globalELMxArray[createTimerIDELMxID].timers[newTimerID] } };
                     let desiredList = ["particularSome", globalELMxArray[createTimerIDELMxID].arrayOfAttendanceIDs];
                     sendToWho(wss, ws, desiredList, createUserResponseObject)
                     //ws.send(JSON.stringify(createUserResponseObject)); // Send response to the client
                     break;
-                case 'resetTimerName': 
+
+
+
+                case 'resetTimerName':
                     //input {"cmd": "resetTimerName", "msg": {"ELMxID": 0, "timerNewName": name}}
                     let resetTimerName_meetingID = message.msg.ELMxID
                     let resetTimerName_timerServerID = message.msg.timerServerID;
@@ -231,54 +235,171 @@ wss.on("connection", (ws) => {
                     //        resetTimerName_timerServerID =firstPart;//this firstPart is the timerServerID        
                     //        console.log(firstPart);
                     //let resetTimerName_timerNewTitleID = message.msg.timerNewTitleID;
-                    let timerNewName= message.msg.timerNewName
+                    let timerNewName = message.msg.timerNewName
                     //globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID]={};
                     //globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].name=""; 
-                    globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].name=timerNewName;
-                    let createUserResponseObjectName = { "cmd": "returnedFromServerResetTimerName", "msg": {"ELMxID": resetTimerName_meetingID, "timerServerID": resetTimerName_timerServerID, "timerNewName": timerNewName} };
+                    globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].name = timerNewName;
+                    let createUserResponseObjectName = { "cmd": "returnedFromServerResetTimerName", "msg": { "ELMxID": resetTimerName_meetingID, "timerServerID": resetTimerName_timerServerID, "timerNewName": timerNewName } };
                     let desiredListName = ["particularSome", globalELMxArray[resetTimerName_meetingID].arrayOfAttendanceIDs];
                     sendToWho(wss, ws, desiredListName, createUserResponseObjectName);
-                
-                break;  
 
-
-                case 'resetVetoName': 
-    // Input: {"cmd": "resetVetoName", "msg": {"ELMxID": 0, "vetoNewName": name}}
-    let resetVetoName_meetingID = message.msg.ELMxID;
-    let resetVetoName_vetoNewTitleID = message.msg.vetoNewTitleID;
-    let vetoNewName = message.msg.vetoNewName;
-
-    let createUserResponseObjectVetoName = { 
-        "cmd": "returnedFromServerResetVetoName", 
-        "msg": {
-            "ELMxID": resetVetoName_meetingID, 
-            "vetoElementID": resetVetoName_vetoNewTitleID, 
-            "vetoNewName": vetoNewName
-        } 
-    };
-
-    let desiredListVetoName = ["particularSome", globalELMxArray[resetVetoName_meetingID].arrayOfAttendanceIDs];
-    sendToWho(wss, ws, desiredListVetoName, createUserResponseObjectVetoName);
-
-    break;
+                    break;
 
 
 
+                case 'resetDefaultTime':
+                    // Input: {"cmd": "resetDefaultTime", "msg": {"timerServerID": "1-2", "newDefaultTime": "5:05"}}
+                    console.log("Received resetDefaultTime message: ", message);  // Log the incoming message for debugging
+                    let resetDefaultTime_ELMxID = message.msg.ELMxID;
+                    let resetDefaultTime_timerServerID = message.msg.timerServerID;
+                    let newDefaultTime = message.msg.defaultTime;
 
-                case 'hardcodeNewTimeIntoTimer': 
-                break; 
+                    // Ensure the timerServerID exists in the global timers object
+                    // if (globalELMxArray[resetDefaultTime_timerServerID]) {
+                    globalELMxArray[resetDefaultTime_ELMxID].timers[resetDefaultTime_timerServerID].defaultTime = newDefaultTime;
 
-                case 'pressStart': 
-                break;   
+                    console.log(`Updated default time for timerServerID ${resetDefaultTime_timerServerID} to ${newDefaultTime}`);
 
-                case 'pressStop': 
-                break; 
+                    // Create a response object to notify the client with the updated default time
+                    let createDefaultTimeResponse = {
+                        cmd: "returnedFromServerResetDefaultTime",
+                        msg: {
+                            timerServerID: resetDefaultTime_timerServerID,
+                            newDefaultTime: newDefaultTime
+                        }
+                    };
 
-                case 'pressResetTimerTime1': 
-                break; 
 
-                case 'pressResetTimerTime2': 
-                break;
+                    // Determine the list of clients to notify (e.g., clients connected to the same meeting)
+                    let desiredListTime = ["particularSome", globalELMxArray[resetDefaultTime_ELMxID].arrayOfAttendanceIDs];
+                    sendToWho(wss, ws, desiredListTime, createDefaultTimeResponse);  // Send the response to the clients
+
+                    // } else {
+                    //     console.error(`Timer with ID ${resetDefaultTime_timerServerID} not found in globalELMxArray.`);
+                    // }
+                    break;
+
+
+
+                case 'resetTimerAsc':
+                    // Input: {"cmd": "resetTimerAsc", "msg": {"ELMxID": 0, "timerServerID": "1-3", "timerAscValue": "00:01"}}
+                    console.log("Received resetTimerAsc message: ", message);  // Log the incoming message for debugging
+
+                    let resetTimerAsc_ELMxID = message.msg.ELMxID;  // Get the meeting ID
+                    let resetTimerAsc_timerServerID = message.msg.timerServerID;  // Get the timerServerID
+                    let timerAscValue = message.msg.timerAscValue;  // Get the new ascending timer value
+
+                    // Ensure the timerServerID exists in the global timers object
+                    if (globalELMxArray[resetTimerAsc_ELMxID] && globalELMxArray[resetTimerAsc_ELMxID].timers[resetTimerAsc_timerServerID]) {
+                        // Update the timer's ascending value in the global array
+                        globalELMxArray[resetTimerAsc_ELMxID].timers[resetTimerAsc_timerServerID].ascValue = timerAscValue;
+
+                        console.log(`Updated ascending time for timerServerID ${resetTimerAsc_timerServerID} to ${timerAscValue}`);
+
+                        // Create a response object to notify the client with the updated ascending timer value
+                        let createAscTimerResponse = {
+                            cmd: "returnedFromServerResetTimerAsc",
+                            msg: {
+                                timerServerID: resetTimerAsc_timerServerID,
+                                timerAscValue: timerAscValue
+                            }
+                        };
+
+                        // Determine the list of clients to notify (e.g., clients connected to the same meeting)
+                        let desiredListAsc = ["particularSome", globalELMxArray[resetTimerAsc_ELMxID].arrayOfAttendanceIDs];
+                        sendToWho(wss, ws, desiredListAsc, createAscTimerResponse);  // Send the response to the clients
+                    } else {
+                        console.error(`Timer with ID ${resetTimerAsc_timerServerID} not found in globalELMxArray.`);
+                    }
+
+                    break;
+
+
+
+                case 'resetVetoName':
+                    // Input: {"cmd": "resetVetoName", "msg": {"ELMxID": 0, "vetoNewName": name}}
+                    let resetVetoName_meetingID = message.msg.ELMxID;
+                    let resetVetoName_vetoNewTitleID = message.msg.vetoNewTitleID;
+                    let vetoNewName = message.msg.vetoNewName;
+
+                    let createUserResponseObjectVetoName = {
+                        "cmd": "returnedFromServerResetVetoName",
+                        "msg": {
+                            "ELMxID": resetVetoName_meetingID,
+                            "vetoElementID": resetVetoName_vetoNewTitleID,
+                            "vetoNewName": vetoNewName
+                        }
+                    };
+
+                    let desiredListVetoName = ["particularSome", globalELMxArray[resetVetoName_meetingID].arrayOfAttendanceIDs];
+                    sendToWho(wss, ws, desiredListVetoName, createUserResponseObjectVetoName);
+
+                    break;
+
+                case 'toggleTimer':
+                    console.log("Received toggleTimer request:", message);
+
+                    // Extract the necessary data from the message
+                    let toggleTimerID = message.msg.timerServerID;  // Timer ID
+                    let resetPlayPauseBtn_ELMxID = message.msg.ELMxID;  // Meeting ID
+                    let resetPlayPauseBtn_timerServerID = message.msg.timerServerID;  // Timer Server ID
+                    let shouldStart = message.msg.shouldStart;  // Whether to start or pause the timer
+
+                    // Directly update the isRunning state of the timer without condition checks
+                    globalELMxArray[resetPlayPauseBtn_ELMxID].timers[resetPlayPauseBtn_timerServerID].isRunning = shouldStart;
+
+                    console.log('testing pringing');
+                    console.log(`Timer ${toggleTimerID} is now ${shouldStart ? "running" : "paused"}`);
+
+                    // Create a response object to notify clients of the timer state update
+                    let toggleResponse = {
+                        cmd: "updateTimerState",
+                        msg: {
+                            timerServerID: toggleTimerID,
+                            isRunning: shouldStart
+                        }
+                    };
+
+                    // Determine the list of clients to notify (clients connected to the same meeting)
+                    let desiredListTimerBtn = globalELMxArray[resetPlayPauseBtn_ELMxID].arrayOfAttendanceIDs;
+
+                    // Log the response object for debugging purposes
+                    console.log("Sending timer state update to clients:", JSON.stringify(toggleResponse));
+
+                    // Send the updated state to the desired clients
+                    sendToWho(wss, ws, desiredListTimerBtn, toggleResponse);
+
+                    // Optionally, log the response sent to clients
+                    console.log(`Timer state update sent: ${JSON.stringify(toggleResponse)}`);
+
+                    break;
+
+
+
+
+
+
+
+
+
+
+
+
+
+                case 'hardcodeNewTimeIntoTimer':
+                    break;
+
+                case 'pressStart':
+                    break;
+
+                case 'pressStop':
+                    break;
+
+                case 'pressResetTimerTime1':
+                    break;
+
+                case 'pressResetTimerTime2':
+                    break;
 
                 case 'addVote':
 
@@ -367,19 +488,19 @@ wss.on("connection", (ws) => {
                     let totalVoteFormString = addVoteMessage.formString;
                     let totalVoteFormTime = addVoteMessage.formTime;
                     let listDesiredTotal = "allInMeeting";
-                    let totalVoteSubmitResponseObject ={};
+                    let totalVoteSubmitResponseObject = {};
                     totalVoteSubmitResponseObject = {
                         cmd: "totalVoteSubmitToAllToStartNextCycle",
                         msg: {
                             totalVotesNumber: 4,
-                            formMajority: {"numberOfVotes": 3, "formType": "turn", "FormString": "popcorn"},
-                            contentMajority: {"numberOfVotes": 4, "contentType": "individual", "contentString": "AI"},
-                            peopleMajority: {"numberOfVotes": 4, "peopleType": "individual", "peopleString": "same"},
+                            formMajority: { "numberOfVotes": 3, "formType": "turn", "FormString": "popcorn" },
+                            contentMajority: { "numberOfVotes": 4, "contentType": "individual", "contentString": "AI" },
+                            peopleMajority: { "numberOfVotes": 4, "peopleType": "individual", "peopleString": "same" },
                             totalFormVote: {
                                 turnBased: {
-                                     straightTurn: 0,
-                                     directiveTurn: 1,
-                                     popcorn: 3,
+                                    straightTurn: 0,
+                                    directiveTurn: 1,
+                                    popcorn: 3,
                                 },//end turn
                                 freeFlow: {
                                     fast: 0,
@@ -398,17 +519,17 @@ wss.on("connection", (ws) => {
                                     self: 0,
                                     group: 1,
                                     world: 3,
-                               },//end individual
-                               particular: {
-                                   topic: 0,
-                                   why: 1,
-                                   how: 3,
-                               },//end particular
-                               universal: {
-                                   care: 0,
-                                   coordinate: 1,
-                                   commence: 3,
-                               },//end universal
+                                },//end individual
+                                particular: {
+                                    topic: 0,
+                                    why: 1,
+                                    how: 3,
+                                },//end particular
+                                universal: {
+                                    care: 0,
+                                    coordinate: 1,
+                                    commence: 3,
+                                },//end universal
 
                             },//end TotalContentVote
                             totalPeopleVote: {
@@ -416,13 +537,13 @@ wss.on("connection", (ws) => {
                                     short: 0,
                                     medium: 1,
                                     long: 3,
-                               },//end turn
-                               remove: {
-                                   short: 0,
-                                   medium: 1,
-                                   long: 3,
-                               },//end freeFlow
-                               change: {
+                                },//end turn
+                                remove: {
+                                    short: 0,
+                                    medium: 1,
+                                    long: 3,
+                                },//end freeFlow
+                                change: {
                                     same: 3,
                                     replace: 0,
                                     pareto: {
@@ -430,22 +551,22 @@ wss.on("connection", (ws) => {
                                         paretoDignity: 1,
                                         paretoTranscendental: 3,
                                     },//end pareto
-                               },//end God Mode
+                                },//end God Mode
 
                             },//end TotalPeopleVote
                             vetoes: {
-                                peopleWhoGetToVetoNowInThisCycle: 
+                                peopleWhoGetToVetoNowInThisCycle:
                                 {
                                     userID1: 3,
                                 },//end  peopleWhoGetToVetoNowInThisCycle
                                 whoGotANewVeto: {
-                                userID1: 1,
-                                userID2: 0,
-                                userID3: 1,
-                                userID4: 0,
-                            },//end whoGotANewVeto
-                        },//end vetoes
-                    },//end msg
+                                    userID1: 1,
+                                    userID2: 0,
+                                    userID3: 1,
+                                    userID4: 0,
+                                },//end whoGotANewVeto
+                            },//end vetoes
+                        },//end msg
                     }//end totalVoteSubmitResponseObject 
                     sendToWho(wss, ws, listDesired, messageToBrowser);
                     break;
@@ -485,7 +606,7 @@ function createUserTimerIDFunction(wss, ws, message) {
     let newUserID = globalUserIDs + 1;
     ws.clientID = newUserID;
     globalUserIDs++;
-    console.log("Login ELMXMEETING ID SHOULD BE for meeting 0: newUserID:" + " " + newUserID +" "+ JSON.stringify(globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs));
+    console.log("Login ELMXMEETING ID SHOULD BE for meeting 0: newUserID:" + " " + newUserID + " " + JSON.stringify(globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs));
     globalUserIDsWebsocketObject[newUserID] = ws;
     globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs[newUserID] = newUserID;
 
@@ -493,7 +614,7 @@ function createUserTimerIDFunction(wss, ws, message) {
 
     let allMeetingData = globalELMxArray[createUserTimerIDELMxID];
     let existingTimerData = allMeetingData.timers;
-    console.log("allMeetingData:"+ allMeetingData);
+    console.log("allMeetingData:" + allMeetingData);
     let createUserResponseObject = { "cmd": "returnNewUserIDWithScreenCatchUp", "msg": { "newID": newUserID, "existingTimerData": existingTimerData, "allMeetingData": allMeetingData } };
     let desiredList = ["individualOne", newUserSocketID];
     sendToWho(wss, ws, desiredList, createUserResponseObject)
@@ -521,14 +642,14 @@ function sendToWho(wss, ws, listDesired, messageToBrowser, meetingIDIfNeeded) {
 
                     userWS = globalUserIDsWebsocketObject[listDesired[1][key]];
                     console.log("Why this not working:" + userWS.readyState)
-                    
+
                     //this section on websocket.open has only been through through ~60% and could result in errors in more complex situations. Its ok to edit it
                     if (userWS.readyState === WebSocket.OPEN) {
                         // Get the WebSocket associated with the key
 
 
                         // Find the index of the user in the WebSocket clients
-                         //socketID = wss.clients.indexOf(userWS); //this indexOf no longer a function
+                        //socketID = wss.clients.indexOf(userWS); //this indexOf no longer a function
                         // wss.clients.forEach((client, index) => {
                         //  if (client === userWS) {
                         //    socketID = index;  // Set the index when a match is found
@@ -555,21 +676,21 @@ function sendToWho(wss, ws, listDesired, messageToBrowser, meetingIDIfNeeded) {
             let individualUserWS = ws; //setting this in what appears to be redundent but makes it clear we are in individual and only sending to an individual user
             let individualUserID = ws.clientID;
 
-          //  if(globalUserIDsWebsocketObject[individualUserID]!=undefined){//this is here for lost connections. If they lose connection then their websocket isn't closed and will still take up space in the wss array. So when they log back in we check to see if their GID is alrady in gidClients because it shouldn't be. If it is, then we find the socket it used to be registered at, use that socketIndex to delete the old ws information, then re-add their gid to gidClients with the new socketIndex. this way our websocket wss array doesn't get full of millions of unused ws objects from being disconnected. There migth already be some kind clean up mechanism but I'm doing it in case
-          //      delete globalUserIDsWebsocketObject[individualUserID];
-          //    }
-          console.log("In individualOne sendToWho:")
-          if (individualUserWS.readyState === WebSocket.OPEN) {
-           // if (socketID !== -1) {
+            //  if(globalUserIDsWebsocketObject[individualUserID]!=undefined){//this is here for lost connections. If they lose connection then their websocket isn't closed and will still take up space in the wss array. So when they log back in we check to see if their GID is alrady in gidClients because it shouldn't be. If it is, then we find the socket it used to be registered at, use that socketIndex to delete the old ws information, then re-add their gid to gidClients with the new socketIndex. this way our websocket wss array doesn't get full of millions of unused ws objects from being disconnected. There migth already be some kind clean up mechanism but I'm doing it in case
+            //      delete globalUserIDsWebsocketObject[individualUserID];
+            //    }
+            console.log("In individualOne sendToWho:")
+            if (individualUserWS.readyState === WebSocket.OPEN) {
+                // if (socketID !== -1) {
                 // socketID found, proceed with sending the message
-                console.log("sendToWho: individualOne now sending in .readyState: socketID:"+individualUserID+ " "+JSON.stringify(messageToBrowser))
+                console.log("sendToWho: individualOne now sending in .readyState: socketID:" + individualUserID + " " + JSON.stringify(messageToBrowser))
                 individualUserWS.send(JSON.stringify(messageToBrowser));
             } else {
                 console.log("WebSocket client not found. Removing ID from globalUserIDsWebsocketObject and clients ");
                 delete globalUserIDsWebsocketObject[individualUserID];
                 delete globalUserIDsWebsocketObject[meetingIDIfNeeded].arrayOfAttendanceIDs[individualUserID];
                 delete globalUserIDsWebsocketObject[meetingIDIfNeeded].arrayOfAttendanceIDs[individualUserID];
-                globalUserIDsWebsocketObject[meetingIDIfNeeded].participants.NumberOfParticipants=globalUserIDsWebsocketObject[meetingIDIfNeeded].participants.NumberOfParticipants -1;
+                globalUserIDsWebsocketObject[meetingIDIfNeeded].participants.NumberOfParticipants = globalUserIDsWebsocketObject[meetingIDIfNeeded].participants.NumberOfParticipants - 1;
             }
             break;
     }
