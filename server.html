@@ -934,22 +934,6 @@
 
           break;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         case "returnedFromServerResetVetoName":
           // input msg: { ELMxID: 0, vetoNewTitleID: '', vetoNewName: 'Veto Mark' }
           let vetoNewName = data.msg.vetoNewName;
@@ -965,33 +949,6 @@
           }
 
           break;
-
-
-        case 'updateTimerState':
-          // Input msg: { timerServerID: '', isRunning: true/false }
-          let timerServerID = data.msg.timerServerID;
-          let isRunning = data.msg.isRunning;
-
-          console.log(`Timer ID: ${timerServerID}, isRunning: ${isRunning}`);
-
-          // Select the timer element based on the server-side timerID
-          const timerElement = document.querySelector(`[data-id="${timerServerID}-5"]`); // Assuming you're using `-5` for the button or other element
-
-          console.log("timerElement: " + JSON.stringify(timerElement));
-
-          if (timerElement) {
-            // Update the UI based on whether the timer is running or paused
-            const startPauseBtn = timerElement.querySelector('button'); // Replace with the actual button or element inside the timer element
-
-            if (startPauseBtn) {
-              // Update the button text based on the timer's state
-              startPauseBtn.textContent = isRunning ? "⏸️" : "▶️";
-            }
-          }
-
-          break;
-
-
 
         case "returnedFromServerManualSetVetoTime":
           // input msg: { ELMxID: 0, vetoManualTimeID: '', vetoNewManualTime: '00:30' }
@@ -1009,10 +966,30 @@
 
           break;
 
+        case "updateTimerState":
+          let { timerServerID, shouldStart, ELMxID } = data.msg;
+          let timerElement = document.querySelector(`[data-id='${timerServerID}']`);
 
+          if (timerElement) {
+            // If the timer is starting
+            if (shouldStart) {
+              startTimer(timerServerID);
+              startAscendingTimer(timerServerID);
+              timerElement.style.backgroundColor = "green";  // Optional: change color to show it's running
+              startPauseBtn.textContent = "⏸️";  // Change button text to 'Pause' or 'Stop'
+            }
+            // If the timer is stopping
+            else {
+              clearInterval(intervalId[timerServerID]);
+              clearInterval(ascIntervalId[timerServerID]);
+              intervalId[timerServerID] = null;
+              ascIntervalId[timerServerID] = null;
+              startPauseBtn.textContent = "▶️";  // Change button text to 'Play' or 'Start'
+              timerElement.style.backgroundColor = "";  // Reset background color
+            }
+          }
+          break;
 
-
-        
 
 
 
@@ -1315,25 +1292,58 @@
       });
 
 
+      // function toggleTimer(shouldStart) {
+      //   if (shouldStart) {
+      //     if (currentRunningTimer && currentRunningTimer !== timerComponent) {
+      //       currentRunningTimer.querySelector(".start-pause-btn").click(); // Stop the other timer
+      //     }
+      //     startTimer();
+      //     startAscendingTimer();
+
+      //   } else {
+      //     clearInterval(intervalId);
+      //     clearInterval(ascIntervalId);
+
+      //     intervalId = null;
+      //     ascIntervalId = null;
+
+      //     startPauseBtn.textContent = "▶️";
+      //     timerComponent.style.backgroundColor = ""; // Reset background color to default
+      //   }
+      // }
+
       function toggleTimer(shouldStart) {
         if (shouldStart) {
           if (currentRunningTimer && currentRunningTimer !== timerComponent) {
-            currentRunningTimer.querySelector(".start-pause-btn").click(); // Stop the other timer
+            currentRunningTimer.querySelector(".start-pause-btn").click(); // Stop other timers
           }
           startTimer();
           startAscendingTimer();
-
         } else {
           clearInterval(intervalId);
           clearInterval(ascIntervalId);
-
           intervalId = null;
           ascIntervalId = null;
-
           startPauseBtn.textContent = "▶️";
-          timerComponent.style.backgroundColor = ""; // Reset background color to default
+          timerComponent.style.backgroundColor = "";
         }
+
+        // Send update to the server
+        const timerServerID = startPauseBtn.getAttribute("data-id");
+        socket.send(JSON.stringify({
+          cmd: "toggleTimer",
+          msg: {
+            ELMxID: 0,
+            timerServerID: timerServerID,
+            shouldStart: shouldStart,
+
+          }
+        }));
+
+        console.log("Sent toggleTimer request to server:", timerServerID, shouldStart);
       }
+
+
 
       function startTimer() {
         // Clear background color when timer starts
@@ -1369,78 +1379,6 @@
         startPauseBtn.textContent = "⏸️";
       }
 
-      // function startTimer() {
-      //   console.log({ cmd: "TIMER_START", msg: "Timer started." });
-
-      //   // Clear background color when timer starts
-      //   timerComponent.style.backgroundColor = "#c5eba9"; // Light green
-
-      //   let [minutes, seconds] = timerValue.value.split(":").map(num => parseInt(num, 10));
-      //   let totalSeconds = minutes * 60 + seconds;
-
-      //   intervalId = setInterval(() => {
-      //     if (totalSeconds <= 0) {
-      //       clearInterval(intervalId);
-      //       intervalId = null;
-      //       timerComponent.style.backgroundColor = "orange";
-      //       console.log({ cmd: "TIMER_COMPLETE", msg: "Timer has ended!" });
-
-      //       onComplete();
-      //       startPauseBtn.textContent = "▶️";
-
-      //       // Stop the ascending timer when countdown reaches zero
-      //       if (ascIntervalId) {
-      //         clearInterval(ascIntervalId);
-      //         ascIntervalId = null;
-      //         console.log({ cmd: "ASC_TIMER_STOP", msg: "Ascending timer stopped." });
-      //       }
-
-      //       return;
-      //     }
-
-      //     totalSeconds--;
-      //     const mins = Math.floor(totalSeconds / 60).toString();
-      //     const secs = (totalSeconds % 60).toString().padStart(2, "0");
-      //     timerValue.value = `${mins}:${secs}`;
-
-      //     console.log({ cmd: "TIMER_UPDATE", msg: `Time left: ${mins}:${secs}` });
-
-
-      //     // Get the value entered by the user
-      //     const timerAscValue = timerAscInputField.value;
-
-      //     // Get the data-id attribute value of the input field
-      //     const timerAscElementID = timerAscInputField.getAttribute('data-id');
-
-      //     let resetTimerAsc_timerServerID = "";
-      //     const parts = timerAscElementID.split('-'); // Split the ID to get the timerServerID
-      //     const firstPart = parts[0]; // The first part is the timerServerID
-      //     resetTimerAsc_timerServerID = firstPart; // Set timerServerID to firstPart
-
-      //     console.log("resetTimerAsc_timerServerID: " + resetTimerAsc_timerServerID);
-
-      //     const ELMxID = 0; // You can dynamically set this as needed
-      //     console.log("Event Listener set for ascending timer update: " + timerAscValue);
-
-      //     // Send the updated ascending timer value to the server when the user unfocuses the input field
-      //     socket.send(JSON.stringify("inside of blur updateAscendingTimer"));
-
-      //     // Create a response object to send to the server
-      //     let responseObject = {
-      //       "cmd": "timerUpdate",
-      //       "msg": {
-      //         "ELMxID": ELMxID,
-      //         "timerServerID": resetTimerAsc_timerServerID,
-      //         "timerAscValue": timerAscValue
-      //       }
-      //     };
-      //     // Send the response object to the server (via socket)
-      //     console.log("Response for ascending timer: " + JSON.stringify(responseObject));
-      //     socket.send(JSON.stringify(responseObject));
-      //     console.log("Ascending timer value sent to server: " + timerAscValue);
-      //   }, 1000);
-      //   startPauseBtn.textContent = "⏸️";
-      // }
 
 
       function startAscendingTimer() {
@@ -1498,37 +1436,39 @@
         }
       });
 
-      startPauseBtn.addEventListener("click", () => {
-        if (intervalId === null) {
-          toggleTimer(true);
-        } else {
-          toggleTimer(false);
-        }
-      });
-
-
-
       // startPauseBtn.addEventListener("click", () => {
-      //   const isStarting = intervalId === null; // Determine if we are starting or pausing
-      //   const timerServerID = startPauseBtn.getAttribute("data-id"); // Extract the timer ID
-
-      //   // Toggle timer locally
-      //   toggleTimer(isStarting);
-
-      //   // Prepare data to send to the server
-      //   let responseObject = {
-      //     cmd: "toggleTimer",
-      //     msg: {
-      //       timerServerID: timerServerID,
-      //       shouldStart: isStarting
-      //     }
-      //   };
-
-      //   // Send the request to the server to update the timer state for all clients
-      //   socket.send(JSON.stringify(responseObject));
-
-      //   console.log("Sent toggleTimer request to server:", responseObject);
+      //   if (intervalId === null) {
+      //     toggleTimer(true);
+      //   } else {
+      //     toggleTimer(false);
+      //   }
       // });
+
+
+
+      startPauseBtn.addEventListener("click", () => {
+        const isStarting = intervalId === null; // Determine if we are starting or pausing
+        const timerServerID = startPauseBtn.getAttribute("data-id"); // Extract the timer ID
+
+        // Toggle timer locally
+        toggleTimer(isStarting);
+
+        // Prepare data to send to the server
+        let responseObject = {
+          cmd: "toggleTimer",
+          msg: {
+            timerServerID: timerServerID,
+            shouldStart: isStarting,
+            ELMxID: 0,
+
+          }
+        };
+
+        // Send the request to the server to update the timer state for all clients
+        socket.send(JSON.stringify(responseObject));
+
+        console.log("Sent toggleTimer request to server:", responseObject);
+      });
 
 
       resetDefaultBtn.addEventListener("click", () => {
@@ -2050,36 +1990,6 @@
 
 
 
-
-
-
-      // console.log("defaultTimeInputField using querySelector:" + JSON.stringify(defaultTimeInputField));
-
-      // defaultTimeInputField.addEventListener('blur', function () {
-      //   const defaultTimeValue = defaultTimeInputField.value; // Get the value entered by the user
-      //   const defaultTimeID = defaultTimeInputField.getAttribute('data-id'); // Get the attribute ID for default time
-      //   const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
-      //   console.log("Event Listener set in createTimerComponent for default time: " + defaultTimeValue);
-
-      //   // Send the new default time to the server when the user unfocuses the input field
-      //   socket.send(JSON.stringify("inside of blur updateDefaultTime"));
-
-      //   let responseObject = {
-      //     "cmd": "resetDefaultTime", // Command to reset default time
-      //     "msg": {
-      //       "ELMxID": ELMxID,
-      //       "timerID": defaultTimeID, // Use the appropriate ID for timer
-      //       "newDefaultTime": defaultTimeValue // The new default time entered by the user
-      //     }
-      //   };
-      //   console.log("Sending default time to server:", responseObject);
-      //   socket.send(JSON.stringify(responseObject));
-      //   socket.send(JSON.stringify(responseObject)); // Send message to the server
-
-      //   console.log("Default time sending to socket: " + defaultTimeValue);
-      // }); // end event handler for blur
-
-
       // setTimeout(function() {
       const vetoInputField = timerComponent.querySelector(`[data-id="${newTimerID}-4"]`);
       console.log("vetoInputField using querySelector:" + JSON.stringify(vetoInputField));
@@ -2106,89 +2016,6 @@
         socket.send(JSON.stringify(responseObject));
         console.log("Veto title sending to socket: " + vetoNewName);
       });//end event handler blur
-
-
-
-      // Ensure intervalId is defined in a higher scope
-
-
-      // Ensure these variables are declared in a scope that covers both functions
-      let intervalId = null;
-      let ascIntervalId = null;
-      let defaultTimeIntervalId = null; // For default time updates
-      let ascSeconds = 0;
-
-      console.log("defaultTimeInputField using querySelector: " + JSON.stringify(defaultTimeInputField));
-
-      const startPauseBtn = timerComponent.querySelector(`[data-id="${newTimerID}-5"]`);
-      console.log("startPauseBtn using querySelector: " + JSON.stringify(startPauseBtn));
-
-      // Define the toggleTimer function
-      function toggleTimer(shouldStart) {
-        if (shouldStart) {
-          console.log("Starting timer...");
-
-          // Start the main timer (example logic; replace with your actual timer functionality)
-          intervalId = setInterval(() => {
-            // console.log("Timer tick...");
-            // Your timer logic here (update UI, decrement time, etc.)
-          }, 1000);
-
-          // Start the ascending timer (example logic)
-          ascIntervalId = setInterval(() => {
-            ascSeconds++;
-            // console.log("Ascending seconds: " + ascSeconds);
-            // Update ascending timer UI if needed
-          }, 1000);
-
-          // Start updating the default time continuously (example: log its current value)
-          defaultTimeIntervalId = setInterval(() => {
-            // You could update the UI or perform other actions here with the default time value
-            // console.log("Default time value: " + defaultTimeInputField.value);
-          }, 1000);
-
-          // Update button text to indicate 'pause'
-          startPauseBtn.textContent = "⏸️";
-        } else {
-          console.log("Pausing timer...");
-
-          // Stop the main timer, ascending timer, and default time update
-          clearInterval(intervalId);
-          intervalId = null;
-          clearInterval(ascIntervalId);
-          ascIntervalId = null;
-          clearInterval(defaultTimeIntervalId);
-          defaultTimeIntervalId = null;
-
-          // Update button text to indicate 'start'
-          startPauseBtn.textContent = "▶️";
-        }
-      }
-
-      // Add the event listener for the start/pause button
-      startPauseBtn.addEventListener('click', function () {
-        const isStarting = intervalId === null; // Determine if we are starting or pausing
-        const timerServerID = startPauseBtn.getAttribute("data-id"); // Extract the timer ID
-        console.log("Event Listener (start/pause): " + isStarting);
-
-        // Toggle timer locally using our defined function
-        toggleTimer(isStarting);
-
-        // Prepare data to send to the server
-        let responseObject = {
-          cmd: "toggleTimer",
-          msg: {
-            timerServerID: timerServerID,
-            shouldStart: isStarting
-          }
-        };
-
-        // Send the request to the server to update the timer state for all clients
-        socket.send(JSON.stringify(responseObject));
-        console.log("Toggle timer sending to socket: " + JSON.stringify(responseObject));
-      });
-
-
 
 
       const contentBtn2 = document.getElementById("contentdata");
@@ -2355,18 +2182,6 @@
 
 
 
-
-        // function updateClickCountDisplay() {
-        //   const list = document.getElementById("click-counts-list");
-        //   list.innerHTML = ""; // Clear previous list
-
-        //   Object.entries(window.submenuClickCounts).forEach(([item, count]) => {
-        //     const listItem = document.createElement("li");
-        //     listItem.innerText = `${item}: ${count} clicks`;
-        //     list.appendChild(listItem);
-        //   });
-        // }
-
         function updateClickCountDisplay(numberOfCitizens) {
           const list = document.getElementById("click-counts-list");
           list.innerHTML = ""; // Clear previous list
@@ -2384,20 +2199,6 @@
             list.appendChild(listItem);
           });
         }
-
-
-        //         function updateClickCountDisplay() {
-        //     const list = document.getElementById("click-counts-list");
-        //     list.innerHTML = ""; // Clear previous list
-
-        //     const entries = Object.entries(window.submenuClickCounts);
-        //     for (let i = 0; i < entries.length; i++) {
-        //         const [item, count] = entries[i];
-        //         const listItem = document.createElement("li");
-        //         listItem.innerText = `${item}: ${count} clicks`;
-        //         list.appendChild(listItem);
-        //     }
-        // }
 
 
         function activateButton(selectedButton) {
@@ -2550,11 +2351,6 @@
       const contentDisplayContainer = document.getElementById("contentDisplayContainer");
       console.log("DOMContentLoaded: timerList:" + JSON.stringify(timerList));
 
-      //const counters = {
-      //  Individual: 0,
-      //  Particular: 0,
-      //  Universal: 0
-      //};
 
       let totalVotes = 0; // Global vote count to track total votes
       let currentRunningTimer = null; // Track the currently running timer

@@ -44,9 +44,9 @@ globalELMxArray = {
             },//end cycleVotingResults
         },//cycles
         "timers": {
-            //"timer1TotalMeetTimer": { "name": "Total Meet Timer", "remainingTime": 59 },
-            //"FudgeTimer": { "name": "Fudge Timer", "remainingTime": 9 },
-            //"timerID1": { "name": "Ben", "remainingTime": 10, "personAssignedID": "ID2" }
+            // "timer1TotalMeetTimer": { "name": "Total Meet Timer", "remainingTime": 59 },
+            // "FudgeTimer": { "name": "Fudge Timer", "remainingTime": 9 },
+            // "timerID1": { "name": "Ben", "remainingTime": 10, "personAssignedID": "ID2" }
 
         },//end timers
         "vote": {
@@ -172,22 +172,6 @@ wss.on("connection", (ws) => {
 
 
 
-            //    if (data.cmd === 'createTimerComponentToBrowser') {
-            //        // input form 
-            //        //    cmd: 'createTimerComponentToBrowser',
-            //        //    msg: {
-            //        //    defaultTime: defaultTime,
-            //        //    timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
-            //        //    }
-            //        //  };
-            //        // Broadcast the new timer to all connected clients
-            //        wss.clients.forEach(client => {
-            //            if (client.readyState === WebSocket.OPEN) {
-            //                client.send(JSON.stringify(data));
-            //            }
-            //        });
-            //    }
-
 
 
 
@@ -208,6 +192,7 @@ wss.on("connection", (ws) => {
                     console.log("Inside createTimerComponentToBrowser:" + createTimerIDELMxID + " " + newTimerID);
 
 
+
                     globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {};//end globalUserIDS
 
                     globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {
@@ -223,6 +208,226 @@ wss.on("connection", (ws) => {
                     sendToWho(wss, ws, desiredList, createUserResponseObject)
                     //ws.send(JSON.stringify(createUserResponseObject)); // Send response to the client
                     break;
+
+
+
+
+
+
+
+
+                    case 'toggleTimer':
+                        console.log("Received toggleTimer request:", message);
+                    
+                        let toggle_ELMxID = message.msg.ELMxID;
+                        let toggle_timerServerID = message.msg.timerServerID; // Example: '1-5'
+                        let shouldStart = message.msg.shouldStart;
+                    
+                        // Ensure the timers object exists for the provided ELMxID
+                        if (!globalELMxArray[toggle_ELMxID]) {
+                            console.error(`ELMxID ${toggle_ELMxID} not found in globalELMxArray`);
+                            break;
+                        }
+                    
+                        if (!globalELMxArray[toggle_ELMxID].timers) {
+                            console.log(`Timers object for ELMxID ${toggle_ELMxID} does not exist`);
+                            globalELMxArray[toggle_ELMxID].timers = {}; // Initialize if missing
+                        }
+                    
+                        // Log the entire timers object to ensure it is correctly populated
+                        console.log(`Timers for ELMxID ${toggle_ELMxID}:`, globalELMxArray[toggle_ELMxID].timers);
+                    
+                        // Convert '1-5' to numeric ID (for example, using the first part '1')
+                        let timerIDParts = toggle_timerServerID.split('-'); // ['1', '5']
+                        let timerID = parseInt(timerIDParts[0], 10); // Use the first part (1) as the numeric key
+                    
+                        let timer = globalELMxArray[toggle_ELMxID].timers[timerID]; // Now you access using numeric key
+                        console.log('timer is', timer);  // Check if the timer is being fetched correctly
+                    
+                        if (!timer) {
+                            console.error(`Timer with ID ${toggle_timerServerID} not found for ELMxID ${toggle_ELMxID}`);
+                            break;
+                        }
+                    
+                        // Stop any existing timers
+                        if (timer.interval) clearInterval(timer.interval);
+                        if (timer.ascInterval) clearInterval(timer.ascInterval);
+                    
+                        // Update timer state
+                        timer.isRunning = shouldStart;
+                        console.log(`Timer ${toggle_timerServerID} updated: shouldStart = ${shouldStart}`);
+                    
+                        // Display the timer's initial state before starting
+                        console.log(`Timer ${toggle_timerServerID} initial state: Default Time = ${timer.defaultTime}, Ascending Time = 0, Remaining Time = ${formatTime(timer.remainingTime || 0)}`);
+                    
+                        // Start or stop the timer based on the shouldStart flag
+                        if (shouldStart) {
+                            // Convert default time to seconds
+                            let defaultTimeSeconds = timer.defaultTime ? convertToSeconds(timer.defaultTime) : 0;
+                            timer.remainingTime = defaultTimeSeconds;
+                    
+                            // Start the countdown timer
+                            timer.interval = setInterval(() => {
+                                if (timer.remainingTime > 0) {
+                                    timer.remainingTime--;
+                                } else {
+                                    clearInterval(timer.interval);
+                                    timer.interval = null;
+                                }
+                    
+                                let formattedTime = formatTime(timer.remainingTime);
+                                console.log(`[Default Timer] ID: ${toggle_timerServerID}, Time Left: ${formattedTime}`);
+                    
+                                let defaultTimeUpdate = {
+                                    cmd: "returnedFromServerResetDefaultTime",
+                                    msg: {
+                                        timerServerID: toggle_timerServerID,
+                                        newDefaultTime: formattedTime
+                                    }
+                                };
+                    
+                                sendToWho(wss, ws, ["particularSome", globalELMxArray[toggle_ELMxID].arrayOfAttendanceIDs], defaultTimeUpdate);
+                    
+                                // Log timer's remaining time on server
+                                console.log(`Remaining Time: ${formattedTime}`);
+                            }, 1000);
+                    
+                            // Start ascending timer
+                            timer.ascValue = 0;
+                    
+                            timer.ascInterval = setInterval(() => {
+                                timer.ascValue++;
+                    
+                                let formattedAscTime = formatTime(timer.ascValue);
+                                console.log(`[Ascending Timer] ID: ${toggle_timerServerID}, Elapsed Time: ${formattedAscTime}`);
+                    
+                                let ascUpdate = {
+                                    cmd: "returnedFromServerResetTimerAsc",
+                                    msg: {
+                                        timerServerID: toggle_timerServerID,
+                                        timerAscValue: formattedAscTime
+                                    }
+                                };
+                    
+                                sendToWho(wss, ws, ["particularSome", globalELMxArray[toggle_ELMxID].arrayOfAttendanceIDs], ascUpdate);
+                    
+                                // Log timer's ascending value on server
+                                console.log(`Elapsed Ascending Time: ${formattedAscTime}`);
+                            }, 1000);
+                        } else {
+                            console.log(`Stopping timer ${toggle_timerServerID}`);
+                        }
+                    
+                        // Broadcast state update to clients
+                        let updateResponse = {
+                            cmd: "updateTimerState",
+                            msg: {
+                                timerServerID: toggle_timerServerID,
+                                shouldStart: shouldStart,
+                                ELMxID: toggle_ELMxID
+                            }
+                        };
+                    
+                        let connectedClients = globalELMxArray[toggle_ELMxID].arrayOfAttendanceIDs;
+                        sendToWho(wss, ws, ["particularSome", connectedClients], updateResponse);
+                    
+                        break;
+                    
+                        // Helper functions
+                        function convertToSeconds(time) {
+                            let parts = time.split(":").map(Number);
+                            return parts[0] * 3600 + parts[1] * 60 + (parts[2] || 0);
+                        }
+                    
+                        function formatTime(seconds) {
+                            let h = Math.floor(seconds / 3600);
+                            let m = Math.floor((seconds % 3600) / 60);
+                            let s = seconds % 60;
+                            return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
+                        }
+                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+                // case 'addTimerToServer':
+                //     console.log("Main Switch: Inside addTimerToServer");
+
+                //     // Extract data from the message
+                //     let createTimerIDELMxID = message.msg.ELMxID;
+                //     let timerIDFromBrowser = message.msg.timerIDFromBrowser;
+                //     let defaultTimeOfNewlyAddedTimer = message.msg.defaultTime;
+                //     let defaultName = "Timer Title";
+
+                //     // Ensure globalELMxArray for the specific ELMxID exists
+                //     if (!globalELMxArray[createTimerIDELMxID]) {
+                //         console.error(`Error: ELMxID '${createTimerIDELMxID}' not found.`);
+                //         break;
+                //     }
+
+                //     // Create a new timer ID
+                //     let newTimerID = globalTimerIDs + 1;
+                //     globalTimerIDs++;
+
+                //     console.log(`Inside createTimerComponentToBrowser: ELMxID = ${createTimerIDELMxID}, New Timer ID = ${newTimerID}`);
+
+                //     // Initialize the timer object for the given ELMxID
+                //     if (!globalELMxArray[createTimerIDELMxID].timers) {
+                //         console.warn(`Timers object not found for ELMxID '${createTimerIDELMxID}', creating it.`);
+                //         globalELMxArray[createTimerIDELMxID].timers = {};
+                //     }
+
+                //     // Check if the timer already exists, prevent overwriting
+                //     if (globalELMxArray[createTimerIDELMxID].timers[newTimerID]) {
+                //         console.warn(`Timer ID '${newTimerID}' already exists for ELMxID '${createTimerIDELMxID}'.`);
+                //         break;
+                //     }
+
+                //     // Add the new timer object to globalELMxArray
+                //     globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {
+                //         "timerServerID": newTimerID,
+                //         "defaultTime": defaultTimeOfNewlyAddedTimer,
+                //         "personAssignedID": "???",
+                //         "name": defaultName,
+                //         "remainingTime": convertToSeconds(defaultTimeOfNewlyAddedTimer), // Set the remaining time in seconds
+                //         "interval": null, // Initialize as null
+                //         "ascInterval": null, // Initialize as null
+                //         "ascValue": 0 // Initialize ascending time
+                //     };
+
+                //     // Prepare response to send back to the client
+                //     let createUserResponseObject = {
+                //         "cmd": "returnedFromServerAddTimer",
+                //         "msg": {
+                //             "timerServerID": newTimerID,
+                //             "defaultTime": defaultTimeOfNewlyAddedTimer,
+                //             "timerBrowserID": timerIDFromBrowser,
+                //             "allMeetingData": globalELMxArray[createTimerIDELMxID].timers[newTimerID]
+                //         }
+                //     };
+
+                //     // Send response to the clients (e.g., "particularSome" group or all clients of attendance list)
+                //     let desiredList = ["particularSome", globalELMxArray[createTimerIDELMxID].arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, desiredList, createUserResponseObject);
+
+                //     console.log(`Timer ${newTimerID} successfully created and sent to clients.`);
+                //     break;
+
+                //     // Helper function to convert HH:MM:SS to seconds
+                //     function convertToSeconds(time) {
+                //         let parts = time.split(":").map(Number);
+                //         return parts[0] * 3600 + parts[1] * 60 + parts[2];
+                //     }
+
 
 
 
@@ -290,6 +495,7 @@ wss.on("connection", (ws) => {
                     let timerAscValue = message.msg.timerAscValue;  // Get the new ascending timer value
 
                     // Ensure the timerServerID exists in the global timers object
+                    console.log('global elmx' + globalELMxArray[resetTimerAsc_ELMxID]);
                     if (globalELMxArray[resetTimerAsc_ELMxID] && globalELMxArray[resetTimerAsc_ELMxID].timers[resetTimerAsc_timerServerID]) {
                         // Update the timer's ascending value in the global array
                         globalELMxArray[resetTimerAsc_ELMxID].timers[resetTimerAsc_timerServerID].ascValue = timerAscValue;
@@ -333,44 +539,6 @@ wss.on("connection", (ws) => {
 
                     let desiredListVetoName = ["particularSome", globalELMxArray[resetVetoName_meetingID].arrayOfAttendanceIDs];
                     sendToWho(wss, ws, desiredListVetoName, createUserResponseObjectVetoName);
-
-                    break;
-
-                case 'toggleTimer':
-                    console.log("Received toggleTimer request:", message);
-
-                    // Extract the necessary data from the message
-                    let toggleTimerID = message.msg.timerServerID;  // Timer ID
-                    let resetPlayPauseBtn_ELMxID = message.msg.ELMxID;  // Meeting ID
-                    let resetPlayPauseBtn_timerServerID = message.msg.timerServerID;  // Timer Server ID
-                    let shouldStart = message.msg.shouldStart;  // Whether to start or pause the timer
-
-                    // Directly update the isRunning state of the timer without condition checks
-                    globalELMxArray[resetPlayPauseBtn_ELMxID].timers[resetPlayPauseBtn_timerServerID].isRunning = shouldStart;
-
-                    console.log('testing pringing');
-                    console.log(`Timer ${toggleTimerID} is now ${shouldStart ? "running" : "paused"}`);
-
-                    // Create a response object to notify clients of the timer state update
-                    let toggleResponse = {
-                        cmd: "updateTimerState",
-                        msg: {
-                            timerServerID: toggleTimerID,
-                            isRunning: shouldStart
-                        }
-                    };
-
-                    // Determine the list of clients to notify (clients connected to the same meeting)
-                    let desiredListTimerBtn = globalELMxArray[resetPlayPauseBtn_ELMxID].arrayOfAttendanceIDs;
-
-                    // Log the response object for debugging purposes
-                    console.log("Sending timer state update to clients:", JSON.stringify(toggleResponse));
-
-                    // Send the updated state to the desired clients
-                    sendToWho(wss, ws, desiredListTimerBtn, toggleResponse);
-
-                    // Optionally, log the response sent to clients
-                    console.log(`Timer state update sent: ${JSON.stringify(toggleResponse)}`);
 
                     break;
 
