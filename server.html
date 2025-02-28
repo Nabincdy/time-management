@@ -1505,6 +1505,7 @@
         numberCitizenTimers = numberCitizenTimers - 1;
         document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
         const voteBtn = timerComponent.querySelector(".vote-btn");
+        const removeBtn = removeBtn.getAttribute("data-id"); // Extract the timer ID
 
         console.log("HAS VOTED:" + (voteBtn.textContent === "Unvote"));
 
@@ -1546,6 +1547,20 @@
         if (currentRunningTimer === timerComponent) {
           currentRunningTimer = null; // Reset if this was the running timer
         }
+
+    // Prepare data to send to the server
+    let responseObject = {
+        cmd: "removeTimer",
+        msg: {
+            timerServerID: timerServerID,
+            ELMxID: 0
+        }
+    };
+
+        socket.send(JSON.stringify(responseObject));
+
+        console.log("Sent removeTimer request to server:", responseObject);
+
       });
 
       function playSound() {
@@ -1863,7 +1878,7 @@
           <button data-id="${newTimerID}-5" class="start-pause-btn">▶️</button>
           <button id2="${newTimerID}"-6 class="reset-initial-btn">⏏️</button>
           <button id2="${newTimerID}"-7 class="reset-default-btn">⤵️</button>
-          <button id2="${newTimerID}-8" class="remove-btn">❌</button>
+          <button data-id="${newTimerID}-8" class="remove-btn">❌</button>
           <button id2="${newTimerID}"-9 class="form-btn" id="formbtn">Form</button>
           <button id2="${newTimerID}"-10 class="content-btn" id="contentdata">Content</button>
           <button id2="${newTimerID}"-11 class="people-btn" id="peoplebtn">People</button>
