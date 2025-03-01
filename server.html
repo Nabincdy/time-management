@@ -887,6 +887,27 @@
 
 
 
+          case "timerRemoved":
+            const timerRemovalServerID = message.msg.timerRemovalServerID;
+            const ELMxID_Remove = message.msg.ELMxID_Remove;
+
+            // Find and remove the timer from the DOM
+            const timerRemoveElement = document.getElementById(`timer-${timerRemovalServerID}`);
+            if (timerRemoveElement) {
+                timerRemoveElement.remove();
+                console.log(`Timer ${timerRemovalServerID} has been removed from the client UI.`);
+            } else {
+                console.warn(`Timer ${timerRemovalServerID} not found in the DOM.`);
+            }
+
+            // Update any other UI elements or global state
+            if (typeof updateGlobalStateAfterTimerRemoval === "function") {
+                updateGlobalStateAfterTimerRemoval(ELMxID_Remove, timerRemovalServerID);
+            } else {
+                console.warn("updateGlobalStateAfterTimerRemoval function is not defined.");
+            }
+            break;
+
 
 
 
@@ -1501,22 +1522,27 @@
         startPauseBtn.textContent = "▶️";
       });
 
-      removeBtn.addEventListener("click", () => {
-        numberCitizenTimers = numberCitizenTimers - 1;
+      // Assuming removeBtn is defined outside of the event listener.
+      removeBtn.addEventListener("click", function () {
+        // `this` refers to the button that was clicked (the one triggering the event)
+        const clickedBtn = this; // Get the button clicked
+
+        // Update the number of citizen timers
+        numberCitizenTimers -= 1;
         document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
-        const voteBtn = timerComponent.querySelector(".vote-btn");
-        const removeBtn = removeBtn.getAttribute("data-id"); // Extract the timer ID
+
+        const voteBtn = timerComponent.querySelector(".vote-btn"); // Make sure timerComponent is defined before
+        const timerID = clickedBtn.getAttribute("data-id"); // Extract the timer ID from the clicked button
 
         console.log("HAS VOTED:" + (voteBtn.textContent === "Unvote"));
-
         console.log("voteBtn: ", voteBtn); // Check if the element is found
         console.log("voteBtn textContent: " + voteBtn.textContent);
 
         if (voteBtn.textContent === "Unvote") {
-          console.log("HERE: " + (totalVotes - 1))
-          totalVotes = totalVotes - 1;
+          console.log("HERE: " + (totalVotes - 1));
+          totalVotes -= 1;
           voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
-        }//end if statement of voteBtn.textContent
+        }
 
         const resetVotesBtn = document.getElementById("resetVotesBtn");
 
@@ -1548,20 +1574,20 @@
           currentRunningTimer = null; // Reset if this was the running timer
         }
 
-    // Prepare data to send to the server
-    let responseObject = {
-        cmd: "removeTimer",
-        msg: {
-            timerServerID: timerServerID,
+        // Prepare data to send to the server
+        let responseObject = {
+          cmd: "removeTimer",
+          msg: {
+            timerServerID: timerID,
             ELMxID: 0
-        }
-    };
+          }
+        };
 
         socket.send(JSON.stringify(responseObject));
 
         console.log("Sent removeTimer request to server:", responseObject);
-
       });
+
 
       function playSound() {
         const audio = new Audio("complete.mp3"); // Correct path to the sound file
@@ -1868,7 +1894,7 @@
       //timerComponent.appendChild(timerTitleInput);
 
       timerComponent.innerHTML = `
-        <input data-id="${newTimerID}-1" type="text" value="" placeholder="${timerTitle}" class="timer-title"/>
+        <input data-id="${newTimerID}-1" type="text" value="${timerTitle}" placeholder="${timerTitle}" class="timer-title"/>
         <input data-id="${newTimerID}-2" type="text" value="${defaultTime}" class="timer-value"/> 
         <input data-id="${newTimerID}-3" type="text" value="00:00" class="timer-asc"/>
         <input data-id="${newTimerID}-4" type="text" placeholder="veto" class="timer-veto"/> <!-- Shorter width for veto -->
