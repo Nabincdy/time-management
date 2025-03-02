@@ -1014,30 +1014,168 @@
 
 
 
+        // case "returnedFromServerSubmenuClick":
+        //   console.log("testing what is this first data " + data.msg);
+
+        //   const { timerServerDropdownID, clickedButton } = data.msg; // No redeclaration here
+        //   console.log("testing what is this data " + data.msg);
+
+
+        //   document.querySelectorAll(".form-btn").forEach(button => {
+        //     button.style.backgroundColor = ""; // Reset background color for all buttons
+        //   });
+
+        //   document.querySelectorAll(".dropdown-item").forEach(button => {
+        //     button.style.backgroundColor = ""; // Reset background color for all buttons
+        //   });
+        //   // Reset background color for all buttons
+        //   document.querySelectorAll(".submenu-item").forEach(button => {
+        //     button.style.backgroundColor = ""; // Reset background color for all buttons
+        //   });
+
+        //   // Find the button that matches the clickedButton and apply the green background color
+        //   document.querySelectorAll(".submenu-item").forEach(button => {
+        //     if (button.innerText.trim() === clickedButton) {
+        //       button.style.backgroundColor = "purple"; // Set green background for clicked button
+
+        //       // Optionally, if you want to activate the parent dropdown item
+        //       const parentButton = button.closest(".dropdown-item");
+        //       if (parentButton) parentButton.style.backgroundColor = "green";
+
+        //       // Optionally, if you want to activate the form button
+        //       const formbtn = button.closest(".form-btn");
+        //       if (formbtn) formbtn.style.backgroundColor = "green";
+
+        //     }
+        //   });
+        //   break;
+
+
+        //     case "returnedFromServerSubmenuClick":
+        // console.log("testing what is this first data " + data.msg);
+
+        // const { timerServerDropdownID, clickedButton } = data.msg;
+
+        // // Log the received data to check the values
+        // console.log("testing what is this data " + data.msg);
+
+        // // Reset background color for all buttons inside this specific timer component
+        // console.log("data value " + JSON.stringify(timerServerDropdownID));
+
+        // // Reset the background color for all form buttons, dropdown items, and submenu items for this timer
+        // document.querySelectorAll(`.form-btn[data-timer-id="${timerServerDropdownID}"]`).forEach(button => {
+        //     button.style.backgroundColor = ""; // Reset background color for form button
+        // });
+
+        // document.querySelectorAll(`.dropdown-item[data-timer-id="${timerServerDropdownID}"]`).forEach(button => {
+        //     button.style.backgroundColor = ""; // Reset background color for dropdown items
+        // });
+
+        // document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"]`).forEach(button => {
+        //     button.style.backgroundColor = ""; // Reset background color for submenu items
+        // });
+
+        // // Find the button that matches the clickedButton and apply the purple background color
+        // document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"]`).forEach(button => {
+        //     if (button.innerText.trim() === clickedButton) {
+        //         button.style.backgroundColor = "purple"; // Set purple background for clicked submenu item
+
+        //         // Find the parent dropdown item that contains the clicked button
+        //         const parentButton = button.closest(`.dropdown-item[data-timer-id="${timerServerDropdownID}"]`);
+        //         if (parentButton) {
+        //             parentButton.style.backgroundColor = "red"; // Set red background for parent dropdown item
+        //         } else {
+        //             console.error("Parent dropdown item not found for:", clickedButton, timerServerDropdownID);
+        //         }
+
+        //         // Find the form button that corresponds to the timer ID
+        //         const formbtn = document.querySelector(`.form-btn[data-timer-id="${timerServerDropdownID}"]`);
+        //         if (formbtn) {
+        //             formbtn.style.backgroundColor = "orange"; // Set orange background for form button
+        //         } else {
+        //             console.error("Form button not found for:", timerServerDropdownID);
+        //         }
+        //     }
+        // });
+
+        // break;
+
+
+        // case "returnedFromServerSubmenuClick":
+        //   console.log("Received data from server:", data.msg);
+
+        //   const { timerServerDropdownID, clickedButton } = data.msg;
+        //   console.log("Timer ID:", timerServerDropdownID, "Clicked Button:", clickedButton);
+
+        //   // Reset background color for all submenu items
+        //   document.querySelectorAll(".submenu-item").forEach(button => {
+        //     button.style.backgroundColor = "";
+        //   });
+
+        //   // Find the clicked submenu item
+        //   document.querySelectorAll(".submenu-item").forEach(button => {
+        //     if (button.innerText.trim() === clickedButton) {
+        //       button.style.backgroundColor = "purple"; // Highlight the clicked submenu item
+
+        //       // Find the parent dropdown container
+        //       const parentDropdown = button.closest(".dropdown-item");
+        //       if (parentDropdown) {
+        //         parentDropdown.style.backgroundColor = "red"; // Highlight dropdown
+        //       } else {
+        //         console.error("Parent dropdown not found for:", clickedButton);
+        //       }
+
+        //       // Find the closest form button
+        //       const formBtn = button.closest(".form-container")?.querySelector(".form-btn");
+        //       if (formBtn) {
+        //         formBtn.style.backgroundColor = "orange"; // Highlight form button
+        //       } else {
+        //         console.error("Form button not found for:", clickedButton);
+        //       }
+        //     }
+        //   });
+
+        //   break;
+
+
+
+
+
+
 
         case "returnedFromServerSubmenuClick":
-          const { clickedButton } = data.msg;
+          console.log("testing what is this first data " + data.msg);
+
+          const { timerServerDropdownID, clickedButton } = data.msg; // No redeclaration here
+          console.log("testing what is this data", JSON.stringify(data.msg));  // Use JSON.stringify to view object content
 
           // Reset background color for all buttons
-          document.querySelectorAll(".submenu-item, .dropdown-item, .form-btn").forEach(button => {
-            button.style.backgroundColor = "";
+          document.querySelectorAll(".submenu-item").forEach(button => {
+            button.style.backgroundColor = ""; // Reset all buttons first
           });
 
-          // Activate clicked button
+          // Find the button that matches both the clickedButton and timerServerDropdownID
           document.querySelectorAll(".submenu-item").forEach(button => {
-            if (button.innerText.trim() === clickedButton) {
-              button.style.backgroundColor = "green";
+            const buttonTimerServerID = button.getAttribute("data-timerServerID");
 
-              // Find and activate the parent button
+            console.log("timerServerDropdownID" + timerServerDropdownID);
+            // If the button's data-timerServerID matches the one from the server, activate it
+            if (buttonTimerServerID === timerServerDropdownID) {
+              button.style.backgroundColor = "green"; // Set green background for clicked button
+
+              // Optionally, if you want to activate the parent button
               const parentButton = button.closest(".dropdown-item");
               if (parentButton) parentButton.style.backgroundColor = "green";
 
-              // Find and activate the form button
+              // Optionally, if you want to activate the form button
               const formbtn = button.closest(".form-btn");
               if (formbtn) formbtn.style.backgroundColor = "green";
             }
           });
           break;
+
+
+
 
 
         default:
@@ -1931,7 +2069,7 @@
           <button id2="${newTimerID}"-6 class="reset-initial-btn">⏏️</button>
           <button id2="${newTimerID}"-7 class="reset-default-btn">⤵️</button>
           <button data-id="${newTimerID}-8" class="remove-btn">❌</button>
-          <button id2="${newTimerID}"-9 class="form-btn" id="formbtn">Form</button>
+          <button data-id="${newTimerID}-9" class="form-btn" id="formbtn">Form</button>
           <button id2="${newTimerID}"-10 class="content-btn" id="contentdata">Content</button>
           <button id2="${newTimerID}"-11 class="people-btn" id="peoplebtn">People</button>
           <button id2="${newTimerID}"-12 class="vote-btn" id="vote-btn" disabled >Vote</button>
@@ -2152,29 +2290,31 @@
 
       // Create Main Menu Items
       formDropdownMenu.innerHTML = `
-        <div class="dropdown-item" id="turnbutton">1. Turn
-          <div class="submenu">
-            <button class="submenu-item" id="straightturn">Straight Turn</button>
-            <button class="submenu-item" id="directiveTurn">Directive Turn</button>
-            <button class="submenu-item" id="popcornTurn">Popcorn Turn</button>
-          </div>
-        </div>
-        <div class="dropdown-item" id="freeflowbutton">2. Free Flow
-          <div class="submenu">
-            <button class="submenu-item">Fast Free Flow</button>
-            <button class="submenu-item">Team Free Flow</button>
-            <button class="submenu-item">Spread Free Flow</button>
-          </div>
-        </div>
-        <div class="dropdown-item" id="godmodebutton">3. God Mode
-          <div class="submenu">
-            <button class="submenu-item">God</button>
-            <button class="submenu-item">Diety</button>
-            <button class="submenu-item">Spirit</button>
-          </div>
-        </div>
-      `;
+  <div class="dropdown-item" id="turnbutton" data-timer-id="${newTimerID}">1. Turn
+    <div class="submenu">
+      <button class="submenu-item" data-timerServerID="${newTimerID}-straightturn" id="straightturn">Straight Turn</button>
+      <button class="submenu-item" data-timerServerID="${newTimerID}-directiveTurn" id="directiveTurn">Directive Turn</button>
+      <button class="submenu-item" data-timerServerID="${newTimerID}-popcornTurn" id="popcornTurn">Popcorn Turn</button>
+    </div>
+  </div>
+  <div class="dropdown-item" id="freeflowbutton" data-timer-id="${newTimerID}">2. Free Flow
+    <div class="submenu">
+      <button class="submenu-item" data-timerServerID="${newTimerID}-fastFreeFlow">Fast Free Flow</button>
+      <button class="submenu-item" data-timerServerID="${newTimerID}-teamFreeFlow">Team Free Flow</button>
+      <button class="submenu-item" data-timerServerID="${newTimerID}-spreadFreeFlow">Spread Free Flow</button>
+    </div>
+  </div>
+  <div class="dropdown-item" id="godmodebutton" data-timer-id="${newTimerID}">3. God Mode
+    <div class="submenu">
+      <button class="submenu-item" data-timerServerID="${newTimerID}-god">God</button>
+      <button class="submenu-item" data-timerServerID="${newTimerID}-diety">Diety</button>
+      <button class="submenu-item" data-timerServerID="${newTimerID}-spirit">Spirit</button>
+    </div>
+  </div>
+`;
       formBtn.appendChild(formDropdownMenu);
+
+
 
       // Toggle dropdown visibility
       formBtn.addEventListener("click", () => {
@@ -2294,7 +2434,7 @@
 
           console.log(`${buttonText} clicked ${window.submenuClickCounts[buttonText]} times`);
           const submenudata = timerComponent.querySelector(".submenu-item");
-          const timerServerID = submenudata.getAttribute("class"); // Extract the timer ID
+          const timerServerID = selectedButton.getAttribute("data-timerServerID"); // Extract the unique timerServerID
 
           const data = {
             cmd: "submenuClick",

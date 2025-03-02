@@ -598,7 +598,7 @@ wss.on("connection", (ws) => {
                         cmd: "returnedFromServerSubmenuClick",
                         msg: {
                             ELMxID: submenu_ELMxID,
-                            timerServerID: submenu_timerServerID,
+                            timerServerDropdownID: submenu_timerServerID,
                             clickedButton: clickedButton
                         }
                     };
