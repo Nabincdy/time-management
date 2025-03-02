@@ -887,26 +887,26 @@
 
 
 
-          case "timerRemoved":
-            const timerRemovalServerID = message.msg.timerRemovalServerID;
-            const ELMxID_Remove = message.msg.ELMxID_Remove;
+        case "timerRemoved":
+          const timerRemovalServerID = message.msg.timerRemovalServerID;
+          const ELMxID_Remove = message.msg.ELMxID_Remove;
 
-            // Find and remove the timer from the DOM
-            const timerRemoveElement = document.getElementById(`timer-${timerRemovalServerID}`);
-            if (timerRemoveElement) {
-                timerRemoveElement.remove();
-                console.log(`Timer ${timerRemovalServerID} has been removed from the client UI.`);
-            } else {
-                console.warn(`Timer ${timerRemovalServerID} not found in the DOM.`);
-            }
+          // Find and remove the timer from the DOM
+          const timerRemoveElement = document.getElementById(`timer-${timerRemovalServerID}`);
+          if (timerRemoveElement) {
+            timerRemoveElement.remove();
+            console.log(`Timer ${timerRemovalServerID} has been removed from the client UI.`);
+          } else {
+            console.warn(`Timer ${timerRemovalServerID} not found in the DOM.`);
+          }
 
-            // Update any other UI elements or global state
-            if (typeof updateGlobalStateAfterTimerRemoval === "function") {
-                updateGlobalStateAfterTimerRemoval(ELMxID_Remove, timerRemovalServerID);
-            } else {
-                console.warn("updateGlobalStateAfterTimerRemoval function is not defined.");
-            }
-            break;
+          // Update any other UI elements or global state
+          if (typeof updateGlobalStateAfterTimerRemoval === "function") {
+            updateGlobalStateAfterTimerRemoval(ELMxID_Remove, timerRemovalServerID);
+          } else {
+            console.warn("updateGlobalStateAfterTimerRemoval function is not defined.");
+          }
+          break;
 
 
 
@@ -1012,6 +1012,32 @@
           break;
 
 
+
+
+
+        case "returnedFromServerSubmenuClick":
+          const { clickedButton } = data.msg;
+
+          // Reset background color for all buttons
+          document.querySelectorAll(".submenu-item, .dropdown-item, .form-btn").forEach(button => {
+            button.style.backgroundColor = "";
+          });
+
+          // Activate clicked button
+          document.querySelectorAll(".submenu-item").forEach(button => {
+            if (button.innerText.trim() === clickedButton) {
+              button.style.backgroundColor = "green";
+
+              // Find and activate the parent button
+              const parentButton = button.closest(".dropdown-item");
+              if (parentButton) parentButton.style.backgroundColor = "green";
+
+              // Find and activate the form button
+              const formbtn = button.closest(".form-btn");
+              if (formbtn) formbtn.style.backgroundColor = "green";
+            }
+          });
+          break;
 
 
         default:
@@ -2267,9 +2293,22 @@
           window.submenuClickCounts[buttonText] += 1;
 
           console.log(`${buttonText} clicked ${window.submenuClickCounts[buttonText]} times`);
+          const submenudata = timerComponent.querySelector(".submenu-item");
+          const timerServerID = submenudata.getAttribute("class"); // Extract the timer ID
 
+          const data = {
+            cmd: "submenuClick",
+            msg: {
+              ELMxID: 0,
+              timerServerID: timerServerID,
+              buttonText: buttonText
+            }
+          };
+
+          socket.send(JSON.stringify(data));
           // Update the HTML list
           updateClickCountDisplay();
+
         }
 
         // Attach event listeners dynamically for the current dropdown

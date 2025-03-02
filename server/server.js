@@ -580,6 +580,46 @@ wss.on("connection", (ws) => {
                         }
                     
                         break;
+
+
+
+                        case "submenuClick":
+    console.log("Received submenuClick message:", message);
+
+    let submenu_ELMxID = message.msg.ELMxID;
+    let submenu_timerServerID = message.msg.timerServerID;
+    let clickedButton = message.msg.buttonText;
+
+    console.log(`Button "${clickedButton}" clicked for TimerServerID: ${submenu_timerServerID}`);
+
+    // Ensure ELMxID exists
+    if (!globalELMxArray[submenu_ELMxID]) {
+        globalELMxArray[submenu_ELMxID] = { timers: {}, arrayOfAttendanceIDs: [] };
+    }
+
+    // Ensure timerServerID exists
+    if (!globalELMxArray[submenu_ELMxID].timers[submenu_timerServerID]) {
+        globalELMxArray[submenu_ELMxID].timers[submenu_timerServerID] = {};
+    }
+
+    // Update global state (if needed)
+    globalELMxArray[submenu_ELMxID].timers[submenu_timerServerID].lastClickedButton = clickedButton;
+
+    // Create response object to broadcast
+    let submenuResponse = {
+        cmd: "returnedFromServerSubmenuClick",
+        msg: {
+            ELMxID: submenu_ELMxID,
+            timerServerID: submenu_timerServerID,
+            clickedButton: clickedButton
+        }
+    };
+
+    // Broadcast the update to all clients in the same session
+    let recipientList = ["particularSome", globalELMxArray[submenu_ELMxID].arrayOfAttendanceIDs];
+    sendToWho(wss, ws, recipientList, submenuResponse);
+    break;
+
                     
 
 
