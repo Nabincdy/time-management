@@ -1016,27 +1016,27 @@
 
 
         case "returnedFromServerSubmenuClick":
-            const { clickedButton } = data.msg;
+          const { clickedButton } = data.msg;
 
-        // Reset background color for all buttons
-        document.querySelectorAll(".submenu-item, .dropdown-item, .form-btn").forEach(button => {
+          // Reset background color for all buttons
+          document.querySelectorAll(".submenu-item, .dropdown-item, .form-btn").forEach(button => {
             button.style.backgroundColor = "";
-        });
+          });
 
-        // Activate clicked button
-        document.querySelectorAll(".submenu-item").forEach(button => {
+          // Activate clicked button
+          document.querySelectorAll(".submenu-item").forEach(button => {
             if (button.innerText.trim() === clickedButton) {
-                button.style.backgroundColor = "green";
+              button.style.backgroundColor = "green";
 
-                // Find and activate the parent button
-                const parentButton = button.closest(".dropdown-item");
-                if (parentButton) parentButton.style.backgroundColor = "green";
+              // Find and activate the parent button
+              const parentButton = button.closest(".dropdown-item");
+              if (parentButton) parentButton.style.backgroundColor = "green";
 
-                // Find and activate the form button
-                const formbtn = button.closest(".form-btn");
-                if (formbtn) formbtn.style.backgroundColor = "green";
+              // Find and activate the form button
+              const formbtn = button.closest(".form-btn");
+              if (formbtn) formbtn.style.backgroundColor = "green";
             }
-        });
+          });
           break;
 
 

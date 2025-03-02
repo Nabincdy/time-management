@@ -524,103 +524,91 @@ wss.on("connection", (ws) => {
 
 
 
-                    case 'removeTimer':
-                        console.log("Received removeTimer request:", message);
-                    
-                        // Extract the timerServerID and ELMxID from the message
-                        const timerServerID = message.msg.timerServerID; // Example: '1-8'
-                        const ELMxID = message.msg.ELMxID;
-                    
-                        // Check if the ELMxID exists
-                        if (!globalELMxArray[ELMxID]) {
-                            console.error(`ELMxID ${ELMxID} not found in globalELMxArray`);
-                            break;
-                        }
-                    
-                        // Log the timers for this ELMxID to verify the structure
-                        console.log(`Timers for ELMxID ${ELMxID}:`, globalELMxArray[ELMxID].timers);
-                    
-                        // Extract the numeric timer ID from timerServerID
-                        const timerRemovalID = timerServerID.split('-')[0];
-                    
-                        // Find and remove the timer
-                        let timers = globalELMxArray[ELMxID].timers;
-                        console.log('Timers before removal:', JSON.stringify(timers));
-                    
-                        if (timers && timers[timerRemovalID]) {
-                            let timer = timers[timerRemovalID];
-                    
-                            // Clear intervals (if running)
-                            if (timer.interval) clearInterval(timer.interval);
-                            if (timer.ascInterval) clearInterval(timer.ascInterval);
-                    
-                            // Remove the timer from the array
-                            delete timers[timerRemovalID];
-                    
-                            console.log(`Timer ${timerRemovalID} removed successfully.`);
-                    
-                            // Prepare the response
-                            let response = {
-                                cmd: 'timerRemoved',
-                                msg: {
-                                    timerRemovalServerID: timerRemovalID, // FIX: Matching frontend expectation
-                                    ELMxID_Remove: ELMxID // FIX: Matching frontend expectation
-                                }
-                            };
-                    
-                            // Send the update to all connected clients
-                            wss.clients.forEach(client => {
-                                if (client.readyState === WebSocket.OPEN) {
-                                    client.send(JSON.stringify(response));
-                                }
-                            });
-                    
-                        } else {
-                            console.error(`Timer with ID ${timerRemovalID} not found for ELMxID ${ELMxID}`);
-                        }
-                    
+                case 'removeTimer':
+                    console.log("Received removeTimer request:", message);
+
+                    // Extract the timerServerID and ELMxID from the message
+                    const timerServerID = message.msg.timerServerID; // Example: '1-8'
+                    const ELMxID = message.msg.ELMxID;
+
+                    // Check if the ELMxID exists
+                    if (!globalELMxArray[ELMxID]) {
+                        console.error(`ELMxID ${ELMxID} not found in globalELMxArray`);
                         break;
+                    }
+
+                    // Log the timers for this ELMxID to verify the structure
+                    console.log(`Timers for ELMxID ${ELMxID}:`, globalELMxArray[ELMxID].timers);
+
+                    // Extract the numeric timer ID from timerServerID
+                    const timerRemovalID = timerServerID.split('-')[0];
+
+                    // Find and remove the timer
+                    let timers = globalELMxArray[ELMxID].timers;
+                    console.log('Timers before removal:', JSON.stringify(timers));
+
+                    if (timers && timers[timerRemovalID]) {
+                        let timer = timers[timerRemovalID];
+
+                        // Clear intervals (if running)
+                        if (timer.interval) clearInterval(timer.interval);
+                        if (timer.ascInterval) clearInterval(timer.ascInterval);
+
+                        // Remove the timer from the array
+                        delete timers[timerRemovalID];
+
+                        console.log(`Timer ${timerRemovalID} removed successfully.`);
+
+                        // Prepare the response
+                        let response = {
+                            cmd: 'timerRemoved',
+                            msg: {
+                                timerRemovalServerID: timerRemovalID, // FIX: Matching frontend expectation
+                                ELMxID_Remove: ELMxID // FIX: Matching frontend expectation
+                            }
+                        };
+
+                        // Send the update to all connected clients
+                        wss.clients.forEach(client => {
+                            if (client.readyState === WebSocket.OPEN) {
+                                client.send(JSON.stringify(response));
+                            }
+                        });
+
+                    } else {
+                        console.error(`Timer with ID ${timerRemovalID} not found for ELMxID ${ELMxID}`);
+                    }
+
+                    break;
 
 
 
-                        case "submenuClick":
-    console.log("Received submenuClick message:", message);
+                case "submenuClick":
+                    console.log("Received submenuClick message:", message);
 
-    let submenu_ELMxID = message.msg.ELMxID;
-    let submenu_timerServerID = message.msg.timerServerID;
-    let clickedButton = message.msg.buttonText;
+                    let submenu_ELMxID = message.msg.ELMxID;
+                    let submenu_timerServerID = message.msg.timerServerID;
+                    let clickedButton = message.msg.buttonText;
 
-    console.log(`Button "${clickedButton}" clicked for TimerServerID: ${submenu_timerServerID}`);
-
-    // Ensure ELMxID exists
-    if (!globalELMxArray[submenu_ELMxID]) {
-        globalELMxArray[submenu_ELMxID] = { timers: {}, arrayOfAttendanceIDs: [] };
-    }
-
-    // Ensure timerServerID exists
-    if (!globalELMxArray[submenu_ELMxID].timers[submenu_timerServerID]) {
-        globalELMxArray[submenu_ELMxID].timers[submenu_timerServerID] = {};
-    }
-
-    // Update global state (if needed)
-    globalELMxArray[submenu_ELMxID].timers[submenu_timerServerID].lastClickedButton = clickedButton;
-
-    // Create response object to broadcast
-    let submenuResponse = {
-        cmd: "returnedFromServerSubmenuClick",
-        msg: {
-            ELMxID: submenu_ELMxID,
-            timerServerID: submenu_timerServerID,
-            clickedButton: clickedButton
-        }
-    };
-
-    // Broadcast the update to all clients in the same session
-    let recipientList = ["particularSome", globalELMxArray[submenu_ELMxID].arrayOfAttendanceIDs];
-    sendToWho(wss, ws, recipientList, submenuResponse);
-    break;
+                    console.log(`Button "${clickedButton}" clicked for TimerServerID: ${submenu_timerServerID}`);
 
                     
+                    // Create response object to broadcast
+                    let submenuResponse = {
+                        cmd: "returnedFromServerSubmenuClick",
+                        msg: {
+                            ELMxID: submenu_ELMxID,
+                            timerServerID: submenu_timerServerID,
+                            clickedButton: clickedButton
+                        }
+                    };
+
+                    // Broadcast the update to all clients in the same session
+                    let recipientList = ["particularSome", globalELMxArray[submenu_ELMxID].arrayOfAttendanceIDs];
+                    sendToWho(wss, ws, recipientList, submenuResponse);
+                    break;
+
+
 
 
 
