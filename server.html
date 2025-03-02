@@ -1154,6 +1154,10 @@
             button.style.backgroundColor = ""; // Reset all buttons first
           });
 
+          document.querySelectorAll(".dropdown-item").forEach(button => {
+            button.style.backgroundColor = ""; // Reset all buttons first
+          });
+
           // Find the button that matches both the clickedButton and timerServerDropdownID
           document.querySelectorAll(".submenu-item").forEach(button => {
             const buttonTimerServerID = button.getAttribute("data-timerServerID");
