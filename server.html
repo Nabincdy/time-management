@@ -1120,15 +1120,18 @@
     const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID } = data.msg;
     console.log("Testing what is this data:", data.msg);
 
-    // Reset background color for all buttons
-    // document.querySelectorAll(".form-btn, .dropdown-item, .submenu-item").forEach(button => {
+
+    // document.querySelectorAll(".submenu-item, .dropdown-item, .form-btn").forEach(button => {
     //     button.style.backgroundColor = "";
     // });
-    document.querySelectorAll(`[data-timerServerID="${timerServerDropdownID}"], 
-                               [data-timer-id="${timerDropdownID}"], 
-                               [data-id="${formButtonID}"]`).forEach(button => {
+
+
+    document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"], 
+                               .dropdown-item[data-timer-id="${timerDropdownID}"], 
+                               .form-btn[data-id="${formButtonID}"]`).forEach(button => {
         button.style.backgroundColor = "";
     });
+
 
     // Find and update the submenu item using  timerServerDropdownID
     document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"]`).forEach(button => {
