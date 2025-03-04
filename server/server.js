@@ -583,31 +583,58 @@ wss.on("connection", (ws) => {
 
 
 
+                // case "submenuClick":
+                //     console.log("Received submenuClick message:", message);
+
+                //     let submenu_ELMxID = message.msg.ELMxID;
+                //     let submenu_timerServerID = message.msg.timerServerID;
+                //     let clickedButton = message.msg.buttonText;
+
+                //     console.log(`Button "${clickedButton}" clicked for TimerServerID: ${submenu_timerServerID}`);
+
+                    
+                //     // Create response object to broadcast
+                //     let submenuResponse = {
+                //         cmd: "returnedFromServerSubmenuClick",
+                //         msg: {
+                //             ELMxID: submenu_ELMxID,
+                //             timerServerDropdownID: submenu_timerServerID,
+                //             clickedButton: clickedButton
+                //         }
+                //     };
+
+                //     // Broadcast the update to all clients in the same session
+                //     let recipientList = ["particularSome", globalELMxArray[submenu_ELMxID].arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, recipientList, submenuResponse);
+                //     break;
+
+
                 case "submenuClick":
                     console.log("Received submenuClick message:", message);
 
-                    let submenu_ELMxID = message.msg.ELMxID;
-                    let submenu_timerServerID = message.msg.timerServerID;
-                    let clickedButton = message.msg.buttonText;
+                    // Extract the necessary data from the message
+                    let { formButtonID, timerdropdownID, timerSubmenuServerID, buttonText } = message.msg;
 
-                    console.log(`Button "${clickedButton}" clicked for TimerServerID: ${submenu_timerServerID}`);
+                    console.log('show data'+ JSON.stringify(message.msg));
+                    console.log(`Button "${buttonText}" clicked for TimerServerID: ${timerSubmenuServerID}`);
 
-                    
-                    // Create response object to broadcast
+                    // Create response object to send back to frontend
                     let submenuResponse = {
                         cmd: "returnedFromServerSubmenuClick",
                         msg: {
-                            ELMxID: submenu_ELMxID,
-                            timerServerDropdownID: submenu_timerServerID,
-                            clickedButton: clickedButton
+                            ELMxID_Form: 0,  // Optional: Can be used to identify the form if needed
+                            clickedButton: buttonText,
+                            formButtonID: formButtonID,  // Pass back the formButtonID for frontend use
+                            timerDropdownID: timerdropdownID,  // Pass the timerDropdownID for frontend use
+                            timerServerDropdownID: timerSubmenuServerID,
+
                         }
                     };
 
-                    // Broadcast the update to all clients in the same session
-                    let recipientList = ["particularSome", globalELMxArray[submenu_ELMxID].arrayOfAttendanceIDs];
+                    // Broadcast the update to the relevant clients
+                    let recipientList = ["particularSome", globalELMxArray[message.msg.ELMxID].arrayOfAttendanceIDs];
                     sendToWho(wss, ws, recipientList, submenuResponse);
                     break;
-
 
 
 
