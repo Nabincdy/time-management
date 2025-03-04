@@ -1121,7 +1121,12 @@
     console.log("Testing what is this data:", data.msg);
 
     // Reset background color for all buttons
-    document.querySelectorAll(".form-btn, .dropdown-item, .submenu-item").forEach(button => {
+    // document.querySelectorAll(".form-btn, .dropdown-item, .submenu-item").forEach(button => {
+    //     button.style.backgroundColor = "";
+    // });
+    document.querySelectorAll(`[data-timerServerID="${timerServerDropdownID}"], 
+                               [data-timer-id="${timerDropdownID}"], 
+                               [data-id="${formButtonID}"]`).forEach(button => {
         button.style.backgroundColor = "";
     });
 
