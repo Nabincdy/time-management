@@ -328,89 +328,6 @@ wss.on("connection", (ws) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-                // case 'addTimerToServer':
-                //     console.log("Main Switch: Inside addTimerToServer");
-
-                //     // Extract data from the message
-                //     let createTimerIDELMxID = message.msg.ELMxID;
-                //     let timerIDFromBrowser = message.msg.timerIDFromBrowser;
-                //     let defaultTimeOfNewlyAddedTimer = message.msg.defaultTime;
-                //     let defaultName = "Timer Title";
-
-                //     // Ensure globalELMxArray for the specific ELMxID exists
-                //     if (!globalELMxArray[createTimerIDELMxID]) {
-                //         console.error(`Error: ELMxID '${createTimerIDELMxID}' not found.`);
-                //         break;
-                //     }
-
-                //     // Create a new timer ID
-                //     let newTimerID = globalTimerIDs + 1;
-                //     globalTimerIDs++;
-
-                //     console.log(`Inside createTimerComponentToBrowser: ELMxID = ${createTimerIDELMxID}, New Timer ID = ${newTimerID}`);
-
-                //     // Initialize the timer object for the given ELMxID
-                //     if (!globalELMxArray[createTimerIDELMxID].timers) {
-                //         console.warn(`Timers object not found for ELMxID '${createTimerIDELMxID}', creating it.`);
-                //         globalELMxArray[createTimerIDELMxID].timers = {};
-                //     }
-
-                //     // Check if the timer already exists, prevent overwriting
-                //     if (globalELMxArray[createTimerIDELMxID].timers[newTimerID]) {
-                //         console.warn(`Timer ID '${newTimerID}' already exists for ELMxID '${createTimerIDELMxID}'.`);
-                //         break;
-                //     }
-
-                //     // Add the new timer object to globalELMxArray
-                //     globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {
-                //         "timerServerID": newTimerID,
-                //         "defaultTime": defaultTimeOfNewlyAddedTimer,
-                //         "personAssignedID": "???",
-                //         "name": defaultName,
-                //         "remainingTime": convertToSeconds(defaultTimeOfNewlyAddedTimer), // Set the remaining time in seconds
-                //         "interval": null, // Initialize as null
-                //         "ascInterval": null, // Initialize as null
-                //         "ascValue": 0 // Initialize ascending time
-                //     };
-
-                //     // Prepare response to send back to the client
-                //     let createUserResponseObject = {
-                //         "cmd": "returnedFromServerAddTimer",
-                //         "msg": {
-                //             "timerServerID": newTimerID,
-                //             "defaultTime": defaultTimeOfNewlyAddedTimer,
-                //             "timerBrowserID": timerIDFromBrowser,
-                //             "allMeetingData": globalELMxArray[createTimerIDELMxID].timers[newTimerID]
-                //         }
-                //     };
-
-                //     // Send response to the clients (e.g., "particularSome" group or all clients of attendance list)
-                //     let desiredList = ["particularSome", globalELMxArray[createTimerIDELMxID].arrayOfAttendanceIDs];
-                //     sendToWho(wss, ws, desiredList, createUserResponseObject);
-
-                //     console.log(`Timer ${newTimerID} successfully created and sent to clients.`);
-                //     break;
-
-                //     // Helper function to convert HH:MM:SS to seconds
-                //     function convertToSeconds(time) {
-                //         let parts = time.split(":").map(Number);
-                //         return parts[0] * 3600 + parts[1] * 60 + parts[2];
-                //     }
-
-
-
-
                 case 'resetTimerName':
                     //input {"cmd": "resetTimerName", "msg": {"ELMxID": 0, "timerNewName": name}}
                     let resetTimerName_meetingID = message.msg.ELMxID
@@ -523,90 +440,70 @@ wss.on("connection", (ws) => {
                     break;
 
 
-
-                case 'removeTimer':
-                    console.log("Received removeTimer request:", message);
-
-                    // Extract the timerServerID and ELMxID from the message
-                    const timerServerID = message.msg.timerServerID; // Example: '1-8'
-                    const ELMxID = message.msg.ELMxID;
-
-                    // Check if the ELMxID exists
-                    if (!globalELMxArray[ELMxID]) {
-                        console.error(`ELMxID ${ELMxID} not found in globalELMxArray`);
-                        break;
-                    }
-
-                    // Log the timers for this ELMxID to verify the structure
-                    console.log(`Timers for ELMxID ${ELMxID}:`, globalELMxArray[ELMxID].timers);
-
-                    // Extract the numeric timer ID from timerServerID
-                    const timerRemovalID = timerServerID.split('-')[0];
-
-                    // Find and remove the timer
-                    let timers = globalELMxArray[ELMxID].timers;
-                    console.log('Timers before removal:', JSON.stringify(timers));
-
-                    if (timers && timers[timerRemovalID]) {
-                        let timer = timers[timerRemovalID];
-
-                        // Clear intervals (if running)
-                        if (timer.interval) clearInterval(timer.interval);
-                        if (timer.ascInterval) clearInterval(timer.ascInterval);
-
-                        // Remove the timer from the array
-                        delete timers[timerRemovalID];
-
-                        console.log(`Timer ${timerRemovalID} removed successfully.`);
-
-                        // Prepare the response
-                        let response = {
-                            cmd: 'timerRemoved',
-                            msg: {
-                                timerRemovalServerID: timerRemovalID, // FIX: Matching frontend expectation
-                                ELMxID_Remove: ELMxID // FIX: Matching frontend expectation
-                            }
-                        };
-
-                        // Send the update to all connected clients
-                        wss.clients.forEach(client => {
-                            if (client.readyState === WebSocket.OPEN) {
-                                client.send(JSON.stringify(response));
-                            }
-                        });
-
-                    } else {
-                        console.error(`Timer with ID ${timerRemovalID} not found for ELMxID ${ELMxID}`);
-                    }
-
-                    break;
-
-
-
-                // case "submenuClick":
-                //     console.log("Received submenuClick message:", message);
-
-                //     let submenu_ELMxID = message.msg.ELMxID;
-                //     let submenu_timerServerID = message.msg.timerServerID;
-                //     let clickedButton = message.msg.buttonText;
-
-                //     console.log(`Button "${clickedButton}" clicked for TimerServerID: ${submenu_timerServerID}`);
-
+                    case 'removeTimer':
+                        console.log("Received removeTimer request:", message);
                     
-                //     // Create response object to broadcast
-                //     let submenuResponse = {
-                //         cmd: "returnedFromServerSubmenuClick",
-                //         msg: {
-                //             ELMxID: submenu_ELMxID,
-                //             timerServerDropdownID: submenu_timerServerID,
-                //             clickedButton: clickedButton
-                //         }
-                //     };
+                        // Extract the timerServerID and ELMxID from the message
+                        const { timerServerID, ELMxID } = message.msg; // Destructure for cleaner code
+                    
+                        // Ensure the ELMxID exists in the global array
+                        if (!globalELMxArray.hasOwnProperty(ELMxID)) {
+                            console.error(`ELMxID ${ELMxID} not found in globalELMxArray.`);
+                            break; // Exit if the ELMxID is not valid
+                        }
+                    
+                        // Log the timers for this ELMxID to verify the structure
+                        console.log(`Timers for ELMxID ${ELMxID}:`, globalELMxArray[ELMxID].timers);
+                    
+                        // Extract the numeric timer ID from timerServerID
+                        const timerRemovalID = timerServerID.split('-')[0]; // Assuming '1-8' format
+                    
+                        // Get the timers object for the ELMxID
+                        let timers = globalELMxArray[ELMxID].timers;
+                    
+                        // Log the current state of timers for debugging
+                        console.log('Timers before removal:', JSON.stringify(timers));
+                    
+                        // Check if the timer exists and proceed to remove it
+                        if (timers && timers[timerRemovalID]) {
+                            const timer = timers[timerRemovalID];
+                    
+                            // Clear any running intervals associated with the timer
+                            if (timer.interval) {
+                                clearInterval(timer.interval);
+                                console.log(`Cleared interval for Timer ${timerRemovalID}`);
+                            }
+                            if (timer.ascInterval) {
+                                clearInterval(timer.ascInterval);
+                                console.log(`Cleared ascending interval for Timer ${timerRemovalID}`);
+                            }
+                    
+                            // Remove the timer from the timers list
+                            delete timers[timerRemovalID];
+                            console.log(`Timer ${timerRemovalID} removed successfully.`);
+                    
+                            // Prepare the response for the frontend
+                            const response = {
+                                cmd: 'timerRemoved',
+                                msg: {
+                                    timerRemovalServerID: timerRemovalID, // Matching frontend expectation
+                                    ELMxID_Remove: ELMxID // Matching frontend expectation
+                                }
+                            };
+                    
+                            // Create the recipient list (combining global array and particular attendees)
+                            const desiredList = ["particularSome", globalELMxArray[ELMxID].arrayOfAttendanceIDs];
+                    
+                            // Send the update to the specific clients
+                            sendToWho(wss, ws, desiredList, response);
+                    
+                        } else {
+                            console.error(`Timer with ID ${timerRemovalID} not found for ELMxID ${ELMxID}`);
+                        }
+                    
+                        break;
+                    
 
-                //     // Broadcast the update to all clients in the same session
-                //     let recipientList = ["particularSome", globalELMxArray[submenu_ELMxID].arrayOfAttendanceIDs];
-                //     sendToWho(wss, ws, recipientList, submenuResponse);
-                //     break;
 
 
                 case "submenuClick":
@@ -615,7 +512,7 @@ wss.on("connection", (ws) => {
                     // Extract the necessary data from the message
                     let { formButtonID, timerdropdownID, timerSubmenuServerID, buttonText } = message.msg;
 
-                    console.log('show data'+ JSON.stringify(message.msg));
+                    console.log('show data' + JSON.stringify(message.msg));
                     console.log(`Button "${buttonText}" clicked for TimerServerID: ${timerSubmenuServerID}`);
 
                     // Create response object to send back to frontend
@@ -656,75 +553,81 @@ wss.on("connection", (ws) => {
                 case 'pressResetTimerTime2':
                     break;
 
-                case 'addVote':
+                    case 'addVote':
 
-                    let addVoteMessage = message.msg;
-                    let addVoteELMxID = addVoteMessage.ELMxID;
-                    let addVoteParticipantID = addVoteMessage.participantID;
-                    let addVoteForm = addVoteMessage.form;
-                    let addVoteFormString = addVoteMessage.formString;
-                    let addVoteFormTime = addVoteMessage.formTime;
+                    console.log("Received vote message:", message);
 
-                    let addVoteContent = addVoteMessage.form;
-                    let addVoteContentString = addVoteMessage.formString;
-                    let addVoteContentTime = addVoteMessage.formTime;
+                        break;
 
-                    let addVotePeople = addVoteMessage.form;
-                    let addVotePeopleString = addVoteMessage.formString;
-                    let addVotePeopleTime = addVoteMessage.formTime;
-                    let listDesired = "allInMeeting"
-                    //test comment for GIT. Hi Nabin!
+                // case 'addVote':
 
-                    let participantInfo = globalELMxArray[addVoteELMxID].vote.individualParticipantVotes[addVoteParticipantID];
-                    let totalAddVoteForm = globalELMxArray[addVoteELMxID].vote.totalVoteForm[addVoteForm];
+                //     let addVoteMessage = message.msg;
+                //     let addVoteELMxID = addVoteMessage.ELMxID;
+                //     let addVoteParticipantID = addVoteMessage.participantID;
+                //     let addVoteForm = addVoteMessage.form;
+                //     let addVoteFormString = addVoteMessage.formString;
+                //     let addVoteFormTime = addVoteMessage.formTime;
 
-                    // Increment this form type (Turn, FreeFlow, GodMode)
-                    globalELMxArray[addVoteELMxID].vote.totalVoteForm[addVoteForm] = totalAddVoteForm + 1;
+                //     let addVoteContent = addVoteMessage.form;
+                //     let addVoteContentString = addVoteMessage.formString;
+                //     let addVoteContentTime = addVoteMessage.formTime;
 
-                    participantInfo.currentVoting = {
-                        voteForm: addVoteForm,
-                        voteFormString: addVoteFormString,
-                        voteFormTime: addVoteFormTime
-                    };
+                //     let addVotePeople = addVoteMessage.form;
+                //     let addVotePeopleString = addVoteMessage.formString;
+                //     let addVotePeopleTime = addVoteMessage.formTime;
+                //     let listDesired = "allInMeeting"
+                //     //test comment for GIT. Hi Nabin!
 
-                    // Update globalELMxArray correctly
-                    globalELMxArray[addVoteELMxID] = {
-                        ...globalELMxArray[addVoteELMxID], // Preserve existing data
-                        vote: {
-                            test: "test",
-                            isVotingHappening: "not yet",
-                            totalVoteForm: "not yet",
-                            totalVoteFormString: "not yet",
-                            totalVoteFormTime: "not yet",
-                            totalVoteContent: "not yet",
-                            totalVoteContentNotion: "not yet", // Individual, Particular, Universal
-                            totalVoteContentString: "not yet",
-                            totalVoteContentTime: "not yet",
-                            totalVotePeople: "not yet",
-                            totalVotePeopleString: "not yet",
-                            totalVotePeopleTime: "not yet",
-                            individualParticipantVotes: {
-                                participant: {
-                                    participantCurrentVoting: {
-                                        VoteForm: "not yet",
-                                        voteFormString: "not yet",
-                                        voteFormTime: "not yet",
-                                        voteContent: "not yet",
-                                        voteContentNotion: "not yet", // Individual, Particular, Universal
-                                        voteContentString: "not yet",
-                                        voteContentTime: "not yet",
-                                        votePeople: "not yet",
-                                        votePeopleString: "not yet",
-                                        votePeopleTime: "not yet",
-                                    }
-                                }
-                            }
-                        }
-                    };
+                //     let participantInfo = globalELMxArray[addVoteELMxID].vote.individualParticipantVotes[addVoteParticipantID];
+                //     let totalAddVoteForm = globalELMxArray[addVoteELMxID].vote.totalVoteForm[addVoteForm];
 
-                    // ws.send(JSON.stringify(message)); // Send response to the client
-                    sendToWho(listDesired);
-                    break;
+                //     // Increment this form type (Turn, FreeFlow, GodMode)
+                //     globalELMxArray[addVoteELMxID].vote.totalVoteForm[addVoteForm] = totalAddVoteForm + 1;
+
+                //     participantInfo.currentVoting = {
+                //         voteForm: addVoteForm,
+                //         voteFormString: addVoteFormString,
+                //         voteFormTime: addVoteFormTime
+                //     };
+
+                //     // Update globalELMxArray correctly
+                //     globalELMxArray[addVoteELMxID] = {
+                //         ...globalELMxArray[addVoteELMxID], // Preserve existing data
+                //         vote: {
+                //             test: "test",
+                //             isVotingHappening: "not yet",
+                //             totalVoteForm: "not yet",
+                //             totalVoteFormString: "not yet",
+                //             totalVoteFormTime: "not yet",
+                //             totalVoteContent: "not yet",
+                //             totalVoteContentNotion: "not yet", // Individual, Particular, Universal
+                //             totalVoteContentString: "not yet",
+                //             totalVoteContentTime: "not yet",
+                //             totalVotePeople: "not yet",
+                //             totalVotePeopleString: "not yet",
+                //             totalVotePeopleTime: "not yet",
+                //             individualParticipantVotes: {
+                //                 participant: {
+                //                     participantCurrentVoting: {
+                //                         VoteForm: "not yet",
+                //                         voteFormString: "not yet",
+                //                         voteFormTime: "not yet",
+                //                         voteContent: "not yet",
+                //                         voteContentNotion: "not yet", // Individual, Particular, Universal
+                //                         voteContentString: "not yet",
+                //                         voteContentTime: "not yet",
+                //                         votePeople: "not yet",
+                //                         votePeopleString: "not yet",
+                //                         votePeopleTime: "not yet",
+                //                     }
+                //                 }
+                //             }
+                //         }
+                //     };
+
+                //     // ws.send(JSON.stringify(message)); // Send response to the client
+                //     sendToWho(listDesired);
+                //     break;
 
                 case 'changeVote':
                     // Handle changeVote logic
