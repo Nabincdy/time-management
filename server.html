@@ -482,14 +482,16 @@
     </div>
 
 
-    <h3>Click Counts:</h3>
-    <ul id="click-counts-list"></ul>
+    <!-- <h3>Click Counts:</h3>
+    <ul id="click-counts-list"></ul> -->
 
     <div id="numberCitizenTimers">Number Citizen Timers: 0</div>
 
     <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button>
 
     <!-- <div id="voteData">Total Votes: 0</div> -->
+    <h3>Click Counts:</h3>
+    <ul id="click-counts-list"></ul> <!-- This will hold the list of button click counts -->
 
 
     <style>
@@ -1027,6 +1029,17 @@
           }
           break;
 
+          case "returntoservervote":
+    console.log("Vote update from server:", data);
+    
+    // Update UI for votes (if applicable)
+    const voteDisplay = document.querySelector(`[data-id='${data.id}'] .vote-count`);
+    
+    if (voteDisplay) {
+        voteDisplay.textContent = `Votes: ${data.totalVotes || "Updated"}`;
+    }
+    break;
+
 
 
 
@@ -1130,39 +1143,71 @@
 
         // break;
 
+        // case "returnedFromServerSubmenuClick":
+        //   console.log("Testing what is this first data:", data.msg);
+
+        //   const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID } = data.msg;
+        //   console.log("Testing what is this data:", data.msg);
+
+
+        //   // document.querySelectorAll(".submenu-item, .dropdown-item, .form-btn").forEach(button => {
+        //   //     button.style.backgroundColor = "";
+        //   // });
+
+
+        //   document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"], 
+        //                        .dropdown-item[data-timer-id="${timerDropdownID}"], 
+        //                        .form-btn[data-id="${formButtonID}"]`).forEach(button => {
+        //     button.style.backgroundColor = "";
+        //   });
+
+
+        //   // Find and update the submenu item using  timerServerDropdownID
+        //   document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"]`).forEach(button => {
+        //     button.style.backgroundColor = "purple"; // Change only the clicked submenu button
+        //   });
+
+        //   // Find and update the parent dropdown item using timerDropdownID
+        //   document.querySelectorAll(`.dropdown-item[data-timer-id="${timerDropdownID}"]`).forEach(parentButton => {
+        //     parentButton.style.backgroundColor = "orange"; // Change background of correct parent dropdown item
+        //   });
+
+        //   // Find and update the form button using formButtonID
+        //   document.querySelectorAll(`.form-btn[data-id="${formButtonID}"]`).forEach(formBtn => {
+        //     formBtn.style.backgroundColor = "green"; // Change only the correct form button
+        //   });
+
+        //   break;
         case "returnedFromServerSubmenuClick":
           console.log("Testing what is this first data:", data.msg);
 
-          const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID } = data.msg;
+          const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID, clickCount } = data.msg; // Include clickCount
           console.log("Testing what is this data:", data.msg);
 
-
-          // document.querySelectorAll(".submenu-item, .dropdown-item, .form-btn").forEach(button => {
-          //     button.style.backgroundColor = "";
-          // });
-
-
+          // Reset background color for all related buttons
           document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"], 
-                               .dropdown-item[data-timer-id="${timerDropdownID}"], 
-                               .form-btn[data-id="${formButtonID}"]`).forEach(button => {
+                                .dropdown-item[data-timer-id="${timerDropdownID}"], 
+                                .form-btn[data-id="${formButtonID}"]`).forEach(button => {
             button.style.backgroundColor = "";
           });
 
-
-          // Find and update the submenu item using  timerServerDropdownID
+          // Update the submenu button
           document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"]`).forEach(button => {
-            button.style.backgroundColor = "purple"; // Change only the clicked submenu button
+            button.style.backgroundColor = "purple"; // Highlight the clicked submenu button
           });
 
-          // Find and update the parent dropdown item using timerDropdownID
+          // Update the parent dropdown item
           document.querySelectorAll(`.dropdown-item[data-timer-id="${timerDropdownID}"]`).forEach(parentButton => {
-            parentButton.style.backgroundColor = "orange"; // Change background of correct parent dropdown item
+            parentButton.style.backgroundColor = "orange"; // Highlight correct parent dropdown item
           });
 
-          // Find and update the form button using formButtonID
+          // Update the form button
           document.querySelectorAll(`.form-btn[data-id="${formButtonID}"]`).forEach(formBtn => {
-            formBtn.style.backgroundColor = "green"; // Change only the correct form button
+            formBtn.style.backgroundColor = "green"; // Highlight the correct form button
           });
+
+          // Update the click count in the list at the top
+          updateClickCountDisplay(timerServerDropdownID, clickCount);
 
           break;
 
@@ -1460,6 +1505,7 @@
     };//end  synchronizeScreenDraw();
 
 
+
     function resetVotes() {
       console.log("In resetVotes (with colours)");
       totalVotes = 0; // Reset total vote count
@@ -1554,8 +1600,10 @@
 
 
       // Vote button functionality
-      
+
       const voteBtn = timerComponent.querySelector(".vote-btn");
+      const timerVoteID = voteBtn.getAttribute("data-id"); // Get dynamic data-id
+
       // Function to handle voting
       voteBtn.addEventListener("click", () => {
         let hasVoted = voteBtn.getAttribute("data-voted") === "true"; // Track vote per button
@@ -1565,12 +1613,14 @@
           voteBtn.setAttribute("data-voted", "true"); // Mark as voted
           voteBtn.textContent = "Unvote"; // Change text
           voteBtn.style.backgroundColor = "green"; // Green color for voted button
-          socket.send(JSON.stringify({ cmd: "addVote", msg: "Vote added" }));
+          socket.send(JSON.stringify({ cmd: "addVote", msg: "Vote added", id: timerVoteID }));
         } else {
           totalVotes = Math.max(0, totalVotes - 1); // Prevent negative votes
           voteBtn.setAttribute("data-voted", "false"); // Mark as unvoted
           voteBtn.textContent = "Vote"; // Reset text
           voteBtn.style.backgroundColor = ""; // Reset color
+          socket.send(JSON.stringify({ cmd: "removeVote", msg: "Vote Removed", id: timerVoteID }));
+
         }
 
         // Update the vote count display
@@ -1895,6 +1945,24 @@
     }//end setupTimerControls
 
 
+    // Function to update click count display
+    function updateClickCountDisplay(timerServerDropdownID, clickCount) {
+      const clickCountsList = document.getElementById("click-counts-list");
+
+      // Check if this button already has a display item
+      let existingItem = document.querySelector(`#click-counts-list li[data-timerServerID="${timerServerDropdownID}"]`);
+
+      // If an item exists, update it
+      if (existingItem) {
+        existingItem.textContent = `${existingItem.textContent.split(':')[0]}: ${clickCount} clicks`;
+      } else {
+        // Otherwise, create a new list item
+        const newItem = document.createElement("li");
+        newItem.setAttribute("data-timerServerID", timerServerDropdownID);
+        newItem.textContent = `${timerServerDropdownID}: ${clickCount} clicks`;
+        clickCountsList.appendChild(newItem);
+      }
+    }
 
 
 
@@ -2384,7 +2452,7 @@
           document.querySelectorAll(".dropdown-item").forEach(item => {
             item.style.backgroundColor = ""; // Reset to default
           });
-          
+
           const selectedContent = e.target.dataset.type;
 
           // Call function to open content form
@@ -2518,72 +2586,6 @@
 
 
 
-        function updateClickCountDisplay(numberOfCitizens) {
-          const list = document.getElementById("click-counts-list");
-          list.innerHTML = ""; // Clear previous list
-
-          // Sort the counts in descending order
-          const sortedEntries = Object.entries(window.submenuClickCounts).sort((a, b) => b[1] - a[1]);
-
-          // Loop through the sorted entries and display them
-          sortedEntries.forEach(([item, count]) => {
-            // Divide the count by the number of citizens
-            const adjustedCount = numberOfCitizens ? (count / numberOfCitizens).toFixed(2) : count;
-
-            const listItem = document.createElement("li");
-            listItem.innerText = `${item}: ${adjustedCount} clicks per citizen`;
-            list.appendChild(listItem);
-          });
-        }
-
-
-        // function activateButton(selectedButton) {
-        //   console.log("In activateButton");
-
-        //   // Reset the background color for all submenu items
-        //   parentButtons.forEach(button => button.style.backgroundColor = "");
-        //   allButtons.forEach(button => button.style.backgroundColor = "");
-
-        //   // Activate the clicked submenu item
-        //   selectedButton.style.backgroundColor = "green";
-        //   const formbtn = selectedButton.closest(".form-btn");
-
-        //   // Find and activate the parent button
-        //   const parentButton = selectedButton.closest(".dropdown-item");
-        //   if (parentButton) parentButton.style.backgroundColor = "green";
-        //   if (formbtn) formbtn.style.backgroundColor = "green";
-
-
-        //   // Track submenu item clicks
-        //   const buttonText = selectedButton.innerText.trim();
-        //   if (!window.submenuClickCounts[buttonText]) {
-        //     window.submenuClickCounts[buttonText] = 0;
-        //   }
-        //   window.submenuClickCounts[buttonText] += 1;
-
-        //   console.log(`${buttonText} clicked ${window.submenuClickCounts[buttonText]} times`);
-        //   const submenudata = timerComponent.querySelector(".submenu-item");
-        //   const timerServerID = selectedButton.getAttribute("data-timerServerID"); // Extract the unique timerServerID
-        //   const timerdropdownID = selectedButton.getAttribute("data-timer-id");  // Get the timer ID from the selected button
-        //   const formButtonID = selectedButton.closest(".form-btn") ? selectedButton.closest(".form-btn").getAttribute("data-id") : null;  // Get the data-id from the form button (if clicked)
-
-        //   const data = {
-        //     cmd: "submenuClick",
-        //     msg: {
-        //       ELMxID: 0,
-        //       timerServerID: timerServerID,
-        //       formButtonID: formButtonID,  // Pass the formButtonID here
-        //       timerdropdownID: timerdropdownID,  
-        //       buttonText: buttonText
-        //     }
-        //   };
-
-        //   socket.send(JSON.stringify(data));
-        //   // Update the HTML list
-        //   updateClickCountDisplay();
-
-        // }
-
         function activateButton(selectedButton) {
           console.log("In activateButton");
 
@@ -2602,6 +2604,9 @@
 
           // Track submenu item clicks
           const buttonText = selectedButton.innerText.trim();
+          if (!window.submenuClickCounts) {
+            window.submenuClickCounts = {}; // Initialize if undefined
+          }
           if (!window.submenuClickCounts[buttonText]) {
             window.submenuClickCounts[buttonText] = 0;
           }
@@ -2618,6 +2623,17 @@
           console.log("Timer Server ID:", timerSubmenuServerID);
           console.log("Form Button ID:", formButtonID);
 
+
+          // Prevent sending duplicate WebSocket messages
+          if (selectedButton.dataset.clicked) return;
+          selectedButton.dataset.clicked = true; // Mark as clicked to prevent multiple sends
+
+          setTimeout(() => {
+            delete selectedButton.dataset.clicked; // Allow future clicks after delay
+          }, 500); // Adjust delay if needed
+
+
+
           // Construct the data object to send via WebSocket
           const data = {
             cmd: "submenuClick",
@@ -2632,9 +2648,6 @@
 
           // Send the data via WebSocket
           socket.send(JSON.stringify(data));
-
-          // Optionally, update the HTML list or UI as needed
-          updateClickCountDisplay();
         }
 
 

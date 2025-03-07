@@ -440,80 +440,124 @@ wss.on("connection", (ws) => {
                     break;
 
 
-                    case 'removeTimer':
-                        console.log("Received removeTimer request:", message);
-                    
-                        // Extract the timerServerID and ELMxID from the message
-                        const { timerServerID, ELMxID } = message.msg; // Destructure for cleaner code
-                    
-                        // Ensure the ELMxID exists in the global array
-                        if (!globalELMxArray.hasOwnProperty(ELMxID)) {
-                            console.error(`ELMxID ${ELMxID} not found in globalELMxArray.`);
-                            break; // Exit if the ELMxID is not valid
+                case 'removeTimer':
+                    console.log("Received removeTimer request:", message);
+
+                    // Extract the timerServerID and ELMxID from the message
+                    const { timerServerID, ELMxID } = message.msg; // Destructure for cleaner code
+
+                    // Ensure the ELMxID exists in the global array
+                    if (!globalELMxArray.hasOwnProperty(ELMxID)) {
+                        console.error(`ELMxID ${ELMxID} not found in globalELMxArray.`);
+                        break; // Exit if the ELMxID is not valid
+                    }
+
+                    // Log the timers for this ELMxID to verify the structure
+                    console.log(`Timers for ELMxID ${ELMxID}:`, globalELMxArray[ELMxID].timers);
+
+                    // Extract the numeric timer ID from timerServerID
+                    const timerRemovalID = timerServerID.split('-')[0]; // Assuming '1-8' format
+
+                    // Get the timers object for the ELMxID
+                    let timers = globalELMxArray[ELMxID].timers;
+
+                    // Log the current state of timers for debugging
+                    console.log('Timers before removal:', JSON.stringify(timers));
+
+                    // Check if the timer exists and proceed to remove it
+                    if (timers && timers[timerRemovalID]) {
+                        const timer = timers[timerRemovalID];
+
+                        // Clear any running intervals associated with the timer
+                        if (timer.interval) {
+                            clearInterval(timer.interval);
+                            console.log(`Cleared interval for Timer ${timerRemovalID}`);
                         }
-                    
-                        // Log the timers for this ELMxID to verify the structure
-                        console.log(`Timers for ELMxID ${ELMxID}:`, globalELMxArray[ELMxID].timers);
-                    
-                        // Extract the numeric timer ID from timerServerID
-                        const timerRemovalID = timerServerID.split('-')[0]; // Assuming '1-8' format
-                    
-                        // Get the timers object for the ELMxID
-                        let timers = globalELMxArray[ELMxID].timers;
-                    
-                        // Log the current state of timers for debugging
-                        console.log('Timers before removal:', JSON.stringify(timers));
-                    
-                        // Check if the timer exists and proceed to remove it
-                        if (timers && timers[timerRemovalID]) {
-                            const timer = timers[timerRemovalID];
-                    
-                            // Clear any running intervals associated with the timer
-                            if (timer.interval) {
-                                clearInterval(timer.interval);
-                                console.log(`Cleared interval for Timer ${timerRemovalID}`);
-                            }
-                            if (timer.ascInterval) {
-                                clearInterval(timer.ascInterval);
-                                console.log(`Cleared ascending interval for Timer ${timerRemovalID}`);
-                            }
-                    
-                            // Remove the timer from the timers list
-                            delete timers[timerRemovalID];
-                            console.log(`Timer ${timerRemovalID} removed successfully.`);
-                    
-                            // Prepare the response for the frontend
-                            const response = {
-                                cmd: 'timerRemoved',
-                                msg: {
-                                    timerRemovalServerID: timerRemovalID, // Matching frontend expectation
-                                    ELMxID_Remove: ELMxID // Matching frontend expectation
-                                }
-                            };
-                    
-                            // Create the recipient list (combining global array and particular attendees)
-                            const desiredList = ["particularSome", globalELMxArray[ELMxID].arrayOfAttendanceIDs];
-                    
-                            // Send the update to the specific clients
-                            sendToWho(wss, ws, desiredList, response);
-                    
-                        } else {
-                            console.error(`Timer with ID ${timerRemovalID} not found for ELMxID ${ELMxID}`);
+                        if (timer.ascInterval) {
+                            clearInterval(timer.ascInterval);
+                            console.log(`Cleared ascending interval for Timer ${timerRemovalID}`);
                         }
-                    
-                        break;
-                    
+
+                        // Remove the timer from the timers list
+                        delete timers[timerRemovalID];
+                        console.log(`Timer ${timerRemovalID} removed successfully.`);
+
+                        // Prepare the response for the frontend
+                        const response = {
+                            cmd: 'timerRemoved',
+                            msg: {
+                                timerRemovalServerID: timerRemovalID, // Matching frontend expectation
+                                ELMxID_Remove: ELMxID // Matching frontend expectation
+                            }
+                        };
+
+                        // Create the recipient list (combining global array and particular attendees)
+                        const desiredList = ["particularSome", globalELMxArray[ELMxID].arrayOfAttendanceIDs];
+
+                        // Send the update to the specific clients
+                        sendToWho(wss, ws, desiredList, response);
+
+                    } else {
+                        console.error(`Timer with ID ${timerRemovalID} not found for ELMxID ${ELMxID}`);
+                    }
+
+                    break;
 
 
+
+
+                // case "submenuClick":
+                //     console.log("Received submenuClick message:", message);
+
+                //     // Extract the necessary data from the message
+                //     let { formButtonID, timerdropdownID, timerSubmenuServerID, buttonText } = message.msg;
+
+                //     console.log('show data' + JSON.stringify(message.msg));
+                //     console.log(`Button "${buttonText}" clicked for TimerServerID: ${timerSubmenuServerID}`);
+
+                //     // Create response object to send back to frontend
+                //     let submenuResponse = {
+                //         cmd: "returnedFromServerSubmenuClick",
+                //         msg: {
+                //             ELMxID_Form: 0,  // Optional: Can be used to identify the form if needed
+                //             clickedButton: buttonText,
+                //             formButtonID: formButtonID,  // Pass back the formButtonID for frontend use
+                //             timerDropdownID: timerdropdownID,  // Pass the timerDropdownID for frontend use
+                //             timerServerDropdownID: timerSubmenuServerID,
+
+                //         }
+                //     };
+
+                //     // Broadcast the update to the relevant clients
+                //     let recipientList = ["particularSome", globalELMxArray[message.msg.ELMxID].arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, recipientList, submenuResponse);
+                //     break;
 
                 case "submenuClick":
                     console.log("Received submenuClick message:", message);
 
-                    // Extract the necessary data from the message
+                    // Extract necessary data
                     let { formButtonID, timerdropdownID, timerSubmenuServerID, buttonText } = message.msg;
 
-                    console.log('show data' + JSON.stringify(message.msg));
+                    console.log('Show received data:', JSON.stringify(message.msg));
                     console.log(`Button "${buttonText}" clicked for TimerServerID: ${timerSubmenuServerID}`);
+
+                    // Ensure globalButtonClickData is defined
+                    if (typeof globalButtonClickData === "undefined") {
+                        globalButtonClickData = {}; // Initialize if missing
+                    }
+
+                    // Create a unique key for tracking button clicks
+                    const buttonKey = `${buttonText}_ID_${timerSubmenuServerID}`;
+
+                    // Prevent counting the same message multiple times
+                    if (!globalButtonClickData[buttonKey]) {
+                        globalButtonClickData[buttonKey] = 1;
+                    } else {
+                        globalButtonClickData[buttonKey] += 1;
+                    }
+
+                    console.log(`${buttonKey} clicked ${globalButtonClickData[buttonKey]} times`);
 
                     // Create response object to send back to frontend
                     let submenuResponse = {
@@ -524,14 +568,18 @@ wss.on("connection", (ws) => {
                             formButtonID: formButtonID,  // Pass back the formButtonID for frontend use
                             timerDropdownID: timerdropdownID,  // Pass the timerDropdownID for frontend use
                             timerServerDropdownID: timerSubmenuServerID,
-
+                            clickCount: globalButtonClickData[buttonKey]  // Include updated click count
                         }
                     };
 
-                    // Broadcast the update to the relevant clients
+                    // Send response to relevant clients
                     let recipientList = ["particularSome", globalELMxArray[message.msg.ELMxID].arrayOfAttendanceIDs];
+
                     sendToWho(wss, ws, recipientList, submenuResponse);
+
                     break;
+
+
 
 
 
@@ -552,12 +600,49 @@ wss.on("connection", (ws) => {
 
                 case 'pressResetTimerTime2':
                     break;
-
-                    case 'addVote':
-
+                case 'addVote':
                     console.log("Received vote message:", message);
 
-                        break;
+
+                    let Vote_ELMxID = message.msg.id;  // Get the meeting ID
+            
+
+                    // Increment vote count
+               
+                    // Broadcast to all clients
+            
+
+                    // Send confirmation back to the sender
+                    ws.send(JSON.stringify({
+                        cmd: "returntoservervote",
+                        msg: "Vote successfully added",
+                        id: Vote_ELMxID,
+                    }));
+
+                    break;
+
+                case 'removeVote':
+                    console.log("Remove vote message:", message);
+                    let Voterm_ELMxID = message.msg.id;  // Get the meeting ID
+
+                    // Decrement vote count
+
+
+                    // Broadcast to all clients
+                    wss.clients.forEach(client => {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify(message));
+                        }
+                    });
+
+                    // Send confirmation back to the sender
+                    ws.send(JSON.stringify({
+                        cmd: "returntoservervote",
+                        msg: "Vote successfully removed",
+                        id: Voterm_ELMxID,
+                    }));
+
+                    break;
 
                 // case 'addVote':
 
