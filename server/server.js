@@ -581,6 +581,50 @@ wss.on("connection", (ws) => {
 
 
 
+                case "peopleDropdownClick":
+                    console.log("Received peopleDropdownClick message:", message);
+
+                    // Extract necessary data
+                    let { action, buttonID, buttonPeopleText } = message.msg;
+
+                    console.log('Show received data:', JSON.stringify(message.msg));
+                    console.log(`Action "${action}" selected for button ID: ${buttonID}`);
+
+                    // Ensure globalActionClickData is defined
+                    if (typeof globalActionClickData === "undefined") {
+                        globalActionClickData = {}; // Initialize if missing
+                    }
+
+                    // Create a unique key for tracking button actions
+                    const actionKey = `${action}_ID_${buttonID}`;
+
+                    // Prevent counting the same message multiple times
+                    if (!globalActionClickData[actionKey]) {
+                        globalActionClickData[actionKey] = 1;
+                    } else {
+                        globalActionClickData[actionKey] += 1;
+                    }
+
+                    console.log(`${actionKey} selected ${globalActionClickData[actionKey]} times`);
+
+                    // Create response object to send back to frontend (without clickCount)
+                    let peopleResponse = {
+                        cmd: "returnedPeopleDropdownClick",
+                        msg: {
+                            ELMxID: 0,  // Optional: Can be used to identify the id if needed
+                            selectedAction: action,
+                            buttonID: buttonID,  // Pass back the buttonID for frontend use
+                            buttonPeopleText: buttonPeopleText  // Include button text for clarity
+                        }
+                    };
+                    console.log("Sending peopleResponse to clients:", JSON.stringify(peopleResponse));
+
+                    // Send response to relevant clients
+                    let recipientPeopleList = ["particularSome", globalELMxArray[message.msg.ELMxID].arrayOfAttendanceIDs];
+
+                    sendToWho(wss, ws, recipientPeopleList, peopleResponse);
+
+                    break;
 
 
 
@@ -605,12 +649,12 @@ wss.on("connection", (ws) => {
 
 
                     let Vote_ELMxID = message.msg.id;  // Get the meeting ID
-            
+
 
                     // Increment vote count
-               
+
                     // Broadcast to all clients
-            
+
 
                     // Send confirmation back to the sender
                     ws.send(JSON.stringify({

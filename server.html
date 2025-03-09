@@ -800,6 +800,8 @@
 
       //Main Switch/Switch Main
       switch (data.cmd) {//messages from server
+
+
         case "returnNewUserIDWithScreenCatchUp":
 
           let allELMxData = data.msg.allMeetingData; //for this meeting currently hardcoded at ELM "0"
@@ -889,41 +891,107 @@
 
 
 
+        // case "timerRemoved":
+        //   console.warn("Timer Removed event received:", JSON.stringify(data));
+
+        //   const timerRemovalServerID = data.msg.timerRemovalServerID;
+        //   const ELMxID_Remove = data.msg.ELMxID_Remove;
+
+
+
+        //   let defaultRemoveButtonElementID = `${timerRemovalServerID}-8`;
+        //   console.log("Searching for Remove Button with ID:", defaultRemoveButtonElementID);
+
+        //   // Debugging: Log all available data-ids to check if it's in the DOM
+        //   document.querySelectorAll("[data-id]").forEach(el => console.log("Existing data-id:", el.dataset.id));
+
+        //   // Try finding the element with expected ID
+        //   let timerRemoveElement = document.querySelector(`[data-id="${defaultRemoveButtonElementID}"]`);
+        //   // If not found, try a fallback (maybe different ID structure)
+        //   if (!timerRemoveElement) {
+        //     console.warn(`Timer with ID '${defaultRemoveButtonElementID}' not found. Trying alternative lookup...`);
+        //     timerRemoveElement = document.querySelector(`[data-id="${timerRemovalServerID}"]`);
+        //   }
+
+        //   console.log("Final timerRemoveElement found:", timerRemoveElement);
+
+        //   if (timerRemoveElement) {
+        //     // Find parent timer container
+        //     const timerContainer = timerRemoveElement.closest('.timer-container');
+        //     if (timerContainer) {
+        //       timerContainer.remove();
+        //       console.log(`✅ Timer ${timerRemovalServerID} removed from the UI.`);
+        //     } else {
+        //       console.warn(`⚠️ Timer ${timerRemovalServerID} found but its parent container is missing.`);
+        //     }
+        //   } else {
+        //     console.warn(`❌ Timer ${timerRemovalServerID} not found in the DOM.`);
+        //   }
+
+        //   // Broadcast the removal to all connected clients (WebSockets)
+        //   // if (socket && socket.send) {
+        //   //   socket.send(JSON.stringify({
+        //   //     cmd: "broadcastRemoveTimer",
+        //   //     msg: { timerRemovalServerID, ELMxID_Remove }
+        //   //   }));
+        //   //   console.log("🔄 Sent remove event to all clients.");
+        //   // } else {
+        //   //   console.warn("⚠️ WebSocket connection not available for broadcasting.");
+        //   // }
+
+        //   // Update global state if function exists
+        //   // if (typeof updateGlobalStateAfterTimerRemoval === "function") {
+        //   //   updateGlobalStateAfterTimerRemoval(ELMxID_Remove, timerRemovalServerID);
+        //   // } else {
+        //   //   console.warn("⚠️ updateGlobalStateAfterTimerRemoval function is not defined.");
+        //   // }
+        //   break;
+
         case "timerRemoved":
-          console.warn("Timer Removed button." + JSON.stringify(data));
+          console.warn("Timer Removed event received:", JSON.stringify(data));
 
           const timerRemovalServerID = data.msg.timerRemovalServerID;
           const ELMxID_Remove = data.msg.ELMxID_Remove;
 
+          let defaultRemoveButtonElementID = `${timerRemovalServerID}-8`;
+          console.log("Searching for Remove Button with ID:", defaultRemoveButtonElementID);
 
-          let defaultRemoveButtonElementID = timerRemovalServerID + "-8";//Feb 19 2025: where did we get the -1 from? Its just a code we made to differentiaete the elements with custom data-id. It is made by the timer over ID with the component number with a "-" seperating them.
-          console.log("defaultRemoveButtonElementID:" + defaultRemoveButtonElementID);
-          const timerRemoveElement = document.querySelector(`[data-id="${defaultRemoveButtonElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
+          // Try finding the element with expected ID
+          let timerRemoveElement = document.querySelector(`[data-id="${defaultRemoveButtonElementID}"]`);
 
+          if (!timerRemoveElement) {
+            console.warn(`Timer with ID '${defaultRemoveButtonElementID}' not found. Trying alternative lookup...`);
+            timerRemoveElement = document.querySelector(`[data-id="${timerRemovalServerID}"]`);
+          }
 
-          console.log("timerRemoveElement" + timerRemoveElement);
-
-          // Use querySelector to find the element with the correct data-id
-          // const timerRemoveElement = document.querySelector(`[data-id="${timerRemovalServerID}-8"]`);  // Adjust based on the data-id of the remove button
+          console.log("Final timerRemoveElement found:", timerRemoveElement);
 
           if (timerRemoveElement) {
-            // Parent of the button is the timer container
-            const timerContainer = timerRemoveElement.closest('.timer-container'); // Assuming the parent has a class 'timer-container'
+            const timerContainer = timerRemoveElement.closest('.timer-container');
             if (timerContainer) {
               timerContainer.remove();
-              console.log(`Timer ${timerRemovalServerID} has been removed from the client UI.`);
+              console.log(`✅ Timer ${timerRemovalServerID} removed from the UI.`);
+            } else {
+              console.warn(`⚠️ Timer ${timerRemovalServerID} found but its parent container is missing.`);
             }
           } else {
-            console.warn(`Timer ${timerRemovalServerID} not found in the DOM.`);
+            console.warn(`❌ Timer ${timerRemovalServerID} not found in the DOM.`);
           }
 
-          // Update any other UI elements or global state
-          if (typeof updateGlobalStateAfterTimerRemoval === "function") {
-            updateGlobalStateAfterTimerRemoval(ELMxID_Remove, timerRemovalServerID);
-          } else {
-            console.warn("updateGlobalStateAfterTimerRemoval function is not defined.");
-          }
           break;
+
+
+
+
+        case "broadcastRemoveTimer":
+          console.log("Received broadcastRemoveTimer:", data);
+          document.querySelectorAll(`[data-id="${data.msg.timerRemovalServerID}"]`).forEach(el => {
+            el.closest('.timer-container')?.remove();
+            console.log(`Timer ${data.msg.timerRemovalServerID} removed in all tabs.`);
+          });
+          break;
+
+
 
 
 
@@ -1029,16 +1097,16 @@
           }
           break;
 
-          case "returntoservervote":
-    console.log("Vote update from server:", data);
-    
-    // Update UI for votes (if applicable)
-    const voteDisplay = document.querySelector(`[data-id='${data.id}'] .vote-count`);
-    
-    if (voteDisplay) {
-        voteDisplay.textContent = `Votes: ${data.totalVotes || "Updated"}`;
-    }
-    break;
+        case "returntoservervote":
+          console.log("Vote update from server:", data);
+
+          // Update UI for votes (if applicable)
+          const voteDisplay = document.querySelector(`[data-id='${data.id}'] .vote-count`);
+
+          if (voteDisplay) {
+            voteDisplay.textContent = `Votes: ${data.totalVotes || "Updated"}`;
+          }
+          break;
 
 
 
@@ -1211,6 +1279,31 @@
 
           break;
 
+
+          case "returnedPeopleDropdownClick":
+    console.log("Received peopleDropdownClick response:", data.msg);
+
+    const { selectedAction, buttonID, buttonPeopleText } = data.msg; // Extract data without clickCount
+
+    console.log("Processed data:", data.msg);
+
+    // Reset background color for all related buttons
+    document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"], 
+                              .people-btn[data-id="${buttonID}"]`).forEach(button => {
+        button.style.backgroundColor = "";
+    });
+
+    // Highlight the clicked dropdown item
+    document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"]`).forEach(button => {
+        button.style.backgroundColor = "purple"; // Highlight selected item
+    });
+
+    // Highlight the people button
+    document.querySelectorAll(`.people-btn[data-id="${buttonID}"]`).forEach(peopleBtn => {
+        peopleBtn.style.backgroundColor = "green"; // Highlight the people button
+    });
+
+    break;
 
 
 
@@ -2264,7 +2357,7 @@
           <button data-id="${newTimerID}-8" class="remove-btn">❌</button>
           <button data-id="${newTimerID}-9" class="form-btn" id="formbtn">Form</button>
           <button id2="${newTimerID}"-10 class="content-btn" id="contentdata">Content</button>
-          <button id2="${newTimerID}"-11 class="people-btn" id="peoplebtn">People</button>
+          <button data-id="${newTimerID}-11" class="people-btn" id="peoplebtn">People</button>
           <button data-id="${newTimerID}-12" class="vote-btn" id="vote-btn" disabled >Vote</button>
         </div>
       `;
@@ -2487,28 +2580,28 @@
 
       // Create Main Menu Items
       formDropdownMenu.innerHTML = `
-  <div class="dropdown-item" id="turnbutton" data-timer-id="${newTimerID}-turn">1. Turn
-    <div class="submenu">
-      <button class="submenu-item" data-timerServerID="${newTimerID}-straightturn" id="straightturn">Straight Turn</button>
-      <button class="submenu-item" data-timerServerID="${newTimerID}-directiveTurn" id="directiveTurn">Directive Turn</button>
-      <button class="submenu-item" data-timerServerID="${newTimerID}-popcornTurn" id="popcornTurn">Popcorn Turn</button>
+    <div class="dropdown-item" id="turnbutton" data-timer-id="${newTimerID}-turn">1. Turn
+      <div class="submenu">
+        <button class="submenu-item" data-timerServerID="${newTimerID}-straightturn" id="straightturn">Straight Turn</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-directiveTurn" id="directiveTurn">Directive Turn</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-popcornTurn" id="popcornTurn">Popcorn Turn</button>
+      </div>
     </div>
-  </div>
-  <div class="dropdown-item" id="freeflowbutton" data-timer-id="${newTimerID}-freeflow">2. Free Flow
-    <div class="submenu">
-      <button class="submenu-item" data-timerServerID="${newTimerID}-fastFreeFlow">Fast Free Flow</button>
-      <button class="submenu-item" data-timerServerID="${newTimerID}-teamFreeFlow">Team Free Flow</button>
-      <button class="submenu-item" data-timerServerID="${newTimerID}-spreadFreeFlow">Spread Free Flow</button>
+    <div class="dropdown-item" id="freeflowbutton" data-timer-id="${newTimerID}-freeflow">2. Free Flow
+      <div class="submenu">
+        <button class="submenu-item" data-timerServerID="${newTimerID}-fastFreeFlow">Fast Free Flow</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-teamFreeFlow">Team Free Flow</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-spreadFreeFlow">Spread Free Flow</button>
+      </div>
     </div>
-  </div>
-  <div class="dropdown-item" id="godmodebutton" data-timer-id="${newTimerID}-godmode">3. God Mode
-    <div class="submenu">
-      <button class="submenu-item" data-timerServerID="${newTimerID}-god">God</button>
-      <button class="submenu-item" data-timerServerID="${newTimerID}-diety">Diety</button>
-      <button class="submenu-item" data-timerServerID="${newTimerID}-spirit">Spirit</button>
+    <div class="dropdown-item" id="godmodebutton" data-timer-id="${newTimerID}-godmode">3. God Mode
+      <div class="submenu">
+        <button class="submenu-item" data-timerServerID="${newTimerID}-god">God</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-diety">Diety</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-spirit">Spirit</button>
+      </div>
     </div>
-  </div>
-`;
+  `;
       formBtn.appendChild(formDropdownMenu);
 
 
@@ -2528,9 +2621,9 @@
       peopleDropdownMenu.classList.add("dropdown-menu");
 
       peopleDropdownMenu.innerHTML = `
-  <button class="dropdown-item" data-action="same">Same People</button>
-  <button class="dropdown-item" data-action="remove">Remove People</button>
-  <button class="dropdown-item" data-action="add">Add People</button>
+  <button class="dropdown-item" data-action="${newTimerID}-same">Same People</button>
+  <button class="dropdown-item" data-action="${newTimerID}-remove">Remove People</button>
+  <button class="dropdown-item" data-action="${newTimerID}-add">Add People</button>
 `;
 
       // Append the dropdown to the button
@@ -2556,17 +2649,44 @@
 
           const action = e.target.dataset.action;
 
-          switch (action) {
-            case "same":
-              console.log("Same People selected");
-              break;
-            case "remove":
-              console.log("Remove People selected");
-              break;
-            case "add":
-              console.log("Add People selected");
-              break;
-          }
+          // switch (action) {
+          //   case "same":
+          //     console.log("Same People selected");
+          //     break;
+          //   case "remove":
+          //     console.log("Remove People selected");
+          //     break;
+          //   case "add":
+          //     console.log("Add People selected");
+          //     break;
+          // }
+
+
+
+
+          // Prevent duplicate WebSocket messages
+          // if (e.target.dataset.clicked) return;
+          // e.target.dataset.clicked = true;
+
+          // setTimeout(() => {
+          //   delete e.target.dataset.clicked; // Allow future clicks after delay
+          // }, 500);
+          let ELMxID = 0;
+          // Construct the data object to send via WebSocket
+          const data = {
+            cmd: "peopleDropdownClick",
+            msg: {
+              action: action,
+              "ELMxID": ELMxID,
+              buttonID: peopleBtn.getAttribute("data-id"),
+              buttonText: e.target.innerText.trim()
+            }
+          };
+
+          // Send the data via WebSocket
+          socket.send(JSON.stringify(data));
+
+          console.log(`Sent action to server: ${action}`);
 
           // Close the dropdown after selection
           peopleDropdownMenu.classList.remove("show-dropdown");
