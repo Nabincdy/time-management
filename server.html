@@ -482,9 +482,7 @@
     </div>
 
 
-    <!-- <h3>Click Counts:</h3>
-    <ul id="click-counts-list"></ul> -->
-
+  
     <div id="numberCitizenTimers">Number Citizen Timers: 0</div>
 
     <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button>
@@ -1274,36 +1272,39 @@
             formBtn.style.backgroundColor = "green"; // Highlight the correct form button
           });
 
+
+          
+
           // Update the click count in the list at the top
           updateClickCountDisplay(timerServerDropdownID, clickCount);
 
           break;
 
 
-          case "returnedPeopleDropdownClick":
-    console.log("Received peopleDropdownClick response:", data.msg);
+        case "returnedPeopleDropdownClick":
+          console.log("Received peopleDropdownClick response:", data.msg);
 
-    const { selectedAction, buttonID, buttonPeopleText } = data.msg; // Extract data without clickCount
+          const { selectedAction, buttonID, buttonPeopleText } = data.msg; // Extract data without clickCount
 
-    console.log("Processed data:", data.msg);
+          console.log("Processed data:", data.msg);
 
-    // Reset background color for all related buttons
-    document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"], 
+          // Reset background color for all related buttons
+          document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"], 
                               .people-btn[data-id="${buttonID}"]`).forEach(button => {
-        button.style.backgroundColor = "";
-    });
+            button.style.backgroundColor = "";
+          });
 
-    // Highlight the clicked dropdown item
-    document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"]`).forEach(button => {
-        button.style.backgroundColor = "purple"; // Highlight selected item
-    });
+          // Highlight the clicked dropdown item
+          document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"]`).forEach(button => {
+            button.style.backgroundColor = "purple"; // Highlight selected item
+          });
 
-    // Highlight the people button
-    document.querySelectorAll(`.people-btn[data-id="${buttonID}"]`).forEach(peopleBtn => {
-        peopleBtn.style.backgroundColor = "green"; // Highlight the people button
-    });
+          // Highlight the people button
+          document.querySelectorAll(`.people-btn[data-id="${buttonID}"]`).forEach(peopleBtn => {
+            peopleBtn.style.backgroundColor = "green"; // Highlight the people button
+          });
 
-    break;
+          break;
 
 
 
@@ -2039,23 +2040,62 @@
 
 
     // Function to update click count display
-    function updateClickCountDisplay(timerServerDropdownID, clickCount) {
-      const clickCountsList = document.getElementById("click-counts-list");
+    // function updateClickCountDisplay(timerServerDropdownID, clickCount) {
+    //   const clickCountsList = document.getElementById("click-counts-list");
 
-      // Check if this button already has a display item
-      let existingItem = document.querySelector(`#click-counts-list li[data-timerServerID="${timerServerDropdownID}"]`);
+    //   // Check if this button already has a display item
+    //   let existingItem = document.querySelector(`#click-counts-list li[data-timerServerID="${timerServerDropdownID}"]`);
 
-      // If an item exists, update it
-      if (existingItem) {
-        existingItem.textContent = `${existingItem.textContent.split(':')[0]}: ${clickCount} clicks`;
-      } else {
-        // Otherwise, create a new list item
-        const newItem = document.createElement("li");
-        newItem.setAttribute("data-timerServerID", timerServerDropdownID);
-        newItem.textContent = `${timerServerDropdownID}: ${clickCount} clicks`;
-        clickCountsList.appendChild(newItem);
-      }
+    //   // If an item exists, update it
+    //   if (existingItem) {
+    //     existingItem.textContent = `${existingItem.textContent.split(':')[0]}: ${clickCount} clicks`;
+    //   } else {
+    //     // Otherwise, create a new list item
+    //     const newItem = document.createElement("li");
+    //     newItem.setAttribute("data-timerServerID", timerServerDropdownID);
+    //     newItem.textContent = `${timerServerDropdownID}: ${clickCount} clicks`;
+    //     clickCountsList.appendChild(newItem);
+    //   }
+    // }
+
+
+
+    let clickCountsMap = {};
+let alreadyClicked = new Set(); // A set to track which buttons have already been clicked
+
+function updateClickCountDisplay(timerServerDropdownID, clickCount) {
+  const clickCountsList = document.getElementById("click-counts-list");
+
+  // Extract the actual name from the timerServerDropdownID (remove "1-" or "2-")
+  const name = timerServerDropdownID.split('-').slice(1).join('-'); // Get only the name part, e.g., "straightturn"
+
+  // Check if this button has already been clicked
+  if (!alreadyClicked.has(timerServerDropdownID)) {
+    // Mark the button as clicked
+    alreadyClicked.add(timerServerDropdownID);
+
+    // If this name is not in the clickCountsMap, initialize it
+    if (!clickCountsMap[name]) {
+      clickCountsMap[name] = 0;
     }
+
+    // Update the click count for this name
+    clickCountsMap[name] += clickCount;
+
+    // Clear the current list
+    clickCountsList.innerHTML = '';
+
+    // Display all items with their total click counts
+    for (let [name, count] of Object.entries(clickCountsMap)) {
+      const listItem = document.createElement("li");
+      listItem.textContent = `${name}: ${count} clicks`;
+      clickCountsList.appendChild(listItem);
+    }
+  } else {
+    // If the button has already been clicked, show a message indicating the repeated click
+    alert(`You have already clicked the ${name} button!`);
+  }
+}
 
 
 
