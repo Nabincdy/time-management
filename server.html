@@ -482,13 +482,13 @@
     </div>
 
 
-  
+
     <div id="numberCitizenTimers">Number Citizen Timers: 0</div>
 
     <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button>
 
     <!-- <div id="voteData">Total Votes: 0</div> -->
-    <h3>Click Counts:</h3>
+    <h3>Vote Counts:</h3>
     <ul id="click-counts-list"></ul> <!-- This will hold the list of button click counts -->
 
 
@@ -1006,7 +1006,7 @@
           console.log("defaultTimeElementID:" + defaultTimeElementID);
           const defaultTimerInputField = document.querySelector(`[data-id="${defaultTimeElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
 
-          console.log("newTimerName:" + timerDefaultTime + " element" + JSON.stringify(defaultTimerInputField));
+          console.log("Default Timer value:" + timerDefaultTime + " element" + JSON.stringify(defaultTimerInputField));
 
           defaultTimerInputField.value = timerDefaultTime;
 
@@ -1107,6 +1107,28 @@
           break;
 
 
+
+          case "returnedFromServerUpdateVoteButton":
+            console.log("Received update from server for vote button:", data);
+
+            let voteButtonID = data.msg.voteButtonID;
+            let isEnabled = data.msg.isEnabled;
+
+            // Find the vote button using the ID
+            let voteButton = document.querySelector(`.vote-btn[data-id='${voteButtonID}']`);
+
+            if (voteButton) {
+                if (isEnabled) {
+                    voteButton.classList.remove('disabled');
+                    voteButton.disabled = false;
+                } else {
+                    voteButton.classList.add('disabled');
+                    voteButton.disabled = true;
+                }
+            } else {
+                console.error(`Vote button with ID ${voteButtonID} not found.`);
+            }
+            break;
 
 
         // case "returnedFromServerSubmenuClick":
@@ -1273,7 +1295,7 @@
           });
 
 
-          
+
 
           // Update the click count in the list at the top
           updateClickCountDisplay(timerServerDropdownID, clickCount);
@@ -2061,41 +2083,42 @@
 
 
     let clickCountsMap = {};
-let alreadyClicked = new Set(); // A set to track which buttons have already been clicked
+    let alreadyClicked = new Set(); // A set to track which buttons have already been clicked
 
-function updateClickCountDisplay(timerServerDropdownID, clickCount) {
-  const clickCountsList = document.getElementById("click-counts-list");
+    function updateClickCountDisplay(timerServerDropdownID, clickCount) {
+      const clickCountsList = document.getElementById("click-counts-list");
 
-  // Extract the actual name from the timerServerDropdownID (remove "1-" or "2-")
-  const name = timerServerDropdownID.split('-').slice(1).join('-'); // Get only the name part, e.g., "straightturn"
+      // Extract the actual name from the timerServerDropdownID (remove "1-" or "2-")
+      const name = timerServerDropdownID.split('-').slice(1).join('-'); // Get only the name part, e.g., "straightturn"
 
-  // Check if this button has already been clicked
-  if (!alreadyClicked.has(timerServerDropdownID)) {
-    // Mark the button as clicked
-    alreadyClicked.add(timerServerDropdownID);
+      // Check if this button has already been clicked
+      if (!alreadyClicked.has(timerServerDropdownID)) {
+        // Mark the button as clicked
+        alreadyClicked.add(timerServerDropdownID);
 
-    // If this name is not in the clickCountsMap, initialize it
-    if (!clickCountsMap[name]) {
-      clickCountsMap[name] = 0;
+        // If this name is not in the clickCountsMap, initialize it
+        if (!clickCountsMap[name]) {
+          clickCountsMap[name] = 0;
+        }
+
+        // Update the click count for this name
+        clickCountsMap[name] += clickCount;
+
+        // Clear the current list
+        clickCountsList.innerHTML = '';
+
+        // Display all items with their total click counts
+        for (let [name, count] of Object.entries(clickCountsMap)) {
+          const listItem = document.createElement("li");
+          listItem.textContent = `${name}: ${count} Vote`;
+          clickCountsList.appendChild(listItem);
+        }
+      } else {
+        // If the button has already been clicked, show a message indicating the repeated click
+        alert(`You have already Vote the ${name} button!`);
+ 
+      }
     }
-
-    // Update the click count for this name
-    clickCountsMap[name] += clickCount;
-
-    // Clear the current list
-    clickCountsList.innerHTML = '';
-
-    // Display all items with their total click counts
-    for (let [name, count] of Object.entries(clickCountsMap)) {
-      const listItem = document.createElement("li");
-      listItem.textContent = `${name}: ${count} clicks`;
-      clickCountsList.appendChild(listItem);
-    }
-  } else {
-    // If the button has already been clicked, show a message indicating the repeated click
-    alert(`You have already clicked the ${name} button!`);
-  }
-}
 
 
 
@@ -2886,6 +2909,24 @@ function updateClickCountDisplay(timerServerDropdownID, clickCount) {
           voteBtn.classList.add('disabled');
           voteBtn.disabled = true;
         }
+
+
+
+           // Send update to the server
+    const voteButtonID = voteBtn.getAttribute("data-id"); // Assuming each vote button has a unique ID
+    socket.send(JSON.stringify({
+        cmd: "updateVoteButton",
+        msg: {
+            ELMxID: 0, 
+            voteButtonID: voteButtonID,
+            isEnabled: allClicked
+        }
+    }));
+
+    console.log("Sent updateVoteButton request to server:", voteButtonID, allClicked);
+
+
+
       }
 
       // Event listener for dynamically added buttons

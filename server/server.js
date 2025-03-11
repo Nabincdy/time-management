@@ -628,6 +628,45 @@ wss.on("connection", (ws) => {
 
 
 
+                    case 'updateVoteButton':
+    console.log("Received updateVoteButton request:", message);
+
+    let vote_ELMxID = message.msg.ELMxID;
+    let voteButtonID = message.msg.voteButtonID;
+    let isEnabled = message.msg.isEnabled;
+
+    if (!globalELMxArray[vote_ELMxID]) {
+        console.error(`ELMxID ${vote_ELMxID} not found in globalELMxArray`);
+        break;
+    }
+
+    if (!globalELMxArray[vote_ELMxID].voteButtons) {
+        console.log(`Vote buttons object for ELMxID ${vote_ELMxID} does not exist, creating it.`);
+        globalELMxArray[vote_ELMxID].voteButtons = {};
+    }
+
+    globalELMxArray[vote_ELMxID].voteButtons[voteButtonID] = {
+        "voteButtonID": voteButtonID,
+        "isEnabled": isEnabled
+    };
+
+    console.log(`Vote button ${voteButtonID} for ELMxID ${vote_ELMxID} is now ${isEnabled ? "enabled" : "disabled"}`);
+
+    let updateVoteResponse = {
+        cmd: "returnedFromServerUpdateVoteButton",
+        msg: {
+            voteButtonID: voteButtonID,
+            isEnabled: isEnabled,
+            ELMxID: vote_ELMxID
+        }
+    };
+
+    let targetAudience = ["particularSome", globalELMxArray[vote_ELMxID].arrayOfAttendanceIDs];
+    sendToWho(wss, ws, targetAudience, updateVoteResponse);
+    break;
+
+    
+
 
 
                 case 'hardcodeNewTimeIntoTimer':
