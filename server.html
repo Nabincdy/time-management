@@ -1095,16 +1095,31 @@
           }
           break;
 
-        case "returntoservervote":
-          console.log("Vote update from server:", data);
+          case "returntoservervote":
+    console.log("Vote update from server:", data);
 
-          // Update UI for votes (if applicable)
-          const voteDisplay = document.querySelector(`[data-id='${data.id}'] .vote-count`);
+    if (!data.id) {
+        console.warn("⚠️ Missing ID in server response:", data);
+        return;
+    }
 
-          if (voteDisplay) {
-            voteDisplay.textContent = `Votes: ${data.totalVotes || "Updated"}`;
-          }
-          break;
+    // Check if the element exists
+    const voteDisplay = document.querySelector(`[data-id='${data.id}']`);
+
+    if (voteDisplay) {
+
+        if (data.msg.includes("added")) {
+            voteDisplay.textContent = `UnVote`;
+            voteDisplay.style.backgroundColor = "green";  // Set background to green on vote
+        } else if (data.msg.includes("removed")) {
+            voteDisplay.textContent = `Vote`;
+            voteDisplay.style.backgroundColor = "";  // Set background to green on vote
+        }
+    } else {
+        console.warn(`⚠️ No element found for data-id '${data.id}'`);
+    }
+    break;
+
 
 
 
@@ -1464,7 +1479,7 @@
 
 
         default:
-          console.log('Unrecognized command:', message.cmd);
+          console.log('Unrecognized command:', data.cmd);
           break;
 
 
@@ -1538,7 +1553,7 @@
       // Attach event listener to timer input field
       document.getElementById("mainTimer").addEventListener("input", sendTimerUpdate);
 
-      // Attach event listener to vote reset button
+      // Attach event listener to vote reset buttonresetVotesBtn
       // document.getElementById("resetVotesBtn").addEventListener("click", () => {
       document.getElementById("voteData").textContent = "Total Votes: 0";
       totalVotes = 0;

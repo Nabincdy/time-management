@@ -683,49 +683,54 @@ wss.on("connection", (ws) => {
 
                 case 'pressResetTimerTime2':
                     break;
-                case 'addVote':
-                    console.log("Received vote message:", message);
-
-
-                    let Vote_ELMxID = message.msg.id;  // Get the meeting ID
-
-
-                    // Increment vote count
-
-                    // Broadcast to all clients
-
-
-                    // Send confirmation back to the sender
-                    ws.send(JSON.stringify({
-                        cmd: "returntoservervote",
-                        msg: "Vote successfully added",
-                        id: Vote_ELMxID,
-                    }));
-
-                    break;
-
-                case 'removeVote':
-                    console.log("Remove vote message:", message);
-                    let Voterm_ELMxID = message.msg.id;  // Get the meeting ID
-
-                    // Decrement vote count
-
-
-                    // Broadcast to all clients
-                    wss.clients.forEach(client => {
-                        if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify(message));
+                    case 'addVote':
+                        console.log("Received vote message:", message);
+                    
+                        let Vote_ELMxID = message.id;  // Get the meeting ID
+                        console.log("Extracted ID for addVote:", Vote_ELMxID);
+                    
+                        if (!Vote_ELMxID) {
+                            console.error("❌ Missing ID in addVote message:", message);
+                            break;
                         }
-                    });
-
-                    // Send confirmation back to the sender
-                    ws.send(JSON.stringify({
-                        cmd: "returntoservervote",
-                        msg: "Vote successfully removed",
-                        id: Voterm_ELMxID,
-                    }));
-
-                    break;
+                    
+                        // Broadcast the vote update to all clients (including sender)
+                        wss.clients.forEach(client => {
+                            if (client.readyState === WebSocket.OPEN) {
+                                client.send(JSON.stringify({
+                                    cmd: "returntoservervote",
+                                    msg: "Vote successfully added",
+                                    id: Vote_ELMxID,
+                                }));
+                            }
+                        });
+                    
+                        break;
+                    
+                    case 'removeVote':
+                        console.log("Remove vote message:", message);
+                    
+                        let Voterm_ELMxID = message.id;  // Get the meeting ID
+                        console.log("Extracted ID for removeVote:", Voterm_ELMxID);
+                    
+                        if (!Voterm_ELMxID) {
+                            console.error("❌ Missing ID in removeVote message:", message);
+                            break;
+                        }
+                    
+                        // Broadcast vote removal to all clients (including sender)
+                        wss.clients.forEach(client => {
+                            if (client.readyState === WebSocket.OPEN) {
+                                client.send(JSON.stringify({
+                                    cmd: "returntoservervote",
+                                    msg: "Vote successfully removed",
+                                    id: Voterm_ELMxID,
+                                }));
+                            }
+                        });
+                    
+                        break;
+                    
 
                 // case 'addVote':
 
