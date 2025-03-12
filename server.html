@@ -1103,23 +1103,26 @@
         return;
     }
 
-    // Check if the element exists
-    const voteDisplay = document.querySelector(`[data-id='${data.id}']`);
+    // Find all elements with the matching data-id across tabs
+    const voteDisplays = document.querySelectorAll(`[data-id='${data.id}']`);
 
-    if (voteDisplay) {
-
-        if (data.msg.includes("added")) {
-            voteDisplay.textContent = `UnVote`;
-            voteDisplay.style.backgroundColor = "green";  // Set background to green on vote
-        } else if (data.msg.includes("removed")) {
-            voteDisplay.textContent = `Vote`;
-            voteDisplay.style.backgroundColor = "";  // Set background to green on vote
-        }
+    if (voteDisplays.length > 0) {
+        voteDisplays.forEach((voteDisplay) => {
+            // If the server sends "added", set button to unvote
+            if (data.msg.includes("added")) {
+                voteDisplay.textContent = "UnVote";
+                voteDisplay.style.backgroundColor = "green";  // Set background to green for unvote
+            } 
+            // If the server sends "removed", set button back to vote
+            else if (data.msg.includes("removed")) {
+                voteDisplay.textContent = "Vote";
+                voteDisplay.style.backgroundColor = "";  // Reset background color
+            }
+        });
     } else {
         console.warn(`⚠️ No element found for data-id '${data.id}'`);
     }
     break;
-
 
 
 
@@ -1735,52 +1738,138 @@
       const voteBtn = timerComponent.querySelector(".vote-btn");
       const timerVoteID = voteBtn.getAttribute("data-id"); // Get dynamic data-id
 
+      // // Function to handle voting
+      // voteBtn.addEventListener("click", () => {
+      //   let hasVoted = voteBtn.getAttribute("data-voted") === "true"; // Track vote per button
+
+      //   if (!hasVoted) {
+      //     totalVotes++; // Increment total vote count
+      //     voteBtn.setAttribute("data-voted", "true"); // Mark as voted
+      //     // voteBtn.textContent = "Unvote"; // Change text
+      //     // voteBtn.style.backgroundColor = "green"; // Green color for voted button
+      //     socket.send(JSON.stringify({ cmd: "addVote", msg: "Vote added", id: timerVoteID }));
+      //   } else {
+      //     totalVotes = Math.max(0, totalVotes - 1); // Prevent negative votes
+      //     voteBtn.setAttribute("data-voted", "false"); // Mark as unvoted
+      //     // voteBtn.textContent = "Vote"; // Reset text
+      //     // voteBtn.style.backgroundColor = ""; // Reset color
+      //     socket.send(JSON.stringify({ cmd: "removeVote", msg: "Vote Removed", id: timerVoteID }));
+
+      //   }
+
+      //   // Update the vote count display
+      //   voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
+
+      //   // Get the reset vote button
+      //   const resetVotesBtn = document.getElementById("resetVotesBtn");
+
+      //   // Prevent division by zero error
+      //   const votePercentage = numberCitizenTimers > 0 ? (totalVotes / numberCitizenTimers) * 100 : 0;
+
+      //   // Update the button color based on the vote percentage
+      //   if (votePercentage === 0) {
+      //     resetVotesBtn.style.backgroundColor = 'black';
+      //     resetVotesBtn.style.color = 'white';
+      //   } else if (votePercentage < 10) {
+      //     resetVotesBtn.style.backgroundColor = 'black';
+      //     resetVotesBtn.style.color = 'white';
+      //   } else if (votePercentage >= 10 && votePercentage < 70) {
+      //     resetVotesBtn.style.backgroundColor = 'red';
+      //     resetVotesBtn.style.color = 'black';
+      //   } else if (votePercentage >= 70 && votePercentage < 100) {
+      //     resetVotesBtn.style.backgroundColor = 'orange';
+      //     resetVotesBtn.style.color = 'black';
+      //   } else if (votePercentage === 100) {
+      //     resetVotesBtn.style.backgroundColor = 'green';
+      //     resetVotesBtn.style.color = 'black';
+      //   }
+      // });
+
+
+
+
       // Function to handle voting
-      voteBtn.addEventListener("click", () => {
-        let hasVoted = voteBtn.getAttribute("data-voted") === "true"; // Track vote per button
+voteBtn.addEventListener("click", () => {
+  let hasVoted = voteBtn.getAttribute("data-voted") === "true"; // Track vote per button
 
-        if (!hasVoted) {
-          totalVotes++; // Increment total vote count
-          voteBtn.setAttribute("data-voted", "true"); // Mark as voted
-          voteBtn.textContent = "Unvote"; // Change text
-          voteBtn.style.backgroundColor = "green"; // Green color for voted button
-          socket.send(JSON.stringify({ cmd: "addVote", msg: "Vote added", id: timerVoteID }));
-        } else {
-          totalVotes = Math.max(0, totalVotes - 1); // Prevent negative votes
-          voteBtn.setAttribute("data-voted", "false"); // Mark as unvoted
-          voteBtn.textContent = "Vote"; // Reset text
-          voteBtn.style.backgroundColor = ""; // Reset color
-          socket.send(JSON.stringify({ cmd: "removeVote", msg: "Vote Removed", id: timerVoteID }));
+  if (!hasVoted) {
+    // Increment total vote count (before sending to server)
+    totalVotes++;
+    voteBtn.setAttribute("data-voted", "true"); // Mark as voted
+    voteBtn.textContent = "UnVote"; // Change text to UnVote
+    voteBtn.style.backgroundColor = "green"; // Set background to green for voted button
+    socket.send(JSON.stringify({ cmd: "addVote", msg: "Vote added", id: timerVoteID }));
+    
+    // Update totalVotes in localStorage (sync across all tabs)
+    localStorage.setItem('totalVotes', totalVotes);
+  } else {
+    totalVotes = Math.max(0, totalVotes - 1); // Prevent negative votes
+    voteBtn.setAttribute("data-voted", "false"); // Mark as unvoted
+    voteBtn.textContent = "Vote"; // Reset text to Vote
+    voteBtn.style.backgroundColor = ""; // Reset background color
+    socket.send(JSON.stringify({ cmd: "removeVote", msg: "Vote Removed", id: timerVoteID }));
+    
+    // Update totalVotes in localStorage (sync across all tabs)
+    localStorage.setItem('totalVotes', totalVotes);
+  }
 
-        }
+  // Update the vote count display (local tab update)
+  voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
 
-        // Update the vote count display
-        voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
+  // Handle the reset vote button color based on percentage
+  const votePercentage = numberCitizenTimers > 0 ? (totalVotes / numberCitizenTimers) * 100 : 0;
+  
+  // Update the votePercentage in localStorage to sync across tabs
+  localStorage.setItem('votePercentage', votePercentage);
 
-        // Get the reset vote button
-        const resetVotesBtn = document.getElementById("resetVotesBtn");
+  // Update the resetVotesBtn color based on votePercentage
+  const resetVotesBtn = document.getElementById("resetVotesBtn");
 
-        // Prevent division by zero error
-        const votePercentage = numberCitizenTimers > 0 ? (totalVotes / numberCitizenTimers) * 100 : 0;
+  if (votePercentage === 0) {
+    resetVotesBtn.style.backgroundColor = 'black';
+    resetVotesBtn.style.color = 'white';
+  } else if (votePercentage < 10) {
+    resetVotesBtn.style.backgroundColor = 'black';
+    resetVotesBtn.style.color = 'white';
+  } else if (votePercentage >= 10 && votePercentage < 70) {
+    resetVotesBtn.style.backgroundColor = 'red';
+    resetVotesBtn.style.color = 'black';
+  } else if (votePercentage >= 70 && votePercentage < 100) {
+    resetVotesBtn.style.backgroundColor = 'orange';
+    resetVotesBtn.style.color = 'black';
+  } else if (votePercentage === 100) {
+    resetVotesBtn.style.backgroundColor = 'green';
+    resetVotesBtn.style.color = 'black';
+  }
+});
 
-        // Update the button color based on the vote percentage
-        if (votePercentage === 0) {
-          resetVotesBtn.style.backgroundColor = 'black';
-          resetVotesBtn.style.color = 'white';
-        } else if (votePercentage < 10) {
-          resetVotesBtn.style.backgroundColor = 'black';
-          resetVotesBtn.style.color = 'white';
-        } else if (votePercentage >= 10 && votePercentage < 70) {
-          resetVotesBtn.style.backgroundColor = 'red';
-          resetVotesBtn.style.color = 'black';
-        } else if (votePercentage >= 70 && votePercentage < 100) {
-          resetVotesBtn.style.backgroundColor = 'orange';
-          resetVotesBtn.style.color = 'black';
-        } else if (votePercentage === 100) {
-          resetVotesBtn.style.backgroundColor = 'green';
-          resetVotesBtn.style.color = 'black';
-        }
-      });
+// Listen for changes to totalVotes or votePercentage in localStorage (to sync across all tabs)
+window.addEventListener('storage', (e) => {
+  if (e.key === 'totalVotes' || e.key === 'votePercentage') {
+    const newVotePercentage = parseFloat(localStorage.getItem('votePercentage'));
+    const resetVotesBtn = document.getElementById("resetVotesBtn");
+
+    // Update the resetVotesBtn color based on the updated votePercentage
+    if (newVotePercentage === 0) {
+      resetVotesBtn.style.backgroundColor = 'black';
+      resetVotesBtn.style.color = 'white';
+    } else if (newVotePercentage < 10) {
+      resetVotesBtn.style.backgroundColor = 'black';
+      resetVotesBtn.style.color = 'white';
+    } else if (newVotePercentage >= 10 && newVotePercentage < 70) {
+      resetVotesBtn.style.backgroundColor = 'red';
+      resetVotesBtn.style.color = 'black';
+    } else if (newVotePercentage >= 70 && newVotePercentage < 100) {
+      resetVotesBtn.style.backgroundColor = 'orange';
+      resetVotesBtn.style.color = 'black';
+    } else if (newVotePercentage === 100) {
+      resetVotesBtn.style.backgroundColor = 'green';
+      resetVotesBtn.style.color = 'black';
+    }
+  }
+});
+
+
 
 
       // function toggleTimer(shouldStart) {
