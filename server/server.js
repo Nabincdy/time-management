@@ -954,21 +954,6 @@ function createUserTimerIDFunction(wss, ws, message) {
 
 
 
-
-// Function to remove circular references
-// function removeCircularReferences(obj) {
-//     const seen = new Set();
-//     return JSON.parse(JSON.stringify(obj, (key, value) => {
-//         if (typeof value === "object" && value !== null) {
-//             if (seen.has(value)) {
-//                 return; // Skip circular reference
-//             }
-//             seen.add(value);
-//         }
-//         return value;
-//     }));
-// }
-
 function sendToWho(wss, ws, listDesired, messageToBrowser, meetingIDIfNeeded) {
     //listDesired let desiredList= ["particular", globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs]
     // clients.forEach((client) => {
