@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Input</title>
+</head>
+<body>
+    <h1>Input Data Sync with WebSocket</h1>
+    <input type="text" id="inputField" placeholder="Type something..." />
+    <p>Data from input: <span id="displayData"></span></p>
+
+    <script>
+        // Connect to WebSocket server
+        const socket = new WebSocket('ws://localhost:8080');
+
+        // When the connection is open, log a message
+        socket.addEventListener('open', function () {
+            console.log('Connected to WebSocket server');
+        });
+
+        // Send input field data to WebSocket server when typed
+        const inputField = document.getElementById('inputField');
+        inputField.addEventListener('input', function () {
+            const inputData = inputField.value;
+            socket.send(inputData); // Send data to the server
+        });
+
+        // Listen for incoming messages from WebSocket server and update the display
+        socket.addEventListener('message', function (event) {
+            const displayData = document.getElementById('displayData');
+            displayData.textContent = event.data; // Display received data
+        });
+    </script>
+</body>
+</html>

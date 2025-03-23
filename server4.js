@@ -110,67 +110,67 @@ setInterval(manageGlobalFlowTimers, 1000);  // Check every second if new timers 
 
 
 function updateTimers() {
-
-    let currentTime = null;
-    let elapsedTime = null;
-
-    // Update participant timers
-    for (const meetingID in globalELMxArray) {
-        if (globalELMxArray.hasOwnProperty(meetingID)) {
-            console.log("UpdateTimers globalELMxArray.hasOwnProperty:" + meetingID);  // Will log: Alice, Bob (but not extraProperty)
-
-            currentTime = performance.now(); // Get the current high-resolution time
-            elapsedTime = (currentTime - globalELMxArray[meetingID].lastUpdateTime) / 1000; // Time in seconds
-
-            for (const timerID in globalELMxArray[meetingID].timers) {
-                //console.log("timerID:"+meetingID+" "+timerID);
-                if (globalELMxArray[meetingID].timers.hasOwnProperty(timerID)) {
-
-                    let timer = globalELMxArray[meetingID].timers[timerID];
-                    //console.log("timer.isRunning:"+meetingID+" "+timerID+" "+JSON.stringify(timer));
-                    if (timer.isRunning) {
-                        // Update the time left for the participant based on the elapsed time
-                        timer.remainingTime -= elapsedTime;
-                        timer.ascendingTime += elapsedTime;
-
-                        console.log("time decreased UpdateTimers globalELMxArray.timer:" + timerID + "elaspedTime:" + elapsedTime + "remainingTime:" + timer.remainingTime + " " + globalELMxArray[meetingID].timers[timerID].remainingTime);
-                        if (timer.remainingTime <= 0) {
-                            timer.remainingTime = 0; // Ensure time doesn't go negative
-                            timer.isRunning = false; // Stop the timer once time is up
-                            console.log(`${timer.name}'s time is up.`);
-
-                        }
-                    }
-                }//end hasOwnProperty
-            };//end globalELMxArray.participants
-
-
-            // Update the last update time to current time
-            globalELMxArray[meetingID].lastUpdateTime = currentTime;
+  
+  let currentTime = null;
+  let elapsedTime = null;
+  
+  // Update participant timers
+  for (const meetingID in globalELMxArray) {
+  if (globalELMxArray.hasOwnProperty(meetingID)) {
+    console.log("UpdateTimers globalELMxArray.hasOwnProperty:"+meetingID);  // Will log: Alice, Bob (but not extraProperty)
+    
+  currentTime = performance.now(); // Get the current high-resolution time
+  elapsedTime = (currentTime - globalELMxArray[meetingID].lastUpdateTime) / 1000; // Time in seconds
+  
+  for (const timerID in globalELMxArray[meetingID].timers) {
+  //console.log("timerID:"+meetingID+" "+timerID);
+  if (globalELMxArray[meetingID].timers.hasOwnProperty(timerID)) {
+  
+  let timer = globalELMxArray[meetingID].timers[timerID];
+  //console.log("timer.isRunning:"+meetingID+" "+timerID+" "+JSON.stringify(timer));
+    if (timer.isRunning) {
+      // Update the time left for the participant based on the elapsed time
+      timer.remainingTime -= elapsedTime;
+      timer.ascendingTime +=elapsedTime;
+      
+      console.log("time decreased UpdateTimers globalELMxArray.timer:"+timerID+"elaspedTime:"+elapsedTime+"remainingTime:"+timer.remainingTime+" "+globalELMxArray[meetingID].timers[timerID].remainingTime);
+      if (timer.remainingTime <= 0) {
+        timer.remainingTime = 0; // Ensure time doesn't go negative
+        timer.isRunning = false; // Stop the timer once time is up
+        console.log(`${timer.name}'s time is up.`);
+       
+      }
+    }
+    }//end hasOwnProperty
+  };//end globalELMxArray.participants
 
 
-        }//end if hasOwnProperty
-    }//end for globalELMxArray that loops over all meetings
+  // Update the last update time to current time
+  globalELMxArray[meetingID].lastUpdateTime = currentTime;
+  
+  
+  }//end if hasOwnProperty
+}//end for globalELMxArray that loops over all meetings
 
-    // If the meeting time hasn't ended, schedule the next update
-    if (globalELMxArray[meetingID].totalMeetingTime > 0) { //we don't need this since this engine will be for all meetings such that when one meeting ends it doesn't stop the loop but only moves the meeting to globalELMxArrayArchive
-        //put archive code here which deletes from active globalELMxArray and moves to archived
-        // removeFromGlobalELMxArray();
-        // addToGlobalELMxArrayArchive();
-
-    }//end globalELMxArrayArchive
+  // If the meeting time hasn't ended, schedule the next update
+  if (globalELMxArray[meetingID].totalMeetingTime > 0) { //we don't need this since this engine will be for all meetings such that when one meeting ends it doesn't stop the loop but only moves the meeting to globalELMxArrayArchive
+  //put archive code here which deletes from active globalELMxArray and moves to archived
+  // removeFromGlobalELMxArray();
+  // addToGlobalELMxArrayArchive();
+  
+  }//end globalELMxArrayArchive
     // Schedule the next update based on the time remaining
     const nextUpdateDelay = Math.max(0, 1000 - (performance.now() - currentTime)); // Delay of 1 second or adjust based on drift
     setTimeout(updateTimers, nextUpdateDelay);
-
+  
 }//end updateTimers
 
 
 function startMeetingEngine() {
-    // Start the timer for the meeting
-    console.log("Meeting 0 started!");
-    //timerStatus.lastUpdateTime = performance.now(); // Initialize the start time
-    updateTimers(); // Begin the timer updates
+  // Start the timer for the meeting
+  console.log("Meeting 0 started!");
+  //timerStatus.lastUpdateTime = performance.now(); // Initialize the start time
+  updateTimers(); // Begin the timer updates
 }
 
 
@@ -190,11 +190,11 @@ let globalTimerIDsWebsocketObject = {}; //not yet used Feb 13 2025 can delete
 let globalUserIDs = 0;
 let globalUserIDsWebsocketObject = {};
 let globalELMxArray = {};//this object contains each ACTIVE meetings data and it can be operated on from other meetings (ELM) too
-let globalELMxArrayArchived = {};//for old or finished meetings that are no longer active.
+let globalELMxArrayArchived={};//for old or finished meetings that are no longer active.
 globalELMxArray = {
     "0": { //ELMxID..this is an example instantiation
-        "lastUpdatTime": null,
-        "pendingNotificationsToAll": null,//to tell when to broadcast out to participants sendToWho() for ELMxEngine
+    	"lastUpdatTime": null,
+    	"pendingNotificationsToAll": null,//to tell when to broadcast out to participants sendToWho() for ELMxEngine
         "flow roles": {
             "executorName": "spiritman/ID",
             "influencerName": "spiritman",
@@ -373,9 +373,9 @@ wss.on("connection", (ws) => {
                     globalTimerIDs++;
                     console.log("Inside createTimerComponentToBrowser:" + createTimerIDELMxID + " " + newTimerID);
 
-                    let [minutes, seconds] = defaultTimeOfNewlyAddedTimer.split(":"); // Split the string at ":"
+			let [minutes, seconds] = defaultTimeOfNewlyAddedTimer.split(":"); // Split the string at ":"
 
-                    let totalSeconds = (parseInt(minutes) * 60) + parseInt(seconds);
+			let totalSeconds = (parseInt(minutes) * 60) + parseInt(seconds);
 
                     globalELMxArray[createTimerIDELMxID].timers[newTimerID] = {};//end globalUserIDS
 
@@ -398,26 +398,26 @@ wss.on("connection", (ws) => {
 
 
 
-                case 'startTimer':
-                    console.log("Received startTimer request:", message);
+		case 'startTimer':
+			console.log("Received startTimer request:", message);
 
-                    let startTimer_ELMxID = message.msg.ELMxID;
+		    let startTimer_ELMxID = message.msg.ELMxID;
                     let startTimer_timerServerID = message.msg.timerServerID;
-
-
-
-                    globalELMxArray[startTimer_ELMxID].timers[startTimer_timerServerID].isRunning = true;
+                    
+                    
+                    
+                    globalELMxArray[startTimer_ELMxID].timers[startTimer_timerServerID].isRunning=true;
                     let startTimer_remainingTime = globalELMxArray[startTimer_ELMxID].timers[startTimer_timerServerID].remainingTime;
                     let startTimer_ascendingTime = globalELMxArray[startTimer_ELMxID].timers[startTimer_timerServerID].ascendingTime;
-
+                    
                     let startTimer_updateResponse = {
                         cmd: "returnedStartTimer",
-                        msg: { timerServerID: startTimer_timerServerID, shouldStart: "starting", ELMxID: startTimer_ELMxID, serverTime: Math.floor(startTimer_remainingTime), ascendingTime: Math.floor(startTimer_ascendingTime) }
+                        msg: { timerServerID: startTimer_timerServerID, shouldStart: "starting", ELMxID: startTimer_ELMxID, serverTime: Math.floor(startTimer_remainingTime), ascendingTime: Math.floor(startTimer_ascendingTime)}
                     };
                     sendToWho(wss, ws, ["particularSome", globalELMxArray[startTimer_ELMxID].arrayOfAttendanceIDs], startTimer_updateResponse);
-                    console.log("startTimer sendToWho() done:" + startTimer_timerServerID);
-
-
+                    	console.log("startTimer sendToWho() done:"+startTimer_timerServerID);
+                    
+                    
 
                     if (!globalELMxArray[startTimer_ELMxID]) {
                         console.error(`ELMxID ${startTimer_ELMxID} not found in globalELMxArray`);
@@ -429,40 +429,40 @@ wss.on("connection", (ws) => {
                         globalELMxArray[startTimer_ELMxID].timers = {};
                     }
 
+                   
+
+                   
 
 
+                   
+				
+                    
 
+			break;//startTimer (added March 14 2025 by Mark to start simplifying)
 
+			case 'stopTimer':
+			console.log("Received stopTimer request:", message);
 
-
-
-
-
-                    break;//startTimer (added March 14 2025 by Mark to start simplifying)
-
-                case 'stopTimer':
-                    console.log("Received stopTimer request:", message);
-
-                    let stopTimer_ELMxID = message.msg.ELMxID;
+		    let stopTimer_ELMxID = message.msg.ELMxID;
                     let stopTimer_timerServerID = message.msg.timerServerID;
-
-
-
-                    globalELMxArray[stopTimer_ELMxID].timers[stopTimer_timerServerID].isRunning = false;
+                    
+                    
+                    
+                    globalELMxArray[stopTimer_ELMxID].timers[stopTimer_timerServerID].isRunning=false;
                     let stopTimer_remainingTime = globalELMxArray[stopTimer_ELMxID].timers[stopTimer_timerServerID].remainingTime;
                     let stopTimer_ascendingTime = globalELMxArray[stopTimer_ELMxID].timers[stopTimer_timerServerID].ascendingTime;
-
+                    
                     let stopTimer_updateResponse = {
                         cmd: "returnedStopTimer",
-                        msg: { timerServerID: stopTimer_timerServerID, shouldStart: "stopping", ELMxID: stopTimer_ELMxID, serverTime: Math.floor(stopTimer_remainingTime), ascendingTime: Math.floor(stopTimer_ascendingTime) }
+                        msg: { timerServerID: stopTimer_timerServerID, shouldStart: "stopping", ELMxID: stopTimer_ELMxID, serverTime: Math.floor(stopTimer_remainingTime), ascendingTime: Math.floor(stopTimer_ascendingTime)}
                     };
                     sendToWho(wss, ws, ["particularSome", globalELMxArray[stopTimer_ELMxID].arrayOfAttendanceIDs], stopTimer_updateResponse);
-                    console.log("stopTimer sendToWho() done:" + stopTimer_timerServerID);
+                    	console.log("stopTimer sendToWho() done:"+stopTimer_timerServerID);
+                    
+                    
+                      
 
-
-
-
-                    break;//stopTimer (added March 14 2025 by Mark to start simplifying)
+                        break;//stopTimer (added March 14 2025 by Mark to start simplifying)
 
 
 
@@ -787,8 +787,7 @@ wss.on("connection", (ws) => {
                     console.log("Received submenuClick message:", message);
 
                     // Extract necessary data
-                    // let { formButtonID, timerdropdownID, timerSubmenuServerID, buttonText } = message.msg;
-                    let { formButtonID, timerdropdownID, timerSubmenuServerID, buttonText, timerFromNewName } = message.msg;
+                    let { formButtonID, timerdropdownID, timerSubmenuServerID, buttonText } = message.msg;
 
                     console.log('Show received data:', JSON.stringify(message.msg));
                     console.log(`Button "${buttonText}" clicked for TimerServerID: ${timerSubmenuServerID}`);
@@ -819,12 +818,9 @@ wss.on("connection", (ws) => {
                             formButtonID: formButtonID,  // Pass back the formButtonID for frontend use
                             timerDropdownID: timerdropdownID,  // Pass the timerDropdownID for frontend use
                             timerServerDropdownID: timerSubmenuServerID,
-                            timerNewName: timerFromNewName, // Change here to match frontend key
                             clickCount: globalButtonClickData[buttonKey]  // Include updated click count
                         }
                     };
-
-                    // console.log("submenuResponse" + submenuResponse);
 
                     // Send response to relevant clients
                     let recipientList = ["particularSome", globalELMxArray[message.msg.ELMxID].arrayOfAttendanceIDs];
@@ -882,44 +878,44 @@ wss.on("connection", (ws) => {
 
 
 
-                case 'updateVoteButton':
-                    console.log("Received updateVoteButton request:", message);
+                    case 'updateVoteButton':
+    console.log("Received updateVoteButton request:", message);
 
-                    let vote_ELMxID = message.msg.ELMxID;
-                    let voteButtonID = message.msg.voteButtonID;
-                    let isEnabled = message.msg.isEnabled;
+    let vote_ELMxID = message.msg.ELMxID;
+    let voteButtonID = message.msg.voteButtonID;
+    let isEnabled = message.msg.isEnabled;
 
-                    if (!globalELMxArray[vote_ELMxID]) {
-                        console.error(`ELMxID ${vote_ELMxID} not found in globalELMxArray`);
-                        break;
-                    }
+    if (!globalELMxArray[vote_ELMxID]) {
+        console.error(`ELMxID ${vote_ELMxID} not found in globalELMxArray`);
+        break;
+    }
 
-                    if (!globalELMxArray[vote_ELMxID].voteButtons) {
-                        console.log(`Vote buttons object for ELMxID ${vote_ELMxID} does not exist, creating it.`);
-                        globalELMxArray[vote_ELMxID].voteButtons = {};
-                    }
+    if (!globalELMxArray[vote_ELMxID].voteButtons) {
+        console.log(`Vote buttons object for ELMxID ${vote_ELMxID} does not exist, creating it.`);
+        globalELMxArray[vote_ELMxID].voteButtons = {};
+    }
 
-                    globalELMxArray[vote_ELMxID].voteButtons[voteButtonID] = {
-                        "voteButtonID": voteButtonID,
-                        "isEnabled": isEnabled
-                    };
+    globalELMxArray[vote_ELMxID].voteButtons[voteButtonID] = {
+        "voteButtonID": voteButtonID,
+        "isEnabled": isEnabled
+    };
 
-                    console.log(`Vote button ${voteButtonID} for ELMxID ${vote_ELMxID} is now ${isEnabled ? "enabled" : "disabled"}`);
+    console.log(`Vote button ${voteButtonID} for ELMxID ${vote_ELMxID} is now ${isEnabled ? "enabled" : "disabled"}`);
 
-                    let updateVoteResponse = {
-                        cmd: "returnedFromServerUpdateVoteButton",
-                        msg: {
-                            voteButtonID: voteButtonID,
-                            isEnabled: isEnabled,
-                            ELMxID: vote_ELMxID
-                        }
-                    };
+    let updateVoteResponse = {
+        cmd: "returnedFromServerUpdateVoteButton",
+        msg: {
+            voteButtonID: voteButtonID,
+            isEnabled: isEnabled,
+            ELMxID: vote_ELMxID
+        }
+    };
 
-                    let targetAudience = ["particularSome", globalELMxArray[vote_ELMxID].arrayOfAttendanceIDs];
-                    sendToWho(wss, ws, targetAudience, updateVoteResponse);
-                    break;
+    let targetAudience = ["particularSome", globalELMxArray[vote_ELMxID].arrayOfAttendanceIDs];
+    sendToWho(wss, ws, targetAudience, updateVoteResponse);
+    break;
 
-
+    
 
 
 
@@ -937,54 +933,54 @@ wss.on("connection", (ws) => {
 
                 case 'pressResetTimerTime2':
                     break;
-                case 'addVote':
-                    console.log("Received vote message:", message);
-
-                    let Vote_ELMxID = message.id;  // Get the meeting ID
-                    console.log("Extracted ID for addVote:", Vote_ELMxID);
-
-                    if (!Vote_ELMxID) {
-                        console.error("❌ Missing ID in addVote message:", message);
-                        break;
-                    }
-
-                    // Broadcast the vote update to all clients (including sender)
-                    wss.clients.forEach(client => {
-                        if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({
-                                cmd: "returntoservervote",
-                                msg: "Vote successfully added",
-                                id: Vote_ELMxID,
-                            }));
+                    case 'addVote':
+                        console.log("Received vote message:", message);
+                    
+                        let Vote_ELMxID = message.id;  // Get the meeting ID
+                        console.log("Extracted ID for addVote:", Vote_ELMxID);
+                    
+                        if (!Vote_ELMxID) {
+                            console.error("❌ Missing ID in addVote message:", message);
+                            break;
                         }
-                    });
-
-                    break;
-
-                case 'removeVote':
-                    console.log("Remove vote message:", message);
-
-                    let Voterm_ELMxID = message.id;  // Get the meeting ID
-                    console.log("Extracted ID for removeVote:", Voterm_ELMxID);
-
-                    if (!Voterm_ELMxID) {
-                        console.error("❌ Missing ID in removeVote message:", message);
+                    
+                        // Broadcast the vote update to all clients (including sender)
+                        wss.clients.forEach(client => {
+                            if (client.readyState === WebSocket.OPEN) {
+                                client.send(JSON.stringify({
+                                    cmd: "returntoservervote",
+                                    msg: "Vote successfully added",
+                                    id: Vote_ELMxID,
+                                }));
+                            }
+                        });
+                    
                         break;
-                    }
-
-                    // Broadcast vote removal to all clients (including sender)
-                    wss.clients.forEach(client => {
-                        if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({
-                                cmd: "returntoservervote",
-                                msg: "Vote successfully removed",
-                                id: Voterm_ELMxID,
-                            }));
+                    
+                    case 'removeVote':
+                        console.log("Remove vote message:", message);
+                    
+                        let Voterm_ELMxID = message.id;  // Get the meeting ID
+                        console.log("Extracted ID for removeVote:", Voterm_ELMxID);
+                    
+                        if (!Voterm_ELMxID) {
+                            console.error("❌ Missing ID in removeVote message:", message);
+                            break;
                         }
-                    });
-
-                    break;
-
+                    
+                        // Broadcast vote removal to all clients (including sender)
+                        wss.clients.forEach(client => {
+                            if (client.readyState === WebSocket.OPEN) {
+                                client.send(JSON.stringify({
+                                    cmd: "returntoservervote",
+                                    msg: "Vote successfully removed",
+                                    id: Voterm_ELMxID,
+                                }));
+                            }
+                        });
+                    
+                        break;
+                    
 
                 // case 'addVote':
 
@@ -1197,21 +1193,21 @@ function createUserTimerIDFunction(wss, ws, message) {
 
     //userData updating done
 
-    //break reference here so that the high precision on server not lost. We draw lower precision on browser
+	//break reference here so that the high precision on server not lost. We draw lower precision on browser
     let deepCopy = JSON.parse(JSON.stringify(globalELMxArray[createUserTimerIDELMxID]));
 
     let allMeetingData = globalELMxArray[createUserTimerIDELMxID];
-
+    
     console.log("allMeetingData:" + allMeetingData);
+    
+  
+  for (const timerID in deepCopy.timers) {
 
-
-    for (const timerID in deepCopy.timers) {
-
-        if (deepCopy.timers.hasOwnProperty(timerID)) {
-            deepCopy.timers[timerID].remainingTime = Math.floor(deepCopy.timers[timerID].remainingTime)
-            deepCopy.timers[timerID].ascendingTime = Math.floor(deepCopy.timers[timerID].ascendingTime)
-
-        }//end has property
+  if (deepCopy.timers.hasOwnProperty(timerID)) {
+    	deepCopy.timers[timerID].remainingTime = Math.floor(deepCopy.timers[timerID].remainingTime)
+    	deepCopy.timers[timerID].ascendingTime = Math.floor(deepCopy.timers[timerID].ascendingTime)
+    
+    }//end has property
     }//end for
     let existingTimerData = deepCopy.timers;
     let createUserResponseObject = { "cmd": "returnNewUserIDWithScreenCatchUp", "msg": { "newID": newUserID, "existingTimerData": existingTimerData, "allMeetingData": deepCopy } };
