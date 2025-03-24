@@ -819,7 +819,7 @@ wss.on("connection", (ws) => {
                             formButtonID: formButtonID,  // Pass back the formButtonID for frontend use
                             timerDropdownID: timerdropdownID,  // Pass the timerDropdownID for frontend use
                             timerServerDropdownID: timerSubmenuServerID,
-                            timerNewName: timerFromNewName, // Change here to match frontend key
+                            timerFromNewName: timerFromNewName, // Change here to match frontend key
                             clickCount: globalButtonClickData[buttonKey]  // Include updated click count
                         }
                     };

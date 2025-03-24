@@ -1328,176 +1328,71 @@
           break;
 
 
-        // case "returnedFromServerSubmenuClick":
-        //   console.log("testing what is this first data " + data.msg);
-
-        //   const { timerServerDropdownID, clickedButton } = data.msg; // No redeclaration here
-        //   console.log("testing what is this data " + data.msg);
-
-
-        //   document.querySelectorAll(".form-btn").forEach(button => {
-        //     button.style.backgroundColor = ""; // Reset background color for all buttons
-        //   });
-
-        //   document.querySelectorAll(".dropdown-item").forEach(button => {
-        //     button.style.backgroundColor = ""; // Reset background color for all buttons
-        //   });
-        //   // Reset background color for all buttons
-        //   document.querySelectorAll(".submenu-item").forEach(button => {
-        //     button.style.backgroundColor = ""; // Reset background color for all buttons
-        //   });
-
-        //   // Find the button that matches the clickedButton and apply the green background color
-        //   document.querySelectorAll(".submenu-item").forEach(button => {
-        //     if (button.innerText.trim() === clickedButton) {
-        //       button.style.backgroundColor = "purple"; // Set green background for clicked button
-
-        //       // Optionally, if you want to activate the parent dropdown item
-        //       const parentButton = button.closest(".dropdown-item");
-        //       if (parentButton) parentButton.style.backgroundColor = "green";
-
-        //       // Optionally, if you want to activate the form button
-        //       const formbtn = button.closest(".form-btn");
-        //       if (formbtn) formbtn.style.backgroundColor = "green";
-
-        //     }
-        //   });
-        //   break;
-
-
-        //     case "returnedFromServerSubmenuClick":
-        // console.log("Testing what is this first data:", data.msg);
-
-        // const { timerServerDropdownID, clickedButton } = data.msg;
-        // console.log("Testing what is this data:", data.msg);
-
-        // // Reset background color for all buttons
-        // document.querySelectorAll(".form-btn, .dropdown-item, .submenu-item").forEach(button => {
-        //     button.style.backgroundColor = "";
-        // });
-
-        // // Find the exact submenu item using its text and change its color
-        // const targetButton = Array.from(document.querySelectorAll(".submenu-item"))
-        //     .find(button => button.innerText.trim() === clickedButton);
-
-        // if (targetButton) {
-        //     targetButton.style.backgroundColor = "purple"; // Change only the clicked button
-
-        //     // Find and update the parent dropdown item
-        //     const parentButton = targetButton.closest(".dropdown-item");
-        //     if (parentButton) parentButton.style.backgroundColor = "green";
-
-        //     // Find and update the form button
-        //     const formBtn = targetButton.closest(".form-btn");
-        //     if (formBtn) formBtn.style.backgroundColor = "green";
-        // }
-        // break;
 
 
 
-        // case "returnedFromServerSubmenuClick":
-        // console.log("Testing what is this first data:", data.msg);
-
-        // const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID } = data.msg;
-        // console.log("Testing what is this data:", data.msg);
-
-        // // Reset background color for all buttons
-        // document.querySelectorAll(".form-btn, .dropdown-item, .submenu-item").forEach(button => {
-        //     button.style.backgroundColor = "";
-        // });
-
-        // // Find all submenu items that match clickedButton and update their background
-        // document.querySelectorAll(".submenu-item").forEach(button => {
-        //     if (button.innerText.trim() === clickedButton) {
-
-        //       this is timer server id timerServerDropdownID data-timerServerID="${newTimerID}"
-        //         button.style.backgroundColor = "purple"; // Change only the clicked button
-
-        //         // Find and update the parent dropdown item
-
-        //         this is timerDropdownID it is data-timer-id="${newTimerID}"
-        //         const parentButton = button.closest(".dropdown-item");
-        //         if (parentButton) parentButton.style.backgroundColor = "green";
-
-        //         // **Find and update all matching form buttons**
-        //         document.querySelectorAll(`.form-btn[data-id="${formButtonID}"]`).forEach(formBtn => {
-        //             formBtn.style.backgroundColor = "green";
-        //         });
-        //     }
-        // });
-
-        // break;
-
-        // case "returnedFromServerSubmenuClick":
-        //   console.log("Testing what is this first data:", data.msg);
-
-        //   const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID } = data.msg;
-        //   console.log("Testing what is this data:", data.msg);
-
-
-        //   // document.querySelectorAll(".submenu-item, .dropdown-item, .form-btn").forEach(button => {
-        //   //     button.style.backgroundColor = "";
-        //   // });
-
-
-        //   document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"], 
-        //                        .dropdown-item[data-timer-id="${timerDropdownID}"], 
-        //                        .form-btn[data-id="${formButtonID}"]`).forEach(button => {
-        //     button.style.backgroundColor = "";
-        //   });
-
-
-        //   // Find and update the submenu item using  timerServerDropdownID
-        //   document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"]`).forEach(button => {
-        //     button.style.backgroundColor = "purple"; // Change only the clicked submenu button
-        //   });
-
-        //   // Find and update the parent dropdown item using timerDropdownID
-        //   document.querySelectorAll(`.dropdown-item[data-timer-id="${timerDropdownID}"]`).forEach(parentButton => {
-        //     parentButton.style.backgroundColor = "orange"; // Change background of correct parent dropdown item
-        //   });
-
-        //   // Find and update the form button using formButtonID
-        //   document.querySelectorAll(`.form-btn[data-id="${formButtonID}"]`).forEach(formBtn => {
-        //     formBtn.style.backgroundColor = "green"; // Change only the correct form button
-        //   });
-
-        //   break;
         case "returnedFromServerSubmenuClick":
           console.log("Testing what is this first data:", data.msg.timerFromNewName);
 
           const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID, clickCount, timerFromNewName } = data.msg;
           console.log("Testing what is this data:", data.msg);
 
-          // Reset background color for all related buttons
-          document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"], 
-                                .dropdown-item[data-timer-id="${timerDropdownID}"], 
-                                .form-btn[data-id="${formButtonID}"]`).forEach(button => {
-            button.style.backgroundColor = "";
-          });
+          // Retrieve previous selections from localStorage (track per formButtonID)
+          let previousSelections = JSON.parse(localStorage.getItem("previousSelections")) || {};
 
-          // Update the submenu button
+          // Reset only the previously selected elements for the same formButtonID
+          if (previousSelections[formButtonID]) {
+            const prevSelection = previousSelections[formButtonID];
+
+            // Reset background only for the previously selected submenu item
+            if (prevSelection.timerServerDropdownID) {
+              document.querySelectorAll(`.submenu-item[data-timerServerID="${prevSelection.timerServerDropdownID}"]`).forEach(button => {
+                button.style.backgroundColor = "";
+              });
+            }
+
+            // Reset background only for the previously selected dropdown item
+            if (prevSelection.timerDropdownID) {
+              document.querySelectorAll(`.dropdown-item[data-timer-id="${prevSelection.timerDropdownID}"]`).forEach(parentButton => {
+                parentButton.style.backgroundColor = "";
+              });
+            }
+
+            // Reset background only for the previously selected form button
+            if (prevSelection.formButtonID) {
+              document.querySelectorAll(`.form-btn[data-id="${prevSelection.formButtonID}"]`).forEach(formBtn => {
+                formBtn.style.backgroundColor = "";
+              });
+            }
+          }
+
+          // Update new selection (change background color only for the newly selected elements)
           document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"]`).forEach(button => {
-            button.style.backgroundColor = "purple"; // Highlight the clicked submenu button
+            button.style.backgroundColor = "green"; // Highlight clicked submenu button
           });
 
-          // Update the parent dropdown item
           document.querySelectorAll(`.dropdown-item[data-timer-id="${timerDropdownID}"]`).forEach(parentButton => {
-            parentButton.style.backgroundColor = "orange"; // Highlight correct parent dropdown item
+            parentButton.style.backgroundColor = "green"; // Highlight correct parent dropdown item
           });
 
-          // Update the form button
           document.querySelectorAll(`.form-btn[data-id="${formButtonID}"]`).forEach(formBtn => {
-            formBtn.style.backgroundColor = "green"; // Highlight the correct form button
+            formBtn.style.backgroundColor = "green"; // Highlight correct form button
           });
 
+          // Save the current selection **per formButtonID**
+          previousSelections[formButtonID] = {
+            timerServerDropdownID,
+            timerDropdownID,
+            formButtonID
+          };
 
+          localStorage.setItem("previousSelections", JSON.stringify(previousSelections));
 
+          // Sync changes across tabs
+          localStorage.setItem("backgroundSync", Date.now());
 
-          // Update the click count in the list at the top
-          // updateClickCountDisplay(timerServerDropdownID, clickCount);
-          updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName);
-
+          // Update the click count display
+          updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID);
           break;
 
 
@@ -1516,7 +1411,7 @@
 
           // Highlight the clicked dropdown item
           document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"]`).forEach(button => {
-            button.style.backgroundColor = "purple"; // Highlight selected item
+            button.style.backgroundColor = "green"; // Highlight selected item
           });
 
           // Highlight the people button
@@ -2347,107 +2242,74 @@
       }
     }//end setupTimerControls
 
+    let clickCountsMap = {}; // Stores total votes for each name
+    let formButtonSelections = {}; // Maps formButtonID to its selected timerServerDropdownID
+    let alreadyClicked = new Set(); // Tracks which buttons have already been clicked
+    let voterMap = {}; // Stores list of voters for each name
 
-    // Function to update click count display
-    // function updateClickCountDisplay(timerServerDropdownID, clickCount) {
-    //   const clickCountsList = document.getElementById("click-counts-list");
-
-    //   // Check if this button already has a display item
-    //   let existingItem = document.querySelector(`#click-counts-list li[data-timerServerID="${timerServerDropdownID}"]`);
-
-    //   // If an item exists, update it
-    //   if (existingItem) {
-    //     existingItem.textContent = `${existingItem.textContent.split(':')[0]}: ${clickCount} clicks`;
-    //   } else {
-    //     // Otherwise, create a new list item
-    //     const newItem = document.createElement("li");
-    //     newItem.setAttribute("data-timerServerID", timerServerDropdownID);
-    //     newItem.textContent = `${timerServerDropdownID}: ${clickCount} clicks`;
-    //     clickCountsList.appendChild(newItem);
-    //   }
-    // }
-
-
-
-    let clickCountsMap = {};
-    let alreadyClicked = new Set(); // A set to track which buttons have already been clicked
-
-    function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName) {
+    function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID) {
       const clickCountsList = document.getElementById("click-counts-list");
+      const name = timerServerDropdownID.split('-').slice(1).join('-');
 
-      // Extract the actual name from the timerServerDropdownID (remove "1-" or "2-")
-      const name = timerServerDropdownID.split('-').slice(1).join('-'); // Get only the name part, e.g., "straightturn"
+      console.log("timerFromNewName: " + timerFromNewName);
 
-      // Check if this button has already been clicked
-      if (!alreadyClicked.has(timerServerDropdownID)) {
-        // Mark the button as clicked
-        alreadyClicked.add(timerServerDropdownID);
+      // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
+      if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
+        const previousTimerServerDropdownID = formButtonSelections[formButtonID];
+        const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
 
-        // If this name is not in the clickCountsMap, initialize it
-        if (!clickCountsMap[name]) {
-          clickCountsMap[name] = 0;
+        if (clickCountsMap[previousName]) {
+          clickCountsMap[previousName] -= 1;
+
+          // Remove the previous voter from the list
+          if (voterMap[previousName]) {
+            voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
+            if (voterMap[previousName].length === 0) {
+              delete voterMap[previousName];
+            }
+          }
+
+          if (clickCountsMap[previousName] <= 0) {
+            delete clickCountsMap[previousName];
+            alreadyClicked.delete(previousTimerServerDropdownID);
+          }
         }
+      }
 
-        // Update the click count for this name
-        clickCountsMap[name] += clickCount;
+      // If the user has already clicked this button, do nothing
+      if (alreadyClicked.has(timerServerDropdownID)) {
+        alert(`You have already voted for ${name}!`);
+        return;
+      }
 
-        // Clear the current list
-        clickCountsList.innerHTML = '';
+      // Mark this selection for the formButtonID
+      formButtonSelections[formButtonID] = timerServerDropdownID;
 
-        // Display all items with their total click counts
-        for (let [name, count] of Object.entries(clickCountsMap)) {
+      // Increment vote count correctly
+      clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
+
+      // Store the voter's name
+      if (!voterMap[name]) {
+        voterMap[name] = [];
+      }
+      if (!voterMap[name].includes(timerFromNewName)) {
+        voterMap[name].push(timerFromNewName);
+      }
+
+      // Clear and update display
+      clickCountsList.innerHTML = '';
+      for (let [key, count] of Object.entries(clickCountsMap)) {
+        if (count > 0) {
+          const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
           const listItem = document.createElement("li");
-          // listItem.textContent = `${name}: ${count} Vote`;
-          listItem.textContent = `${timerFromNewName} (${name}): ${count} Vote`;
-
+          listItem.textContent = `(${voters}) voted for (${key}): ${count} Vote${count > 1 ? 's' : ''}`;
           clickCountsList.appendChild(listItem);
         }
-      } else {
-        // If the button has already been clicked, show a message indicating the repeated click
-        alert(`You have already Vote the ${name} button!`);
-
       }
     }
 
 
-    // function updateClickCountDisplay(timerServerDropdownID, clickCount, timerNewName) {
-    //   const clickCountsList = document.getElementById("click-counts-list");
 
-    //   // Extract the actual name from the timerServerDropdownID
-    //   const name = timerServerDropdownID.split('-').slice(1).join('-');
-
-    //   // Check if this button has already been clicked
-    //   if (!alreadyClicked.has(timerServerDropdownID)) {
-    //     // Mark the button as clicked
-    //     alreadyClicked.add(timerServerDropdownID);
-
-    //     // If this name is not in the clickCountsMap, initialize it
-    //     if (!clickCountsMap[name]) {
-    //       clickCountsMap[name] = 0;
-    //     }
-
-    //     // Update the click count for this name
-    //     clickCountsMap[name] += clickCount;
-
-    //     // Clear the current list
-    //     clickCountsList.innerHTML = '';
-
-    //     // Display all items with their total click counts, including the new timer name
-    //     for (let [name, count] of Object.entries(clickCountsMap)) {
-    //       const listItem = document.createElement("li");
-    //       listItem.textContent = `${timerNewName} (${name}): ${count} Vote`;
-    //       clickCountsList.appendChild(listItem);
-    //     }
-    //   } else {
-    //     alert(`You have already Voted for the ${timerNewName} button!`);
-    //   }
-    // }
-
-
-
-
-
-    // 
 
     function getTimersAsJson() {
       const timers = [];
