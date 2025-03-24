@@ -541,7 +541,7 @@
       }
 
       .timer-veto {
-        width: 30px;
+        width: 40px;
         padding: 8px 12px;
         font-size: 14px;
         border: 2px solid #ccc;
@@ -2244,69 +2244,82 @@
 
     let clickCountsMap = {}; // Stores total votes for each name
     let formButtonSelections = {}; // Maps formButtonID to its selected timerServerDropdownID
-    let alreadyClicked = new Set(); // Tracks which buttons have already been clicked
+    // let alreadyClicked = new Set(); // Tracks which buttons have already been clicked
     let voterMap = {}; // Stores list of voters for each name
 
-    function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID) {
-      const clickCountsList = document.getElementById("click-counts-list");
-      const name = timerServerDropdownID.split('-').slice(1).join('-');
+    let alreadyClicked = {}; // Now an object instead of a Set
 
-      console.log("timerFromNewName: " + timerFromNewName);
+function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID) {
+  const clickCountsList = document.getElementById("click-counts-list");
+  const name = timerServerDropdownID.split('-').slice(1).join('-');
 
-      // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
-      if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
-        const previousTimerServerDropdownID = formButtonSelections[formButtonID];
-        const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
+  console.log("timerFromNewName: " + timerFromNewName);
 
-        if (clickCountsMap[previousName]) {
-          clickCountsMap[previousName] -= 1;
+  // Ensure we track votes per user
+  if (!alreadyClicked[timerFromNewName]) {
+    alreadyClicked[timerFromNewName] = new Set();
+  }
 
-          // Remove the previous voter from the list
-          if (voterMap[previousName]) {
-            voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
-            if (voterMap[previousName].length === 0) {
-              delete voterMap[previousName];
-            }
-          }
+  // Check if this user has already voted for this option
+  if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
+    alert(`You have already voted for ${name}!`);
+    return;
+  }
 
-          if (clickCountsMap[previousName] <= 0) {
-            delete clickCountsMap[previousName];
-            alreadyClicked.delete(previousTimerServerDropdownID);
-          }
+  // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
+  if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
+    const previousTimerServerDropdownID = formButtonSelections[formButtonID];
+    const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
+
+    if (clickCountsMap[previousName]) {
+      clickCountsMap[previousName] -= 1;
+
+      // Remove the previous voter from the list
+      if (voterMap[previousName]) {
+        voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
+        if (voterMap[previousName].length === 0) {
+          delete voterMap[previousName];
         }
       }
 
-      // If the user has already clicked this button, do nothing
-      if (alreadyClicked.has(timerServerDropdownID)) {
-        alert(`You have already voted for ${name}!`);
-        return;
+      if (clickCountsMap[previousName] <= 0) {
+        delete clickCountsMap[previousName];
       }
 
-      // Mark this selection for the formButtonID
-      formButtonSelections[formButtonID] = timerServerDropdownID;
-
-      // Increment vote count correctly
-      clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
-
-      // Store the voter's name
-      if (!voterMap[name]) {
-        voterMap[name] = [];
-      }
-      if (!voterMap[name].includes(timerFromNewName)) {
-        voterMap[name].push(timerFromNewName);
-      }
-
-      // Clear and update display
-      clickCountsList.innerHTML = '';
-      for (let [key, count] of Object.entries(clickCountsMap)) {
-        if (count > 0) {
-          const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
-          const listItem = document.createElement("li");
-          listItem.textContent = `(${voters}) voted for (${key}): ${count} Vote${count > 1 ? 's' : ''}`;
-          clickCountsList.appendChild(listItem);
-        }
-      }
+      // Remove previous selection from alreadyClicked
+      alreadyClicked[timerFromNewName].delete(previousTimerServerDropdownID);
     }
+  }
+
+  // Mark this selection for the formButtonID
+  formButtonSelections[formButtonID] = timerServerDropdownID;
+
+  // Increment vote count correctly
+  clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
+
+  // Store the voter's name
+  if (!voterMap[name]) {
+    voterMap[name] = [];
+  }
+  if (!voterMap[name].includes(timerFromNewName)) {
+    voterMap[name].push(timerFromNewName);
+  }
+
+  // Mark this vote in alreadyClicked
+  alreadyClicked[timerFromNewName].add(timerServerDropdownID);
+
+  // Clear and update display
+  clickCountsList.innerHTML = '';
+  for (let [key, count] of Object.entries(clickCountsMap)) {
+    if (count > 0) {
+      const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+      const listItem = document.createElement("li");
+      listItem.textContent = `(${voters}) voted for (${key}): ${count} Vote${count > 1 ? 's' : ''}`;
+      clickCountsList.appendChild(listItem);
+    }
+  }
+}
+
 
 
 
