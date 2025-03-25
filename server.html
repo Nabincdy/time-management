@@ -490,6 +490,10 @@
     <!-- <div id="voteData">Total Votes: 0</div> -->
     <h3>Vote Counts:</h3>
     <ul id="click-counts-list"></ul> <!-- This will hold the list of button click counts -->
+    <div id="people-click-counts-container" style="margin-top: 10px;">
+      <h3>People Selection Count</h3>
+      <ul id="people-click-counts-list"></ul>
+    </div>
 
 
     <style>
@@ -1338,39 +1342,45 @@
           break;
 
 
-          case "returnedPeopleDropdownClick":
-    console.log("Received peopleDropdownClick response:", data.msg);
 
-    const { selectedAction, buttonID, buttonPeopleText } = data.msg;
+        case "returnedPeopleDropdownClick":
+          console.log("Received peopleDropdownClick response:", data.msg);
 
-    console.log("Processed data:", data.msg);
+          const { selectedAction, buttonID, buttonPeopleText, timerPeopleNewName } = data.msg;
 
-    // Store the last selected action per button to reset background color
-    if (!window.previousPeopleSelections) {
-        window.previousPeopleSelections = {};  // Global variable to track previous selections
-    }
+          console.log("Processed data:", data.msg);
 
-    // Reset the background of the last selected action for this buttonID
-    if (window.previousPeopleSelections[buttonID]) {
-        document.querySelectorAll(`.dropdown-item[data-action="${window.previousPeopleSelections[buttonID]}"]`).forEach(button => {
-            button.style.backgroundColor = "";
-        });
-    }
+          if (!window.previousPeopleSelections) {
+            window.previousPeopleSelections = {};
+          }
 
-    // Update the new selection
-    document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"]`).forEach(button => {
-        button.style.backgroundColor = "green"; // Highlight selected item
-    });
+          if (window.previousPeopleSelections[buttonID]) {
+            document.querySelectorAll(`.dropdown-item[data-action="${window.previousPeopleSelections[buttonID]}"]`).forEach(button => {
+              button.style.backgroundColor = "";
+            });
+          }
 
-    // Update the people button
-    document.querySelectorAll(`.people-btn[data-id="${buttonID}"]`).forEach(peopleBtn => {
-        peopleBtn.style.backgroundColor = "brown"; // Highlight the people button
-    });
+          document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"]`).forEach(button => {
+            button.style.backgroundColor = "green";
+          });
 
-    // Store the new selection to reset it next time
-    window.previousPeopleSelections[buttonID] = selectedAction;
+          document.querySelectorAll(`.people-btn[data-id="${buttonID}"]`).forEach(peopleBtn => {
+            peopleBtn.style.backgroundColor = "brown";
+          });
 
-    break;
+          window.previousPeopleSelections[buttonID] = selectedAction;
+
+          // Update the displayed selection
+          const selectedPeopleDisplay = document.getElementById("selected-people-display");
+          if (selectedPeopleDisplay) {
+            selectedPeopleDisplay.textContent = `Selected: ${buttonPeopleText}`;
+          }
+
+          // Update people selection count display
+          updatePeopleClickCountDisplay(selectedAction, buttonID, buttonPeopleText, timerPeopleNewName);
+
+          break;
+
 
 
 
@@ -1556,7 +1566,7 @@
         voteBtn.style.backgroundColor = "";
         voteBtn.textContent = "Vote";
         voteBtn.setAttribute("data-voted", "false");
-        voteBtn.disabled = false; // Enable voting again
+        voteBtn.disabled = true; // Enable voting again
       });
 
       // Reset content buttons
@@ -1814,6 +1824,8 @@
         // currentRunningTimer = timerComponent; // Set the current running timer
         startPauseBtn.textContent = "⏸️";
       }
+
+
 
 
 
@@ -2200,6 +2212,76 @@
         }
       });
     }//end openCounterForm
+
+
+
+
+
+    let peopleClickCounts = {}; // Stores total selections for each action
+let peopleSelections = {}; // Maps buttonID to its selected action
+let peopleVoterMap = {}; // Stores list of voters per action
+
+function updatePeopleClickCountDisplay(selectedAction, buttonID, buttonPeopleText, timerPeopleNewName) {
+    const peopleClickCountsList = document.getElementById("people-click-counts-list");
+    const actionName = selectedAction; // Name of the selected action
+
+    console.log(`Updating click count display for: ${actionName}, Timer Name: ${timerPeopleNewName}`);
+
+    // Ensure we track voters per action (not per user)
+    if (!peopleVoterMap[actionName]) {
+        peopleVoterMap[actionName] = new Set();
+    }
+
+    // Prevent duplicate selection by the same user
+    if (peopleVoterMap[actionName].has(timerPeopleNewName)) {
+        alert(`"${timerPeopleNewName}" has already selected "${actionName}"!`);
+        return;
+    }
+
+    // If this buttonID previously selected a different action, decrease its count
+    if (peopleSelections[buttonID] && peopleSelections[buttonID] !== selectedAction) {
+        const previousAction = peopleSelections[buttonID];
+
+        if (peopleClickCounts[previousAction]) {
+            peopleClickCounts[previousAction] -= 1;
+
+            // Remove the previous voter from the list
+            if (peopleVoterMap[previousAction]) {
+                peopleVoterMap[previousAction].delete(timerPeopleNewName);
+            }
+
+            if (peopleClickCounts[previousAction] <= 0) {
+                delete peopleClickCounts[previousAction];
+            }
+        }
+    }
+
+    // Mark this selection for the buttonID
+    peopleSelections[buttonID] = selectedAction;
+
+    // Increment vote count correctly
+    peopleClickCounts[actionName] = (peopleClickCounts[actionName] || 0) + 1;
+
+    // Store the voter
+    peopleVoterMap[actionName].add(timerPeopleNewName);
+
+    // Clear and update display
+    peopleClickCountsList.innerHTML = '';
+    for (let [key, count] of Object.entries(peopleClickCounts)) {
+        if (count > 0) {
+            const voters = Array.from(peopleVoterMap[key]).join(", ") || "Unknown";
+            const listItem = document.createElement("li");
+            listItem.textContent = `(${voters}) selected "${key}": ${count} time${count > 1 ? 's' : ''}`;
+            peopleClickCountsList.appendChild(listItem);
+        }
+    }
+}
+
+
+
+
+
+
 
 
     function updateCounterDisplay() {
@@ -2696,6 +2778,9 @@
       // Create dropdown menu inside people-btn
       const peopleBtn = timerComponent.querySelector(".people-btn");
       const peopleDropdownMenu = document.createElement("div");
+      // const timerNewName = titleInputField.value;
+
+      // console.log("timerNewName test" + timerNewName);
       peopleDropdownMenu.classList.add("dropdown-menu");
 
       peopleDropdownMenu.innerHTML = `
@@ -2712,11 +2797,22 @@
         peopleDropdownMenu.classList.toggle("show-dropdown");
       });
 
+
+
       // Handle click events for people dropdown
       peopleDropdownMenu.addEventListener("click", (e) => {
+
+        const timerNewName = titleInputField ? titleInputField.value.trim() : ""; // Fetch updated value
+        // console.log("Updated timerNewName:", timerNewName);
+
+
+
+
         if (e.target.classList.contains("dropdown-item")) {
           // Reset the background color for all items
           const items = peopleDropdownMenu.querySelectorAll(".dropdown-item");
+
+
           items.forEach(item => {
             item.style.backgroundColor = ""; // Reset all item backgrounds
           });
@@ -2729,13 +2825,19 @@
 
           let ELMxID = 0;
           // Construct the data object to send via WebSocket
+
+          console.log("Clicked Button:", e.target); 
+// console.log("Extracted Button Text:", e.target.innerText.trim());
+          buttonPeopleText = e.target.innerText.trim();
+
           const data = {
             cmd: "peopleDropdownClick",
             msg: {
               action: action,
               "ELMxID": ELMxID,
               buttonID: peopleBtn.getAttribute("data-id"),
-              buttonText: e.target.innerText.trim()
+              timerPeopleNewName: timerNewName,
+              buttonPeopleText: buttonPeopleText
             }
           };
 

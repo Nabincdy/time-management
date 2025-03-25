@@ -839,7 +839,8 @@ wss.on("connection", (ws) => {
                     console.log("Received peopleDropdownClick message:", message);
 
                     // Extract necessary data
-                    let { action, buttonID, buttonPeopleText } = message.msg;
+                    let { action, buttonID, buttonPeopleText, timerPeopleNewName } = message.msg;
+
 
                     console.log('Show received data:', JSON.stringify(message.msg));
                     console.log(`Action "${action}" selected for button ID: ${buttonID}`);
@@ -868,6 +869,7 @@ wss.on("connection", (ws) => {
                             ELMxID: 0,  // Optional: Can be used to identify the id if needed
                             selectedAction: action,
                             buttonID: buttonID,  // Pass back the buttonID for frontend use
+                            timerPeopleNewName: timerPeopleNewName, // Change here to match frontend key
                             buttonPeopleText: buttonPeopleText  // Include button text for clarity
                         }
                     };
