@@ -1009,64 +1009,6 @@
 
           break;
 
-
-
-        // case "timerRemoved":
-        //   console.warn("Timer Removed event received:", JSON.stringify(data));
-
-        //   const timerRemovalServerID = data.msg.timerRemovalServerID;
-        //   const ELMxID_Remove = data.msg.ELMxID_Remove;
-
-
-
-        //   let defaultRemoveButtonElementID = `${timerRemovalServerID}-8`;
-        //   console.log("Searching for Remove Button with ID:", defaultRemoveButtonElementID);
-
-        //   // Debugging: Log all available data-ids to check if it's in the DOM
-        //   document.querySelectorAll("[data-id]").forEach(el => console.log("Existing data-id:", el.dataset.id));
-
-        //   // Try finding the element with expected ID
-        //   let timerRemoveElement = document.querySelector(`[data-id="${defaultRemoveButtonElementID}"]`);
-        //   // If not found, try a fallback (maybe different ID structure)
-        //   if (!timerRemoveElement) {
-        //     console.warn(`Timer with ID '${defaultRemoveButtonElementID}' not found. Trying alternative lookup...`);
-        //     timerRemoveElement = document.querySelector(`[data-id="${timerRemovalServerID}"]`);
-        //   }
-
-        //   console.log("Final timerRemoveElement found:", timerRemoveElement);
-
-        //   if (timerRemoveElement) {
-        //     // Find parent timer container
-        //     const timerContainer = timerRemoveElement.closest('.timer-container');
-        //     if (timerContainer) {
-        //       timerContainer.remove();
-        //       console.log(`✅ Timer ${timerRemovalServerID} removed from the UI.`);
-        //     } else {
-        //       console.warn(`⚠️ Timer ${timerRemovalServerID} found but its parent container is missing.`);
-        //     }
-        //   } else {
-        //     console.warn(`❌ Timer ${timerRemovalServerID} not found in the DOM.`);
-        //   }
-
-        //   // Broadcast the removal to all connected clients (WebSockets)
-        //   // if (socket && socket.send) {
-        //   //   socket.send(JSON.stringify({
-        //   //     cmd: "broadcastRemoveTimer",
-        //   //     msg: { timerRemovalServerID, ELMxID_Remove }
-        //   //   }));
-        //   //   console.log("🔄 Sent remove event to all clients.");
-        //   // } else {
-        //   //   console.warn("⚠️ WebSocket connection not available for broadcasting.");
-        //   // }
-
-        //   // Update global state if function exists
-        //   // if (typeof updateGlobalStateAfterTimerRemoval === "function") {
-        //   //   updateGlobalStateAfterTimerRemoval(ELMxID_Remove, timerRemovalServerID);
-        //   // } else {
-        //   //   console.warn("⚠️ updateGlobalStateAfterTimerRemoval function is not defined.");
-        //   // }
-        //   break;
-
         case "timerRemoved":
           console.warn("Timer Removed event received:", JSON.stringify(data));
 
@@ -1396,162 +1338,39 @@
           break;
 
 
-        case "returnedPeopleDropdownClick":
-          console.log("Received peopleDropdownClick response:", data.msg);
+          case "returnedPeopleDropdownClick":
+    console.log("Received peopleDropdownClick response:", data.msg);
 
-          const { selectedAction, buttonID, buttonPeopleText } = data.msg; // Extract data without clickCount
+    const { selectedAction, buttonID, buttonPeopleText } = data.msg;
 
-          console.log("Processed data:", data.msg);
+    console.log("Processed data:", data.msg);
 
-          // Reset background color for all related buttons
-          document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"], 
-                              .people-btn[data-id="${buttonID}"]`).forEach(button => {
+    // Store the last selected action per button to reset background color
+    if (!window.previousPeopleSelections) {
+        window.previousPeopleSelections = {};  // Global variable to track previous selections
+    }
+
+    // Reset the background of the last selected action for this buttonID
+    if (window.previousPeopleSelections[buttonID]) {
+        document.querySelectorAll(`.dropdown-item[data-action="${window.previousPeopleSelections[buttonID]}"]`).forEach(button => {
             button.style.backgroundColor = "";
-          });
+        });
+    }
 
-          // Highlight the clicked dropdown item
-          document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"]`).forEach(button => {
-            button.style.backgroundColor = "green"; // Highlight selected item
-          });
+    // Update the new selection
+    document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"]`).forEach(button => {
+        button.style.backgroundColor = "green"; // Highlight selected item
+    });
 
-          // Highlight the people button
-          document.querySelectorAll(`.people-btn[data-id="${buttonID}"]`).forEach(peopleBtn => {
-            peopleBtn.style.backgroundColor = "green"; // Highlight the people button
-          });
+    // Update the people button
+    document.querySelectorAll(`.people-btn[data-id="${buttonID}"]`).forEach(peopleBtn => {
+        peopleBtn.style.backgroundColor = "brown"; // Highlight the people button
+    });
 
-          break;
+    // Store the new selection to reset it next time
+    window.previousPeopleSelections[buttonID] = selectedAction;
 
-
-
-
-
-        //     case "returnedFromServerSubmenuClick":
-        // console.log("testing what is this first data " + data.msg);
-
-        // const { timerServerDropdownID, clickedButton } = data.msg;
-
-        // // Log the received data to check the values
-        // console.log("testing what is this data " + data.msg);
-
-        // // Reset background color for all buttons inside this specific timer component
-        // console.log("data value " + JSON.stringify(timerServerDropdownID));
-
-        // // Reset the background color for all form buttons, dropdown items, and submenu items for this timer
-        // document.querySelectorAll(`.form-btn[data-timer-id="${timerServerDropdownID}"]`).forEach(button => {
-        //     button.style.backgroundColor = ""; // Reset background color for form button
-        // });
-
-        // document.querySelectorAll(`.dropdown-item[data-timer-id="${timerServerDropdownID}"]`).forEach(button => {
-        //     button.style.backgroundColor = ""; // Reset background color for dropdown items
-        // });
-
-        // document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"]`).forEach(button => {
-        //     button.style.backgroundColor = ""; // Reset background color for submenu items
-        // });
-
-        // // Find the button that matches the clickedButton and apply the purple background color
-        // document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"]`).forEach(button => {
-        //     if (button.innerText.trim() === clickedButton) {
-        //         button.style.backgroundColor = "purple"; // Set purple background for clicked submenu item
-
-        //         // Find the parent dropdown item that contains the clicked button
-        //         const parentButton = button.closest(`.dropdown-item[data-timer-id="${timerServerDropdownID}"]`);
-        //         if (parentButton) {
-        //             parentButton.style.backgroundColor = "red"; // Set red background for parent dropdown item
-        //         } else {
-        //             console.error("Parent dropdown item not found for:", clickedButton, timerServerDropdownID);
-        //         }
-
-        //         // Find the form button that corresponds to the timer ID
-        //         const formbtn = document.querySelector(`.form-btn[data-timer-id="${timerServerDropdownID}"]`);
-        //         if (formbtn) {
-        //             formbtn.style.backgroundColor = "orange"; // Set orange background for form button
-        //         } else {
-        //             console.error("Form button not found for:", timerServerDropdownID);
-        //         }
-        //     }
-        // });
-
-        // break;
-
-
-        // case "returnedFromServerSubmenuClick":
-        //   console.log("Received data from server:", data.msg);
-
-        //   const { timerServerDropdownID, clickedButton } = data.msg;
-        //   console.log("Timer ID:", timerServerDropdownID, "Clicked Button:", clickedButton);
-
-        //   // Reset background color for all submenu items
-        //   document.querySelectorAll(".submenu-item").forEach(button => {
-        //     button.style.backgroundColor = "";
-        //   });
-
-        //   // Find the clicked submenu item
-        //   document.querySelectorAll(".submenu-item").forEach(button => {
-        //     if (button.innerText.trim() === clickedButton) {
-        //       button.style.backgroundColor = "purple"; // Highlight the clicked submenu item
-
-        //       // Find the parent dropdown container
-        //       const parentDropdown = button.closest(".dropdown-item");
-        //       if (parentDropdown) {
-        //         parentDropdown.style.backgroundColor = "red"; // Highlight dropdown
-        //       } else {
-        //         console.error("Parent dropdown not found for:", clickedButton);
-        //       }
-
-        //       // Find the closest form button
-        //       const formBtn = button.closest(".form-container")?.querySelector(".form-btn");
-        //       if (formBtn) {
-        //         formBtn.style.backgroundColor = "orange"; // Highlight form button
-        //       } else {
-        //         console.error("Form button not found for:", clickedButton);
-        //       }
-        //     }
-        //   });
-
-        //   break;
-
-
-
-
-
-
-
-        // case "returnedFromServerSubmenuClick":
-        //   console.log("testing what is this first data " + JSON.stringify(data.msg));
-
-        //   const { timerServerDropdownID, clickedButton } = data.msg; // No redeclaration here
-        //   console.log("testing what is this data", JSON.stringify(data.msg));  // Use JSON.stringify to view object content
-
-        //   // Reset background color for all buttons
-        //   document.querySelectorAll(".submenu-item").forEach(button => {
-        //     button.style.backgroundColor = ""; // Reset all buttons first
-        //   });
-
-        //   document.querySelectorAll(".dropdown-item").forEach(button => {
-        //     button.style.backgroundColor = ""; // Reset all buttons first
-        //   });
-
-        //   // Find the button that matches both the clickedButton and timerServerDropdownID
-        //   document.querySelectorAll(".submenu-item").forEach(button => {
-        //     const buttonTimerServerID = button.getAttribute("data-timerServerID");
-
-        //     console.log("timerServerDropdownID" + timerServerDropdownID);
-        //     // If the button's data-timerServerID matches the one from the server, activate it
-        //     if (buttonTimerServerID === timerServerDropdownID) {
-        //       button.style.backgroundColor = "green"; // Set green background for clicked button
-
-        //       // Optionally, if you want to activate the parent button
-        //       const parentButton = button.closest(".dropdown-item");
-        //       if (parentButton) parentButton.style.backgroundColor = "green";
-
-        //       // Optionally, if you want to activate the form button
-        //       const formbtn = button.closest(".form-btn");
-        //       if (formbtn) formbtn.style.backgroundColor = "green";
-        //     }
-        //   });
-        //   break;
-
+    break;
 
 
 
@@ -1717,40 +1536,68 @@
 
 
 
+    let resetCycleCompleted = false; // Tracks if the first reset cycle has been completed
+
     function resetVotes() {
       console.log("In resetVotes (with colours)");
-      totalVotes = 0; // Reset total vote count
-      voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
 
-      // Reset all vote buttons
-      const voteBtns = document.querySelectorAll(".vote-btn");
-      voteBtns.forEach(voteBtn => {
-        voteBtn.style.backgroundColor = ""; // Remove background color
-        voteBtn.textContent = "Vote"; // Reset text to "Vote"
-        voteBtn.setAttribute("data-voted", "false"); // Reset vote state
-        voteBtn.disabled = true; // Enable voting again
+      // Reset vote tracking data
+      clickCountsMap = {};
+      formButtonSelections = {};
+      voterMap = {};
+      alreadyClicked = {};
+
+      // Reset total vote count display
+      totalVotes = 0;
+      voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
+
+      // Reset vote buttons
+      document.querySelectorAll(".vote-btn").forEach(voteBtn => {
+        voteBtn.style.backgroundColor = "";
+        voteBtn.textContent = "Vote";
+        voteBtn.setAttribute("data-voted", "false");
+        voteBtn.disabled = false; // Enable voting again
       });
 
-      const contentBtns = document.querySelectorAll(".content-btn"); // Use querySelectorAll to get all content-btn elements
-      contentBtns.forEach(contentBtn => {
-        contentBtn.style.backgroundColor = ""; // Remove background color
-        contentBtn.setAttribute("data-voted", "false"); // Reset vote state
-        contentBtn.disabled = false; // Enable voting again
-      });//contentBtns
-
-
-      // Reset the background color for all people-btn elements
-      const peopleBtns = document.querySelectorAll(".people-btn"); // Use querySelectorAll for global selection
-      peopleBtns.forEach(peopleBtn => {
-        peopleBtn.style.backgroundColor = ""; // Reset background color for each people button
+      // Reset content buttons
+      document.querySelectorAll(".content-btn").forEach(contentBtn => {
+        contentBtn.style.backgroundColor = "";
+        contentBtn.setAttribute("data-voted", "false");
+        contentBtn.disabled = false;
       });
 
+      // Reset the background color for all people buttons
+      document.querySelectorAll(".people-btn").forEach(peopleBtn => {
+        peopleBtn.style.backgroundColor = "";
+      });
+
+      // Reset previous selections stored in localStorage
+      localStorage.removeItem("previousSelections");
+
+      // Clear UI elements that track votes
+      const clickCountsList = document.getElementById("click-counts-list");
+      clickCountsList.innerHTML = ''; // Clear vote count list
+
+      // Reset dropdown buttons
       resetDropdownButtons();
 
+      // Notify other tabs that the votes were reset by storing a timestamp in localStorage
+      console.log("Date.now()" + Date.now());
+      localStorage.setItem("voteReset", Date.now());
 
-      sendTimerUpdate(); // Ensure the update is sent via WebSocket
-      //socket.send(JSON.stringify("vote is reset"));
-    }//end resetVotes
+      // Ensure the update is sent via WebSocket
+      sendTimerUpdate();
+
+    }
+
+    // Listen for reset events from other tabs
+    window.addEventListener("storage", (event) => {
+      if (event.key === "voteReset") {
+        console.log("Vote reset detected from another tab");
+        resetVotes(); // Trigger reset in the current tab
+      }
+    });
+
 
 
 
@@ -1814,54 +1661,6 @@
 
       const voteBtn = timerComponent.querySelector(".vote-btn");
       const timerVoteID = voteBtn.getAttribute("data-id"); // Get dynamic data-id
-
-      // // Function to handle voting
-      // voteBtn.addEventListener("click", () => {
-      //   let hasVoted = voteBtn.getAttribute("data-voted") === "true"; // Track vote per button
-
-      //   if (!hasVoted) {
-      //     totalVotes++; // Increment total vote count
-      //     voteBtn.setAttribute("data-voted", "true"); // Mark as voted
-      //     // voteBtn.textContent = "Unvote"; // Change text
-      //     // voteBtn.style.backgroundColor = "green"; // Green color for voted button
-      //     socket.send(JSON.stringify({ cmd: "addVote", msg: "Vote added", id: timerVoteID }));
-      //   } else {
-      //     totalVotes = Math.max(0, totalVotes - 1); // Prevent negative votes
-      //     voteBtn.setAttribute("data-voted", "false"); // Mark as unvoted
-      //     // voteBtn.textContent = "Vote"; // Reset text
-      //     // voteBtn.style.backgroundColor = ""; // Reset color
-      //     socket.send(JSON.stringify({ cmd: "removeVote", msg: "Vote Removed", id: timerVoteID }));
-
-      //   }
-
-      //   // Update the vote count display
-      //   voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
-
-      //   // Get the reset vote button
-      //   const resetVotesBtn = document.getElementById("resetVotesBtn");
-
-      //   // Prevent division by zero error
-      //   const votePercentage = numberCitizenTimers > 0 ? (totalVotes / numberCitizenTimers) * 100 : 0;
-
-      //   // Update the button color based on the vote percentage
-      //   if (votePercentage === 0) {
-      //     resetVotesBtn.style.backgroundColor = 'black';
-      //     resetVotesBtn.style.color = 'white';
-      //   } else if (votePercentage < 10) {
-      //     resetVotesBtn.style.backgroundColor = 'black';
-      //     resetVotesBtn.style.color = 'white';
-      //   } else if (votePercentage >= 10 && votePercentage < 70) {
-      //     resetVotesBtn.style.backgroundColor = 'red';
-      //     resetVotesBtn.style.color = 'black';
-      //   } else if (votePercentage >= 70 && votePercentage < 100) {
-      //     resetVotesBtn.style.backgroundColor = 'orange';
-      //     resetVotesBtn.style.color = 'black';
-      //   } else if (votePercentage === 100) {
-      //     resetVotesBtn.style.backgroundColor = 'green';
-      //     resetVotesBtn.style.color = 'black';
-      //   }
-      // });
-
 
 
 
@@ -1948,26 +1747,6 @@
 
 
 
-
-      // function toggleTimer(shouldStart) {
-      //   if (shouldStart) {
-      //     if (currentRunningTimer && currentRunningTimer !== timerComponent) {
-      //       currentRunningTimer.querySelector(".start-pause-btn").click(); // Stop the other timer
-      //     }
-      //     startTimer();
-      //     startAscendingTimer();
-
-      //   } else {
-      //     clearInterval(intervalId);
-      //     clearInterval(ascIntervalId);
-
-      //     intervalId = null;
-      //     ascIntervalId = null;
-
-      //     startPauseBtn.textContent = "▶️";
-      //     timerComponent.style.backgroundColor = ""; // Reset background color to default
-      //   }
-      // }
 
       function toggleTimer(shouldStart) {
         if (shouldStart) {
@@ -2093,41 +1872,6 @@
         }
       });
 
-      // startPauseBtn.addEventListener("click", () => {
-      //   if (intervalId === null) {
-      //     toggleTimer(true);
-      //   } else {
-      //     toggleTimer(false);
-      //   }
-      // });
-
-
-      /*
-            startPauseBtn.addEventListener("click", () => {
-              const isStarting = intervalId === null; // Determine if we are starting or pausing
-              const timerServerID = startPauseBtn.getAttribute("data-id"); // Extract the timer ID
-      
-              // Toggle timer locally
-              toggleTimer(isStarting);
-      
-              // Prepare data to send to the server
-              let responseObject = {
-                cmd: "toggleTimer",
-                msg: {
-                  timerServerID: timerServerID,
-                  shouldStart: isStarting,
-                  ELMxID: 0,
-      
-                }
-              };
-      
-              // Send the request to the server to update the timer state for all clients
-              socket.send(JSON.stringify(responseObject));
-      
-              console.log("Sent toggleTimer request to server:", responseObject);
-            });
-      
-      */
       resetDefaultBtn.addEventListener("click", () => {
         clearInterval(intervalId);
         clearInterval(ascIntervalId);
@@ -2204,13 +1948,7 @@
           resetVotesBtn.style.color = 'black';
         }
 
-        /*
-                clearInterval(intervalId);
-                timerComponent.remove();
-                if (currentRunningTimer === timerComponent) {
-                  currentRunningTimer = null; // Reset if this was the running timer
-                }
-        */
+
         // Prepare data to send to the server
         let responseObject = {
           cmd: "removeTimer",
@@ -2249,76 +1987,76 @@
 
     let alreadyClicked = {}; // Now an object instead of a Set
 
-function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID) {
-  const clickCountsList = document.getElementById("click-counts-list");
-  const name = timerServerDropdownID.split('-').slice(1).join('-');
+    function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID) {
+      const clickCountsList = document.getElementById("click-counts-list");
+      const name = timerServerDropdownID.split('-').slice(1).join('-');
 
-  console.log("timerFromNewName: " + timerFromNewName);
+      console.log("timerFromNewName: " + timerFromNewName);
 
-  // Ensure we track votes per user
-  if (!alreadyClicked[timerFromNewName]) {
-    alreadyClicked[timerFromNewName] = new Set();
-  }
+      // Ensure we track votes per user
+      if (!alreadyClicked[timerFromNewName]) {
+        alreadyClicked[timerFromNewName] = new Set();
+      }
 
-  // Check if this user has already voted for this option
-  if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
-    alert(`You have already voted for ${name}!`);
-    return;
-  }
+      // Check if this user has already voted for this option
+      if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
+        alert(`You have already voted for ${name}!`);
+        return;
+      }
 
-  // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
-  if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
-    const previousTimerServerDropdownID = formButtonSelections[formButtonID];
-    const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
+      // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
+      if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
+        const previousTimerServerDropdownID = formButtonSelections[formButtonID];
+        const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
 
-    if (clickCountsMap[previousName]) {
-      clickCountsMap[previousName] -= 1;
+        if (clickCountsMap[previousName]) {
+          clickCountsMap[previousName] -= 1;
 
-      // Remove the previous voter from the list
-      if (voterMap[previousName]) {
-        voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
-        if (voterMap[previousName].length === 0) {
-          delete voterMap[previousName];
+          // Remove the previous voter from the list
+          if (voterMap[previousName]) {
+            voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
+            if (voterMap[previousName].length === 0) {
+              delete voterMap[previousName];
+            }
+          }
+
+          if (clickCountsMap[previousName] <= 0) {
+            delete clickCountsMap[previousName];
+          }
+
+          // Remove previous selection from alreadyClicked
+          alreadyClicked[timerFromNewName].delete(previousTimerServerDropdownID);
         }
       }
 
-      if (clickCountsMap[previousName] <= 0) {
-        delete clickCountsMap[previousName];
+      // Mark this selection for the formButtonID
+      formButtonSelections[formButtonID] = timerServerDropdownID;
+
+      // Increment vote count correctly
+      clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
+
+      // Store the voter's name
+      if (!voterMap[name]) {
+        voterMap[name] = [];
+      }
+      if (!voterMap[name].includes(timerFromNewName)) {
+        voterMap[name].push(timerFromNewName);
       }
 
-      // Remove previous selection from alreadyClicked
-      alreadyClicked[timerFromNewName].delete(previousTimerServerDropdownID);
+      // Mark this vote in alreadyClicked
+      alreadyClicked[timerFromNewName].add(timerServerDropdownID);
+
+      // Clear and update display
+      clickCountsList.innerHTML = '';
+      for (let [key, count] of Object.entries(clickCountsMap)) {
+        if (count > 0) {
+          const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+          const listItem = document.createElement("li");
+          listItem.textContent = `(${voters}) voted for (${key}): ${count} Vote${count > 1 ? 's' : ''}`;
+          clickCountsList.appendChild(listItem);
+        }
+      }
     }
-  }
-
-  // Mark this selection for the formButtonID
-  formButtonSelections[formButtonID] = timerServerDropdownID;
-
-  // Increment vote count correctly
-  clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
-
-  // Store the voter's name
-  if (!voterMap[name]) {
-    voterMap[name] = [];
-  }
-  if (!voterMap[name].includes(timerFromNewName)) {
-    voterMap[name].push(timerFromNewName);
-  }
-
-  // Mark this vote in alreadyClicked
-  alreadyClicked[timerFromNewName].add(timerServerDropdownID);
-
-  // Clear and update display
-  clickCountsList.innerHTML = '';
-  for (let [key, count] of Object.entries(clickCountsMap)) {
-    if (count > 0) {
-      const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
-      const listItem = document.createElement("li");
-      listItem.textContent = `(${voters}) voted for (${key}): ${count} Vote${count > 1 ? 's' : ''}`;
-      clickCountsList.appendChild(listItem);
-    }
-  }
-}
 
 
 
@@ -2559,27 +2297,6 @@ function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNew
       });
     }
 
-    /*
-    function resetButtons() {
-          console.log("RESET BUTTON PUSHED:");
-          const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
-          const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
-          const contentBtn = document.getElementById("contentdata"); // Ensure correct selection
-
-          // Reset all submenu and parent buttons
-          allButtons.forEach(button => button.style.backgroundColor = "");
-          parentButtons.forEach(parent => parent.style.backgroundColor = "");
-
-          // Change dropdown menu background to red
-          // dropdownMenu.style.backgroundColor = "red";
-
-          // Change Content button background to red properly
-          if (contentBtn) {
-            contentBtn.style.backgroundColor = "red";
-          }
-        }//end resetButtons
-
-*/
     ///////////////NEXT FUNCTION (they must go in this order. )
 
     function createTimerComponent(allThisTimerDataFromServer, timerList, totalVotes) {
@@ -3005,33 +2722,11 @@ function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNew
           });
 
           // Apply background color to the clicked item
-          e.target.style.backgroundColor = "green"; // You can change the color as needed
-          peopleBtn.style.backgroundColor = "green"; // Change to desired color
+          // e.target.style.backgroundColor = "green"; // You can change the color as needed
+          // peopleBtn.style.backgroundColor = "green"; // Change to desired color
 
           const action = e.target.dataset.action;
 
-          // switch (action) {
-          //   case "same":
-          //     console.log("Same People selected");
-          //     break;
-          //   case "remove":
-          //     console.log("Remove People selected");
-          //     break;
-          //   case "add":
-          //     console.log("Add People selected");
-          //     break;
-          // }
-
-
-
-
-          // Prevent duplicate WebSocket messages
-          // if (e.target.dataset.clicked) return;
-          // e.target.dataset.clicked = true;
-
-          // setTimeout(() => {
-          //   delete e.target.dataset.clicked; // Allow future clicks after delay
-          // }, 500);
           let ELMxID = 0;
           // Construct the data object to send via WebSocket
           const data = {
