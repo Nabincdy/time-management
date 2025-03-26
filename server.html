@@ -408,13 +408,14 @@
       }
     }
 
-    button#resetVotesBtn {
-      padding: 5px 10px;
+
+    .resetVotesBtn {
+      cursor: pointer;
+      padding: 15px 20px;
       border: none;
       background-color: black;
       color: white;
       border-radius: 5px;
-      cursor: pointer;
       font-size: 14px;
     }
 
@@ -465,9 +466,9 @@
       </div>
 
 
-      <div class="info-box">
+      <div class="info-box" id="form-data-display">
         ⭐ <span>Form:</span>
-        <p>Straight turn</p>
+        <p></p>
       </div>
 
       <div class="info-box">
@@ -485,7 +486,8 @@
 
     <div id="numberCitizenTimers">Number Citizen Timers: 0</div>
 
-    <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button>
+    <button id="resetVotesBtn" class="resetVotesBtn" title="Reset Votes">Reset Votes</button>
+    <div id="reset-count-display">Total Metting Cycles: F0 times</div>
 
     <!-- <div id="voteData">Total Votes: 0</div> -->
     <h3>Vote Counts:</h3>
@@ -907,8 +909,8 @@
 
 
   <script>
-    // const socket = new WebSocket("ws://69.197.142.130:8082");
-    const socket = new WebSocket("http://localhost:8082/");
+    // const socket = new WebSocket("ws://69.197.142.130:8084");
+    const socket = new WebSocket("http://localhost:8084/");
 
     socket.onopen = function () {
       console.log("Connected to   WebSocket server");
@@ -1546,79 +1548,212 @@
 
 
 
-    let resetCycleCompleted = false; // Tracks if the first reset cycle has been completed
+    // let resetCycleCompleted = false; // Tracks if the first reset cycle has been completed
 
-    function resetVotes() {
-      console.log("In resetVotes (with colours)");
+    // function resetVotes() {
+    //   console.log("In resetVotes (with colours)");
 
-      // Reset vote tracking data
-      clickCountsMap = {};
-      formButtonSelections = {};
-      voterMap = {};
-      alreadyClicked = {};
+    //   // Reset vote tracking data
+    //   clickCountsMap = {};
+    //   formButtonSelections = {};
+    //   voterMap = {};
+    //   alreadyClicked = {};
 
-      // Reset total vote count display
-      totalVotes = 0;
-      voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
+    //   // Reset total vote count display
+    //   totalVotes = 0;
+    //   voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
 
-      // Reset vote buttons
-      document.querySelectorAll(".vote-btn").forEach(voteBtn => {
-        voteBtn.style.backgroundColor = "";
-        voteBtn.textContent = "Vote";
-        voteBtn.setAttribute("data-voted", "false");
-        voteBtn.disabled = true; // Enable voting again
-      });
+    //   // Reset vote buttons
+    //   document.querySelectorAll(".vote-btn").forEach(voteBtn => {
+    //     voteBtn.style.backgroundColor = "";
+    //     voteBtn.textContent = "Vote";
+    //     voteBtn.setAttribute("data-voted", "false");
+    //     voteBtn.disabled = true; // Enable voting again
+    //   });
 
-      // Reset content buttons
-      document.querySelectorAll(".content-btn").forEach(contentBtn => {
-        contentBtn.style.backgroundColor = "";
-        contentBtn.setAttribute("data-voted", "false");
-        contentBtn.disabled = false;
-      });
+    //   // Reset content buttons
+    //   document.querySelectorAll(".content-btn").forEach(contentBtn => {
+    //     contentBtn.style.backgroundColor = "";
+    //     contentBtn.setAttribute("data-voted", "false");
+    //     contentBtn.disabled = false;
+    //   });
 
-      // Reset the background color for all people buttons
-      document.querySelectorAll(".people-btn").forEach(peopleBtn => {
-        peopleBtn.style.backgroundColor = "";
-      });
+    //   // Reset the background color for all people buttons
+    //   document.querySelectorAll(".people-btn").forEach(peopleBtn => {
+    //     peopleBtn.style.backgroundColor = "";
+    //   });
 
-      // Reset previous selections stored in localStorage
-      localStorage.removeItem("previousSelections");
+    //   // Reset previous selections stored in localStorage
+    //   localStorage.removeItem("previousSelections");
 
-      // Clear UI elements that track votes
-      const clickCountsList = document.getElementById("click-counts-list");
-      clickCountsList.innerHTML = ''; // Clear vote count list
+    //   // Clear UI elements that track votes
+    //   const clickCountsList = document.getElementById("click-counts-list");
+    //   clickCountsList.innerHTML = ''; // Clear vote count list
 
-      // Reset dropdown buttons
-      resetDropdownButtons();
+    //   // Reset dropdown buttons
+    //   resetDropdownButtons();
 
-      // Notify other tabs that the votes were reset by storing a timestamp in localStorage
-      console.log("Date.now()" + Date.now());
-      localStorage.setItem("voteReset", Date.now());
+    //   // Notify other tabs that the votes were reset by storing a timestamp in localStorage
+    //   console.log("Date.now()" + Date.now());
+    //   localStorage.setItem("voteReset", Date.now());
 
-      // Ensure the update is sent via WebSocket
-      sendTimerUpdate();
+    //   // Ensure the update is sent via WebSocket
+    //   sendTimerUpdate();
 
+    // }
+
+    // // Listen for reset events from other tabs
+    // window.addEventListener("storage", (event) => {
+    //   if (event.key === "voteReset") {
+    //     console.log("Vote reset detected from another tab");
+    //     resetVotes(); // Trigger reset in the current tab
+    //   }
+    // });
+
+
+
+
+
+    // function resetDropdownButtons() {
+    //   const buttons = document.querySelectorAll("#formbtn, .dropdown-item, .submenu-item");
+
+    //   buttons.forEach(button => {
+    //     button.style.backgroundColor = ""; // Reset background color for all buttons
+    //   });
+    // }//end resetDropdownButtons
+
+
+
+    let resetClickCount = 0; // Reset click count tracked in session
+
+    function updateResetClickDisplay() {
+      const resetCountDisplay = document.getElementById("reset-count-display");
+      if (resetCountDisplay) {
+        resetCountDisplay.textContent = `Total Metting Cycles: F${resetClickCount} times`;
+      }
     }
 
-    // Listen for reset events from other tabs
-    window.addEventListener("storage", (event) => {
-      if (event.key === "voteReset") {
-        console.log("Vote reset detected from another tab");
-        resetVotes(); // Trigger reset in the current tab
+    const resetVotesBtn = document.getElementById("resetVotesBtn");
+
+    // const resetVotesBtn = document.getElementById("resetVotesBtn");
+      // resetVotesBtn.style.backgroundColor = 'black';
+      // resetVotesBtn.style.color = 'white';
+
+    function resetVotes(isManualReset = true) {
+      console.log("In resetVotes (with colours)");
+      const resetVotesBtn = document.getElementById("resetVotesBtn");
+
+      if (isManualReset) {
+        // working 1
+        document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+        console.log('numberCitizenTimers', numberCitizenTimers);
+
+        const totalVotesOfForm = Object.values(clickCountsMap).reduce((sum, count) => sum + count, 0);
+        console.log('Total Votes totalVotesOfForm:', totalVotesOfForm);
+
+        if (numberCitizenTimers === totalVotesOfForm) {
+
+
+          if (resetVotesBtn) {
+            // resetVotesBtn.style.backgroundColor = 'green';  // Set background color to green
+            // resetVotesBtn.style.color = 'white';  // Set text color to white
+
+            resetVotesBtn.style.backgroundColor = 'blue';
+            resetVotesBtn.style.color = 'white';
+
+          }
+
+          clickCountsMap = {};
+          formButtonSelections = {};
+          voterMap = {};
+          alreadyClicked = {};
+
+          // Reset total vote count display
+          totalVotes = 0;
+          voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
+
+          // Reset vote buttons
+          document.querySelectorAll(".vote-btn").forEach(voteBtn => {
+            voteBtn.style.backgroundColor = "";
+            voteBtn.textContent = "Vote";
+            voteBtn.setAttribute("data-voted", "false");
+            voteBtn.disabled = true;
+          });
+
+          // Reset content buttons
+          document.querySelectorAll(".content-btn").forEach(contentBtn => {
+            contentBtn.style.backgroundColor = "";
+            contentBtn.setAttribute("data-voted", "false");
+            contentBtn.disabled = false;
+          });
+
+          // Reset people buttons
+          document.querySelectorAll(".people-btn").forEach(peopleBtn => {
+            peopleBtn.style.backgroundColor = "";
+          });
+
+          const clickCountsList = document.getElementById("click-counts-list");
+          if (clickCountsList) clickCountsList.innerHTML = '';
+
+
+
+
+          resetClickCount++;
+          resetDropdownButtons();
+
+          updateResetClickDisplay();  // Only call if they are equal
+        } else {
+          console.log("Number Citizen Timers and Total Votes don't match.");
+        }
+
+        // resetClickCount++;
+        // updateResetClickDisplay();
+
+
+
+        // Send reset count to server
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({ cmd: "voteReset", msg: resetClickCount }));
+        }
       }
-    });
+      // Notify other tabs via WebSocket
+      sendTimerUpdate();
+    }
 
-
-
-
+    // Listen for reset events from WebSocket
+    if (socket) {
+      socket.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "voteReset") {
+          console.log("Vote reset detected from WebSocket message");
+          resetVotes(false); // Prevent incrementing the count again
+        }
+      });
+    }
 
     function resetDropdownButtons() {
-      const buttons = document.querySelectorAll("#formbtn, .dropdown-item, .submenu-item");
-
-      buttons.forEach(button => {
-        button.style.backgroundColor = ""; // Reset background color for all buttons
+      document.querySelectorAll("#formbtn, .dropdown-item, .submenu-item").forEach(button => {
+        button.style.backgroundColor = "";
       });
-    }//end resetDropdownButtons
+    }
+
+    // Ensure reset count is displayed on page load
+    document.addEventListener("DOMContentLoaded", updateResetClickDisplay);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2058,6 +2193,34 @@
       // Mark this vote in alreadyClicked
       alreadyClicked[timerFromNewName].add(timerServerDropdownID);
 
+
+      // Print the total count of votes (ignoring the keys)
+      // working 2
+      // const totalVotesOfForm = Object.values(clickCountsMap).reduce((sum, count) => sum + count, 0);
+      // console.log('Total Votes totalVotesOfForm:', totalVotesOfForm);
+
+
+
+    // Find the person with the highest vote count
+let highestVotesName = "";
+let highestVotesCount = 0;
+
+for (let [key, count] of Object.entries(clickCountsMap)) {
+  if (count > highestVotesCount) {
+    highestVotesName = key;
+    highestVotesCount = count;
+  }
+}
+
+console.log(`Person with highest vote count: ${highestVotesName} with ${highestVotesCount} votes`);
+//working 3
+// Display the message in HTML inside the #form-data-display element
+const formDataDisplay = document.getElementById('form-data-display');
+if (formDataDisplay) {
+  const message = ` ${highestVotesName} with ${highestVotesCount} votes`;
+  formDataDisplay.innerHTML = `⭐ <span>Form:</span> <p>${message}</p>`;
+}
+
       // Clear and update display
       clickCountsList.innerHTML = '';
       for (let [key, count] of Object.entries(clickCountsMap)) {
@@ -2218,64 +2381,64 @@
 
 
     let peopleClickCounts = {}; // Stores total selections for each action
-let peopleSelections = {}; // Maps buttonID to its selected action
-let peopleVoterMap = {}; // Stores list of voters per action
+    let peopleSelections = {}; // Maps buttonID to its selected action
+    let peopleVoterMap = {}; // Stores list of voters per action
 
-function updatePeopleClickCountDisplay(selectedAction, buttonID, buttonPeopleText, timerPeopleNewName) {
-    const peopleClickCountsList = document.getElementById("people-click-counts-list");
-    const actionName = selectedAction; // Name of the selected action
+    function updatePeopleClickCountDisplay(selectedAction, buttonID, buttonPeopleText, timerPeopleNewName) {
+      const peopleClickCountsList = document.getElementById("people-click-counts-list");
+      const actionName = selectedAction; // Name of the selected action
 
-    console.log(`Updating click count display for: ${actionName}, Timer Name: ${timerPeopleNewName}`);
+      console.log(`Updating click count display for: ${actionName}, Timer Name: ${timerPeopleNewName}`);
 
-    // Ensure we track voters per action (not per user)
-    if (!peopleVoterMap[actionName]) {
+      // Ensure we track voters per action (not per user)
+      if (!peopleVoterMap[actionName]) {
         peopleVoterMap[actionName] = new Set();
-    }
+      }
 
-    // Prevent duplicate selection by the same user
-    if (peopleVoterMap[actionName].has(timerPeopleNewName)) {
+      // Prevent duplicate selection by the same user
+      if (peopleVoterMap[actionName].has(timerPeopleNewName)) {
         alert(`"${timerPeopleNewName}" has already selected "${actionName}"!`);
         return;
-    }
+      }
 
-    // If this buttonID previously selected a different action, decrease its count
-    if (peopleSelections[buttonID] && peopleSelections[buttonID] !== selectedAction) {
+      // If this buttonID previously selected a different action, decrease its count
+      if (peopleSelections[buttonID] && peopleSelections[buttonID] !== selectedAction) {
         const previousAction = peopleSelections[buttonID];
 
         if (peopleClickCounts[previousAction]) {
-            peopleClickCounts[previousAction] -= 1;
+          peopleClickCounts[previousAction] -= 1;
 
-            // Remove the previous voter from the list
-            if (peopleVoterMap[previousAction]) {
-                peopleVoterMap[previousAction].delete(timerPeopleNewName);
-            }
+          // Remove the previous voter from the list
+          if (peopleVoterMap[previousAction]) {
+            peopleVoterMap[previousAction].delete(timerPeopleNewName);
+          }
 
-            if (peopleClickCounts[previousAction] <= 0) {
-                delete peopleClickCounts[previousAction];
-            }
+          if (peopleClickCounts[previousAction] <= 0) {
+            delete peopleClickCounts[previousAction];
+          }
         }
-    }
+      }
 
-    // Mark this selection for the buttonID
-    peopleSelections[buttonID] = selectedAction;
+      // Mark this selection for the buttonID
+      peopleSelections[buttonID] = selectedAction;
 
-    // Increment vote count correctly
-    peopleClickCounts[actionName] = (peopleClickCounts[actionName] || 0) + 1;
+      // Increment vote count correctly
+      peopleClickCounts[actionName] = (peopleClickCounts[actionName] || 0) + 1;
 
-    // Store the voter
-    peopleVoterMap[actionName].add(timerPeopleNewName);
+      // Store the voter
+      peopleVoterMap[actionName].add(timerPeopleNewName);
 
-    // Clear and update display
-    peopleClickCountsList.innerHTML = '';
-    for (let [key, count] of Object.entries(peopleClickCounts)) {
+      // Clear and update display
+      peopleClickCountsList.innerHTML = '';
+      for (let [key, count] of Object.entries(peopleClickCounts)) {
         if (count > 0) {
-            const voters = Array.from(peopleVoterMap[key]).join(", ") || "Unknown";
-            const listItem = document.createElement("li");
-            listItem.textContent = `(${voters}) selected "${key}": ${count} time${count > 1 ? 's' : ''}`;
-            peopleClickCountsList.appendChild(listItem);
+          const voters = Array.from(peopleVoterMap[key]).join(", ") || "Unknown";
+          const listItem = document.createElement("li");
+          listItem.textContent = `(${voters}) selected "${key}": ${count} time${count > 1 ? 's' : ''}`;
+          peopleClickCountsList.appendChild(listItem);
         }
+      }
     }
-}
 
 
 
@@ -2826,8 +2989,8 @@ function updatePeopleClickCountDisplay(selectedAction, buttonID, buttonPeopleTex
           let ELMxID = 0;
           // Construct the data object to send via WebSocket
 
-          console.log("Clicked Button:", e.target); 
-// console.log("Extracted Button Text:", e.target.innerText.trim());
+          console.log("Clicked Button:", e.target);
+          // console.log("Extracted Button Text:", e.target.innerText.trim());
           buttonPeopleText = e.target.innerText.trim();
 
           const data = {
@@ -2963,7 +3126,6 @@ function updatePeopleClickCountDisplay(selectedAction, buttonID, buttonPeopleTex
       //Change the Reset Button Colour in case in mid vote, colours will update
       // Get the button DOM element
       const resetVotesBtn = document.getElementById("resetVotesBtn");
-
 
 
 

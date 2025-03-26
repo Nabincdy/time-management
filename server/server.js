@@ -246,6 +246,16 @@ globalELMxArray = {
             "totalVotePeopleTime": "not yet",
             "individualParticipantVotes": {
                 "participant1": {
+
+                    "vetoes":{ //globalELMxArray[0].votes.individualParticipantVotes.participant1.vetoes.formVeto = current  + 1;
+                    		"formVeto": 0, 
+                    		"formTimeVeto": 1,
+                    		"contentVeto": 0,
+                    		"contentTimeVeto": 2,
+                    		"peopleVeto": 1,
+                    		"peopleTimeVeto": 1
+                    	     },
+                             
                     "participant1CurrentVoting": {
                         "VoteForm": "not yet",
                         "voteFormString": "not yet",
@@ -1177,7 +1187,8 @@ wss.on("connection", (ws) => {
 });
 
 // Start the server
-const PORT = 8082;
+// const PORT = 8082;
+const PORT = 8084;
 server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}/`);
 });
