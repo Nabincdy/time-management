@@ -1,36 +1,3290 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Input</title>
+  <meta charset="UTF-8" />
+  <title>Dynamic Timer Components with Voice Recorder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400..800&display=swap" rel="stylesheet" />
+  <!-- <link rel="stylesheet" href="style.css"> -->
+
+  <style>
+    .inline-block {
+      display: inline-block;
+    }
+
+    body {
+      font-family: "Rethink Sans", -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue,
+        helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+      font-optical-sizing: auto;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 1.67;
+      background-color: #e5e7e9;
+    }
+
+    input {
+      font-size: inherit;
+      background-color: transparent;
+    }
+
+    .config {
+      margin-bottom: 20px;
+    }
+
+    #defaultTime {
+      font-size: 24px;
+      border: none;
+      background-color: #f9f9f8;
+    }
+
+    #timerList {
+      /* display timers in an auto-flowing grid */
+      display: contents;
+      grid-template-columns: repeat(auto-fit, minmax(496px, max-content));
+      grid-auto-rows: auto;
+      grid-gap: 12px;
+      margin: 20px 0px;
+
+
+      /* display: flex; */
+      /*flex-wrap: wrap; /* /* Allows wrapping if the screen size is too small */
+      /* gap: 10px;/* /* Optional, for spacing between the timers */
+
+    }
+
+    .timer {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background-color: #f9f9f8;
+      border-radius: 8px 20px 20px 8px;
+      width: max-content;
+      margin: 10px 0px;
+    }
+
+    .timer-title {
+      /* elegant and readable editable title */
+      width: 144px;
+      font-family: "Rethink Sans", -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue,
+        helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+      font-optical-sizing: auto;
+      font-weight: 500;
+      line-height: 1.67;
+      font-size: 18px;
+      border: none;
+      flex-basis: 1;
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+
+    .timer-value {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      width: 80px;
+      font-size: 30px;
+      border: none;
+      color: gold;
+      font-weight: 600;
+      background: black;
+      margin-right: 8px;
+      border-radius: 10px;
+    }
+
+    .timer-asc {
+      width: 80px;
+      font-size: 12px;
+      text-align: center;
+      border: none;
+    }
+
+    .timer-value:focus {
+      border: initial;
+      color: black;
+      background-color: yellow;
+    }
+
+    .timer-asc:focus {
+      border: initial;
+      background-color: yellow;
+    }
+
+    .flex-row {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .btn-container {
+      padding: 4px;
+      border-radius: 20px;
+      position: relative;
+      margin: 0;
+      overflow: auto;
+      background: -moz-linear-gradient(top, #aca79b 0%, #fcfbfa 100%);
+      background: -webkit-linear-gradient(top, #aca79b 0%, #fcfbfa 100%);
+      background: linear-gradient(to bottom, #aca79b 0%, #fcfbfa 100%);
+    }
+
+    .btn-container:before {
+      content: "";
+      display: block;
+      clear: both;
+      width: calc(100% - 11px);
+      box-shadow: inset 0 0 50px #000;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      height: calc(100% - 9px);
+      transform: translateX(-50%) translateY(-50%);
+      border-radius: 17px;
+    }
+
+    .btn-container>button {
+      font-size: 14px;
+      position: relative;
+      padding: 9px 12px;
+      border: none;
+      z-index: 1;
+      border-radius: 15px;
+      margin: 3px 2px 3px 0px;
+      box-shadow: inset 0 2px 2px #fff, inset 0 -1px 2px #aeaba4;
+      background: #ece7df;
+      line-height: 1;
+      transition: all 0.15s ease;
+    }
+
+    .btn-container>button:first-child {
+      margin-left: 4px;
+      margin-right: 2px;
+    }
+
+    .btn-container>button:last-child {
+      margin-left: 0px;
+      margin-right: 4px;
+    }
+
+    .btn-container>button:only-child {
+      margin-left: 4px;
+      margin-right: 4px;
+    }
+
+
+
+    .btn-container>button:hover {
+      box-shadow: inset 0 1px 1px #fff, inset 0 -1px 2px #aeaba4, inset 0 0 1px rgba(0, 0, 0, 0.25),
+        inset 0 0px 1px rgba(0, 0, 0, 0.25);
+
+    }
+
+    .btn-container>button:active {
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25), inset 0 5px 10px rgba(0, 0, 0, 0.25), inset 0 2px 2px #ddd,
+        inset 0 -1px 2px #9d9b94;
+    }
+
+    .btn-container>button:active:after {
+      width: 67%;
+      height: 67%;
+    }
+
+    .btn-container .start-pause-btn {
+      padding-left: 48px;
+      padding-right: 48px;
+    }
+
+
+
+    /* Add your styles here */
+    .timer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: #f9f9f8;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .timer-title {
+      font-size: 18px;
+      font-weight: bold;
+      width: 150px;
+      text-align: center;
+      border: none;
+      background-color: #f0f0f0;
+    }
+
+    .timer-value {
+      width: 80px;
+      font-size: 24px;
+      text-align: center;
+      border: none;
+    }
+
+    button {
+      padding: 5px 10px;
+      font-size: 16px;
+    }
+
+
+
+    /* content */
+
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    .show-dropdown {
+      display: flex;
+    }
+
+    .dropdown-item {
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .dropdown-item:hover {
+      background-color: #f0f0f0;
+    }
+
+
+
+
+
+
+    /* content */
+
+    /* Dropdown Menu Base Styles */
+    .dropdown-menu {
+      position: absolute;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      display: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      opacity: 0;
+      transform: scale(0.9);
+    }
+
+    .show-dropdown {
+      display: flex;
+      opacity: 1;
+      left: 25%;
+      transform: scale(1);
+    }
+
+    /* Main Menu Item Styles */
+    .dropdown-item {
+      position: relative;
+      padding: 10px 20px;
+      cursor: pointer;
+      background: #f4f4f4;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .dropdown-item:hover {
+      background: #4caf50;
+      color: #fff;
+    }
+
+    /* Submenu Styles */
+    .submenu {
+      display: none;
+      position: absolute;
+      /* left: 100%; */
+      top: 38px;
+      background: #f9f9f9;
+      border-radius: 5px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      opacity: 0;
+      transform: translateX(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .dropdown-item:hover .submenu {
+      display: flex;
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Submenu Item Styles */
+    .submenu-item {
+      display: block;
+      padding: 8px 16px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      margin: 5px 0;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .submenu-item:hover {
+      background: #81c784;
+      color: #fff;
+    }
+
+
+
+
+
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .col {
+      flex: 1;
+      padding: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    #contentForm input {
+      border-radius: 5px;
+      padding: 5px 10px;
+    }
+
+
+
+
+    /* style section for top star data  */
+
+
+    .info-container {
+      display: flex;
+      flex-wrap: wrap;
+      /* Allows wrapping for smaller screens */
+      gap: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      font-family: Arial, sans-serif;
+      /* justify-content: center; */
+    }
+
+    .info-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+      white-space: nowrap;
+      /* Prevents breaking text inside */
+    }
+
+    .info-box span {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .info-box p {
+      margin: 0;
+      color: #555;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .info-container {
+        flex-direction: column;
+        /* Stack elements in a column */
+        align-items: center;
+      }
+
+      .info-box {
+        width: 90%;
+        /* Makes boxes take more space on smaller screens */
+        justify-content: center;
+      }
+    }
+
+
+    .resetVotesBtn {
+      cursor: pointer;
+      padding: 15px 20px;
+      border: none;
+      background-color: black;
+      color: white;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    #voteData {
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* end star section */
+
+
+
+    /* people section */
+    .dropdown-item.active {
+      background-color: green !important;
+      color: white;
+    }
+
+
+    /* people section end */
+  </style>
 </head>
+
 <body>
-    <h1>Input Data Sync with WebSocket</h1>
-    <input type="text" id="inputField" placeholder="Type something..." />
-    <p>Data from input: <span id="displayData"></span></p>
+  <div class="config">
+    <label>
+      <input type="checkbox" id="notifyCheckbox" />
+      Enable System Notifications
+    </label>
+
+    <h1>Showing up on time helps give Sacred time. Otherwise others can donate some of their sacred time.</h1>
+    <br />
+
+    <label class="defaultTimeLabel">
+      Default Time:
+      <input type="text" id="defaultTime" value="5:00" placeholder="Default Time M:SS" />
+    </label>
+    <div class="btn-container inline-block">
+      <button id="addTimerBtn" title="Add A Timer">➕</button>
+    </div>
+
+    <div class="info-container">
+      <div class="info-box">
+        ⭐ <span>Votes:</span>
+        <p id="voteData">
+          Total Votes: 0
+        </p>
+      </div>
+
+
+      <div class="info-box" id="form-data-display">
+        ⭐ <span>Form:</span>
+        <p></p>
+      </div>
+
+      <div class="info-box">
+        ⭐ <span>Content:</span>
+        <p>Universal-Ai</p>
+      </div>
+
+      <div class="info-box">
+        ⭐ <span>People:</span>
+        <p>Same</p>
+      </div>
+    </div>
+
+
+
+    <div id="numberCitizenTimers">Number Citizen Timers: 0</div>
+
+    <button id="resetVotesBtn" class="resetVotesBtn" title="Reset Votes">Reset Votes</button>
+    <div id="reset-count-display">Total Metting Cycles: F0 times</div>
+
+    <!-- <div id="voteData">Total Votes: 0</div> -->
+    <h3>Vote Counts:</h3>
+    <ul id="click-counts-list"></ul> <!-- This will hold the list of button click counts -->
+    <div id="people-click-counts-container" style="margin-top: 10px;">
+      <h3>People Selection Count</h3>
+      <ul id="people-click-counts-list"></ul>
+    </div>
+
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      .toggle-btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 5px;
+      }
+
+      .toggle-btn:hover {
+        background-color: #0056b3;
+      }
+
+      .table-container {
+        margin-top: 10px;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out;
+      }
+
+      .hidden {
+        max-height: 0;
+        visibility: hidden;
+        transition: max-height 0.4s ease-in, visibility 0.2s ease-in;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f4f4f4;
+      }
+
+      .timer-veto {
+        width: 40px;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+        color: #333;
+        transition: border-color 0.3s, background-color 0.3s;
+      }
+
+      /* Change border color when the input field is focused */
+      .timer-veto:focus {
+        border-color: #4CAF50;
+        background-color: #e8f5e9;
+        outline: none;
+      }
+
+      /* Add a box shadow effect for better focus */
+      .timer-veto:focus {
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+      }
+
+      /* Optional: Add placeholder text styling */
+      .timer-veto::placeholder {
+        color: #999;
+        /* Gray placeholder text */
+        font-style: italic;
+      }
+    </style>
+
+
+
+
+
+
+
+
+    <button class="toggle-btn" onclick="toggleTable()">Total Cycle</button>
+
+    <div class="table-container hidden" id="tableContainer">
+      <table>
+        <thead>
+          <tr>
+            <th>User Name</th>
+            <th>Cycle 1</th>
+            <th>Cycle 2</th>
+            <th>Cycle 3</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>John Doe</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+
+          </tr>
+          <tr>
+            <td>Jane Smith</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+          </tr>
+          <tr>
+            <td>Michael Brown</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+            <td>cycle data</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <script>
-        // Connect to WebSocket server
-        const socket = new WebSocket('ws://localhost:8080');
+      function toggleTable() {
+        let tableContainer = document.getElementById("tableContainer");
 
-        // When the connection is open, log a message
-        socket.addEventListener('open', function () {
-            console.log('Connected to WebSocket server');
-        });
-
-        // Send input field data to WebSocket server when typed
-        const inputField = document.getElementById('inputField');
-        inputField.addEventListener('input', function () {
-            const inputData = inputField.value;
-            socket.send(inputData); // Send data to the server
-        });
-
-        // Listen for incoming messages from WebSocket server and update the display
-        socket.addEventListener('message', function (event) {
-            const displayData = document.getElementById('displayData');
-            displayData.textContent = event.data; // Display received data
-        });
+        if (tableContainer.classList.contains("hidden")) {
+          tableContainer.classList.remove("hidden");
+          tableContainer.style.maxHeight = tableContainer.scrollHeight + "px";
+        } else {
+          tableContainer.style.maxHeight = "0";
+          setTimeout(() => {
+            tableContainer.classList.add("hidden");
+          }, 400); // Delay to match transition
+        }
+      }
     </script>
+
+
+
+    <div id="mainTimerContainer" class="timer">
+      <input type="text" id2="mainTimerID2-1" id="timerTitle" class="timer-title" value="Total Time"
+        oninput="updateTimerTitle()" />
+      <input type="text" id2="mainTimerID2-2" id="mainTimer" class="timer-value" value="60:00" />
+      <!-- <input type="text" id="mainTimer" class="timer-value" value="10:00" oninput="updateMainTimerFromInput()" /> -->
+
+      <button id="toggleStartPauseBtn" onclick="toggleStartPause()">▶️</button>
+      <button onclick="resetMainTimer()">🔄</button>
+    </div>
+  </div>
+
+  <div id="timerList">
+  </div>
+
+  <div id="contentDisplayContainer">
+    <h2>Content Display</h2>
+  </div>
+
+  <div id="counterDisplay">
+    Individual: <span id="individualCount">0</span> |
+    Particular: <span id="particularCount">0</span> |
+    Universal: <span id="universalCount">0</span>
+  </div>
+
+  <script>
+    let mainTimerInterval;
+    let mainTimerSeconds = 600; // Timer starts at 10 minutes (600 seconds)
+    let isTimerRunning = false;
+    let numberCitizenTimers = 0;
+    let globalTimerIDs = 0 //in createTimerComponent it generates a new ID for each one and each button has a subreference
+
+    // Function to update the timer display
+    function updateMainTimerDisplay() {
+      let minutes = Math.floor(mainTimerSeconds / 60);
+      let seconds = mainTimerSeconds % 60;
+      document.getElementById("mainTimer").value = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+
+
+    function startAscendingTimer(timerServerID, ascendingTime) {//ascendingTime is in seconds
+      let timerComponent = document.getElementById(timerServerID)
+      let timerAsc = document.querySelector(`[data-id="${timerServerID}-3"]`)
+      // let [ascMinutes, ascSecondsRaw] = timerAsc.value.split(":").map(num => parseInt(num, 10));
+      //ascSeconds = ascMinutes * 60 + ascSecondsRaw;
+
+      allAscendingTimersByServerID[timerServerID] = setInterval(() => {
+        console.log("Automatic AscendingTimer Stop:" + timerServerID);
+        let startPauseBtn = document.querySelector(`[data-id="${timerServerID}-5"]`)
+
+        if (startPauseBtn.dataset.status == "currently_paused") {
+          console.log("Automatic2 AscendingTimer Stop:" + timerServerID);
+          clearInterval(allAscendingTimersByServerID[timerServerID]);
+          delete allAscendingTimersByServerID[timerServerID]
+
+          return;
+
+        }//end if
+
+        ascendingTime++;
+        const mins = Math.floor(ascendingTime / 60).toString();
+        const secs = (ascendingTime % 60).toString().padStart(2, "0");
+        timerAsc.value = `${mins}:${secs}`;
+      }, 1000);
+    }//end startAscendingTimer
+
+
+    function startTimer(timerServerID, serverTime) {
+      // Clear background color when timer starts
+      console.log("startTimer(timerServerID):" + timerServerID);
+
+      let timerComponent = document.getElementById(timerServerID);
+      console.log("startTimer(timerComponent:" + timerComponent + " " + JSON.stringify(timerComponent));
+      let timerValue = document.querySelector(`[data-id="${timerServerID}-2"]`)
+      console.log("startTimer(timerValue" + timerValue + " " + JSON.stringify(timerValue));
+      //let startPauseBtn = document.querySelector(`[data-id="${timerServerID}-5"]`)
+      //console.log("startPauseBtn:"+ JSON.stringify(startPauseBtn));
+      let totalSeconds = serverTime;
+      timerComponent.style.backgroundColor = "#c5eba9"; // Turn bg color to light green
+
+      //      let [minutes, seconds] = serverTime.value.split(":").map(num => parseInt(num, 10));
+      //        let totalSeconds = minutes * 60 + seconds;
+
+      allTimersByServerID[timerServerID] = setInterval(() => {
+
+        if (totalSeconds <= 0) {
+          clearInterval(allTimersByServerID[timerServerID]);
+          delete allTimersByServerID[timerServerID]
+          let timerComponent2 = document.getElementById(timerServerID);
+          timerComponent2.style.backgroundColor = "orange";
+          //onComplete();
+          let startPauseBtn = document.querySelector(`[data-id="${timerServerID}-5"]`)
+          startPauseBtn.textContent = "▶️";
+          startPauseBtn.dataset.status = "currently_paused";
+          //stop the ascending timer when the count down reaches
+          let responseObject = {
+            cmd: "stopTimer",
+            msg: {
+              ELMxID: 0, //hardcoded so switch when meetings dynamic
+              timerServerID: timerServerID,
+            }//end msg
+          };//end responseObject
+
+          // Send the request to the server to update the timer state for all clients
+          socket.send(JSON.stringify(responseObject));
+
+
+          return;
+        }
+        totalSeconds--;
+
+        const mins = Math.floor(totalSeconds / 60).toString();
+        const secs = (totalSeconds % 60).toString().padStart(2, "0");
+        timerValue.value = `${mins}:${secs}`;
+      }, 1000);
+      let startPauseBtn = document.querySelector(`[data-id="${timerServerID}-5"]`)
+      // currentRunningTimer = timerComponent; // Set the current running timer
+      startPauseBtn.textContent = "⏸️ ";
+      startPauseBtn.dataset.status = "currently_running";
+    }//end startTimer(timerServerID)
+
+
+    function stopTimer(timerServerIDStop) {
+      //this is triggered when manually select timer and inputting new time in block time
+
+      let timerElementStop = document.getElementById(timerServerIDStop);
+
+
+      console.log("StopTimer:" + timerServerIDStop + " " + JSON.stringify(timerElementStop));
+      if (timerElementStop) {
+
+
+        console.log("Returning from server to stop timer on brower");
+        let localTimerIDStop = allTimersByServerID[timerServerIDStop]
+        let localAscendingTimerIDStop = allAscendingTimersByServerID[timerServerIDStop]
+        console.log("localTimerIDStop:" + localTimerIDStop + " " + JSON.stringify(allTimersByServerID));
+        clearInterval(localTimerIDStop);
+        clearInterval(localAscendingTimerIDStop);
+        delete allTimersByServerID[timerServerIDStop];
+        delete allAscendingTimersByServerID[timerServerIDStop];
+        let startPauseBtnStop = document.querySelector(`[data-id="${timerServerIDStop}-5"]`)
+        startPauseBtnStop.textContent = "▶️";  // Change button text to 'Play' or 'Start'
+        let timeElement = document.querySelector(`[data-id="${timerServerIDStop}-2"]`)
+        console.log("StopTimer TotalSeconds:" + JSON.stringify(timeElement));
+        let timeLeft = timeElement.value;
+        console.log("StopTimer2 TotalSeconds:" + timeElement.value);
+        let [minutes, seconds] = timeLeft.split(":").map(num => parseInt(num, 10));
+        let totalSeconds = minutes * 60 + seconds;
+        console.log("StopTimer3 TotalSeconds:" + totalSeconds);
+        if (totalSeconds <= 0) {
+          timerElementStop.style.backgroundColor = "orange";
+        } else {
+          timerElementStop.style.backgroundColor = "";  // Reset background color
+        }//end if
+        startPauseBtnStop.dataset.status = "currently_paused";
+
+      }//end timerElementStop
+
+    }//end stopTimer
+
+
+
+    // Function to update the timer title (if needed)
+    function updateTimerTitle() {
+      const newTitle = document.getElementById("timerTitle").value;
+      console.log("Timer title updated to: " + newTitle);
+
+      //const inputField = document.getElementById('timerTitle'); // The ID of the input field
+
+      // title.addEventListener('blur', function() {
+      const timerNameElement = document.querySelector(`.timer[id2="${timerID}"]`);
+      console.log("timerNameElement in mainTimer:" + JSON.stringify(timerNameElement))
+      //const timerNewName = inputField.value; // Get the value entered by the user
+      const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
+      //hereMark
+      const timerNewName = timerNameElement.value; // Get the value entered by the user
+      const timerNewTitleID = timerNameElement.id2; // Get the value entered by the user
+      //const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
+      console.log("Event Listener set in createTimerComponent: " + timerNewName);
+
+      // Send the new timer name to the server when the user unfocuses the input field
+      socket.send(JSON.stringify("inside of blur updateTimerTitleName"));
+      let responseObject = { "cmd": "resetTimerName", "msg": { "ELMxID": ELMxID, "timerNewTitleID": timerNewTitleID, "timerNewName": timerNewName } }
+      socket.send(JSON.stringify(responseObject));
+      console.log("Timer title sending to socket: " + timerNewName);
+      //});//end event handler blur
+    }//end updateTimerTitle
+
+    // Toggle between start and pause button
+    function toggleStartPause() {
+      if (isTimerRunning) {
+        clearInterval(mainTimerInterval);
+        mainTimerInterval = null;
+        isTimerRunning = false;
+        document.getElementById("toggleStartPauseBtn").textContent = "▶️"; // Start icon
+      } else {
+        startMainTimer();
+        document.getElementById("toggleStartPauseBtn").textContent = "⏸️"; // Pause icon
+      }
+    }
+
+    // Function to start the main timer
+    function startMainTimer() {
+      if (!mainTimerInterval && mainTimerSeconds > 0) {
+        mainTimerInterval = setInterval(() => {
+          if (mainTimerSeconds > 0) {
+            mainTimerSeconds--;
+            updateMainTimerDisplay();
+          } else {
+            clearInterval(mainTimerInterval);
+            mainTimerInterval = null;
+            isTimerRunning = false;
+            document.getElementById("toggleStartPauseBtn").textContent = "▶️"; // Reset to start button
+          }
+        }, 1000);
+        isTimerRunning = true;
+      }
+    }
+
+
+    // Function to update the timer value from user input
+    function updateMainTimerFromInput() {
+      const input = document.getElementById("mainTimer").value;
+      const parts = input.split(":");
+      if (parts.length === 2) {
+        let mins = parseInt(parts[0], 10);
+        let secs = parseInt(parts[1], 10);
+        if (!isNaN(mins) && !isNaN(secs) && secs >= 0 && secs < 60) {
+          mainTimerSeconds = mins * 60 + secs;
+          updateMainTimerDisplay();
+        }
+      }
+    }
+
+
+
+
+
+
+    // Function to reset the timer
+    function resetMainTimer() {
+      clearInterval(mainTimerInterval);
+      mainTimerInterval = null;
+      isTimerRunning = false;
+      mainTimerSeconds = 600;
+      updateMainTimerDisplay();
+      document.getElementById("toggleStartPauseBtn").textContent = "▶️"; // Start icon
+    }
+
+    // Event listener to pause the timer when editing the input
+    document.getElementById("mainTimer").addEventListener("focus", () => {
+      if (isTimerRunning) {
+        clearInterval(mainTimerInterval);
+        mainTimerInterval = null;
+        isTimerRunning = false;
+        document.getElementById("toggleStartPauseBtn").textContent = "▶️"; // Change button to start icon
+      }
+    });
+
+    // Event listener to update the timer when input loses focus
+    document.getElementById("mainTimer").addEventListener("blur", updateMainTimerFromInput);
+
+    // Initialize display
+    updateMainTimerDisplay();
+
+
+  </script>
+
+
+
+  <script>
+    // const socket = new WebSocket("ws://69.197.142.130:8084");
+    const socket = new WebSocket("http://localhost:8084/");
+
+    socket.onopen = function () {
+      console.log("Connected to   WebSocket server");
+    };
+
+
+    socket.onmessage = function (event) {//RETURN FROM SERVER SWITCH STARTS HERE
+      const data = JSON.parse(event.data);
+
+      console.log("Received update:", data);
+
+
+
+      //Main Switch/Switch Main
+      switch (data.cmd) {//messages from server
+
+
+        case "returnNewUserIDWithScreenCatchUp":
+
+          let allELMxData = data.msg.allMeetingData; //for this meeting currently hardcoded at ELM "0"
+          let allTimersData = allELMxData.timers
+
+          console.log("In browser returnNewUserIDWithScreenCatchUp:" + JSON.stringify(allTimersData));
+
+          for (let key in allTimersData) {
+            if (allTimersData.hasOwnProperty(key)) {
+              //NOTE: Feb 19 2025: before you can run these DOM functions, the DOMContentLoaded must load but the websocket starts before it so we must load the variables until DOM is done and grab them.
+              // Your code to access the key and its value
+              let singleTimerData = allTimersData[key];
+              // Create the timer component in this browser
+              numberCitizenTimers++; // Update total number for VoteReset and color
+              // Broadcast the new timer to all connected clients
+              const browserIndTimerDefault = singleTimerData.remainingTime;
+              const serverTimerID = singleTimerData.timerServerID;
+              console.log("MAIN SWITCH:createTimerComponentToBrowser" + " " + "browserIndTimerDefault:" + browserIndTimerDefault)
+
+
+              const timerContainer = document.getElementById("timerList");
+              //const newTimerComponent = document.createElement("div");
+              //newTimerComponent.innerHTML = data.timerComponent;
+              //timerContainer.appendChild(newTimerComponent);
+              const timerComponent = createTimerComponent(singleTimerData, timerContainer); //this has no socket.send in it
+
+              setupTimerControls(timerComponent, browserIndTimerDefault);
+
+              document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+
+
+              console.log("key:" + key + " singleTimer:" + JSON.stringify(singleTimerData));
+            }//end if statement
+          }//end for loop
+          break;
+        case "returnedFromServerAddTimer": //this one is from server for the non Optimistic UI draw but the one from the server
+          // Create the timer component in this browser
+          numberCitizenTimers++; // Update total number for VoteReset and color
+          // Broadcast the new timer to all connected clients
+          let allThisTimerData = data.msg.allMeetingData
+          const browserIndTimerDefault = data.msg.allMeetingData.defaultTime;
+          const serverTimerID = data.msg.allMeetingData.newTimerID;
+          const timerTitle = data.msg.allMeetingData.name;
+          console.log("MAIN SWITCH:createTimerComponentToBrowser" + " " + "browserIndTimerDefault:" + browserIndTimerDefault)
+          console.log("MAIN SWITCH:createTimerComponentToBrowser: NAME:" + timerTitle)
+
+          const timerContainer = document.getElementById("timerList");
+          //const newTimerComponent = document.createElement("div");
+          //newTimerComponent.innerHTML = data.timerComponent;
+          //timerContainer.appendChild(newTimerComponent);
+          const timerComponent = createTimerComponent(allThisTimerData, timerContainer); //this has no socket.send in it
+
+          setupTimerControls(timerComponent, browserIndTimerDefault);
+
+          document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+
+
+          break;
+
+        case "returnedFromServerResetTimerName":
+          //input  msg: { ELMxID: 0, timerNewTitleID: '', timerNewName: 'Mark' } }
+          let timerNewName = data.msg.timerNewName;
+          let resetTimerName_timerServerID = data.msg.timerServerID;
+          let nameElementID = resetTimerName_timerServerID + "-1";//Feb 19 2025: where did we get the -1 from? Its just a code we made to differentiaete the elements with custom data-id. It is made by the timer over ID with the component number with a "-" seperating them.
+          console.log("nameElementID:" + nameElementID);
+          const titleInputField = document.querySelector(`[data-id="${nameElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
+
+          console.log("newTimerName:" + timerNewName + " element" + JSON.stringify(titleInputField));
+
+          titleInputField.value = timerNewName;
+
+          break;
+
+        case "returnedFromServerManualSetTime":
+          //input  msg: { ELMxID: 0, timerNewTitleID: '', timerNewName: 'Mark' } }
+          let timerNewManualTime = data.msg.timerNewName;
+          let manualTimeElementID = data.msg.manualTimeElementID;;
+          console.log("nameElementID:" + nameElementID);
+          const manualTimeInputField = document.querySelector(`[data-id="${nameElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
+
+          console.log("newTimerName:" + timerNewName + " element" + JSON.stringify(manualTimeInputField));
+
+
+          manualTimeInputField.value = timerNewName;
+
+          break;
+
+        case "timerRemoved":
+          console.warn("Timer Removed event received:", JSON.stringify(data));
+
+          const timerRemovalServerID = data.msg.timerRemovalServerID;
+          const ELMxID_Remove = data.msg.ELMxID_Remove;
+
+          let defaultRemoveButtonElementID = `${timerRemovalServerID}-8`;
+          console.log("Searching for Remove Button with ID:", defaultRemoveButtonElementID);
+
+          // Try finding the element with expected ID
+          let timerRemoveElement = document.querySelector(`[data-id="${defaultRemoveButtonElementID}"]`);
+
+          if (!timerRemoveElement) {
+            console.warn(`Timer with ID '${defaultRemoveButtonElementID}' not found. Trying alternative lookup...`);
+            timerRemoveElement = document.querySelector(`[data-id="${timerRemovalServerID}"]`);
+          }
+
+          console.log("Final timerRemoveElement found:", timerRemoveElement);
+
+          if (timerRemoveElement) {
+            const timerContainer = document.getElementById(timerRemovalServerID);
+            if (timerContainer) {
+              timerContainer.remove();
+              if (allTimersByServerID.hasOwnProperty(timerRemovalServerID)) {
+                console.log("RemoveTimer delete allTimersByServerID[timerServerIDStop];" + timerRemovalServerID);
+                let localTimerIDStop = allTimersByServerID[timerRemovalServerID]
+                let localAscendingTimerIDStop = allAscendingTimersByServerID[timerRemovalServerID]
+                console.log("localTimerIDStop:" + localTimerIDStop + " " + JSON.stringify(localAscendingTimerIDStop));
+                clearInterval(localTimerIDStop);
+                clearInterval(localAscendingTimerIDStop);
+                delete allTimersByServerID[timerRemovalServerID];
+                delete allAscendingTimersByServerID[timerRemovalServerID];
+              }
+
+
+
+              console.log(`✅ Timer ${timerRemovalServerID} removed from the UI.`);
+            } else {
+              console.warn(`⚠️ Timer ${timerRemovalServerID} found but its parent container is missing.`);
+            }
+          } else {
+            console.warn(`❌ Timer ${timerRemovalServerID} not found in the DOM.`);
+          }
+
+          break;
+
+
+
+
+        case "broadcastRemoveTimer":
+          console.log("Received broadcastRemoveTimer:", data);
+          document.querySelectorAll(`[data-id="${data.msg.timerRemovalServerID}"]`).forEach(el => {
+            el.closest('.timer-container')?.remove();
+            console.log(`Timer ${data.msg.timerRemovalServerID} removed in all tabs.`);
+          });
+          break;
+
+
+
+
+
+
+
+
+        case "returnedFromServerResetDefaultTime":
+
+          console.log("Received resetDefaultTime message: " + data.msg);  // Log the incoming message for debugging
+          //  input  msg: { ELMxID: 0, timerNewTitleID: '', timerDefaultTime: 'Mark' } }
+          let timerDefaultTime = data.msg.newDefaultTime;
+          let resetDefaultTime_timerServerID = data.msg.timerServerID;
+          let defaultTimeElementID = resetDefaultTime_timerServerID + "-2";//Feb 19 2025: where did we get the -1 from? Its just a code we made to differentiaete the elements with custom data-id. It is made by the timer over ID with the component number with a "-" seperating them.
+          console.log("defaultTimeElementID:" + defaultTimeElementID);
+          const defaultTimerInputField = document.querySelector(`[data-id="${defaultTimeElementID}"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
+
+          console.log("Default Timer value:" + timerDefaultTime + " element" + JSON.stringify(defaultTimerInputField));
+
+          let minutes = Math.floor(timerDefaultTime / 60);  // Get the number of minutes
+          let remainingSeconds = timerDefaultTime % 60;    // Get the remaining seconds
+
+          // Pad seconds with a leading zero if needed
+          remainingSeconds = remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds;
+
+          // Return formatted time in mm:ss format
+          let timeString = `${minutes}:${remainingSeconds}`;
+
+          defaultTimerInputField.value = timeString;
+
+
+          break;
+
+
+
+
+        case "returnedFromServerResetTimerAsc":
+          // Input: msg: { ELMxID: 0, timerServerID: '123', timerAscValue: '00:01' }
+
+          let timerAscValue = data.msg.timerAscValue;  // Get the updated ascending timer value from the server response
+          let resetTimerAsc_timerServerID = data.msg.timerServerID; // Get the timerServerID
+          let ascElementID = resetTimerAsc_timerServerID + "-3"; // Assuming -3 is used for ascending timer input fields
+
+          console.log("ascElementID: " + ascElementID);  // Log the element ID for debugging
+
+          // Find the input field element using the data-id (same pattern as the previous case)
+          const ascInputField = document.querySelector(`[data-id="${ascElementID}"]`);
+
+          console.log("newTimerAscValue: " + timerAscValue + " element: " + JSON.stringify(ascInputField));
+
+          // Update the value of the input field with the new ascending timer value
+          if (ascInputField) {
+            ascInputField.value = timerAscValue;  // Set the new ascending timer value
+          } else {
+            console.log("Error: Could not find the input field for timer asc value with data-id: " + ascElementID);
+          }
+
+          break;
+
+        case "returnedFromServerResetVetoName":
+          // input msg: { ELMxID: 0, vetoNewTitleID: '', vetoNewName: 'Veto Mark' }
+          let vetoNewName = data.msg.vetoNewName;
+          let vetoElementID = data.msg.vetoElementID;
+          console.log("vetoElementID:" + vetoElementID);
+
+          const vetoInputField = document.querySelector(`[data-id="${vetoElementID}"]`); // Select the veto input field
+
+          console.log("newVetoName:" + vetoNewName + " element" + JSON.stringify(vetoInputField));
+
+          if (vetoInputField) {
+            vetoInputField.value = vetoNewName;
+          }
+
+          break;
+
+        case "returnedFromServerManualSetVetoTime":
+          // input msg: { ELMxID: 0, vetoManualTimeID: '', vetoNewManualTime: '00:30' }
+          let vetoNewManualTime = data.msg.vetoNewManualTime;
+          let vetoManualTimeElementID = data.msg.vetoManualTimeElementID;
+          console.log("vetoManualTimeElementID:" + vetoManualTimeElementID);
+
+          const vetoManualTimeInputField = document.querySelector(`[data-id="${vetoManualTimeElementID}"]`); // Select the veto time input field
+
+          console.log("newVetoManualTime:" + vetoNewManualTime + " element" + JSON.stringify(vetoManualTimeInputField));
+
+          if (vetoManualTimeInputField) {
+            vetoManualTimeInputField.value = vetoNewManualTime;
+          }
+
+          break;
+
+        case "returnedStartTimer":
+          let { timerServerID, shouldStart, ELMxID, serverTime, ascendingTime } = data.msg;
+          // let timerElement = document.querySelector(`[data-id='${timerServerID}']`);
+          let timerElement = document.getElementById(timerServerID);
+
+
+          console.log("returnedStartTimer:" + timerServerID + " " + JSON.stringify(timerElement));
+          if (timerElement) {
+
+            // If the timer is starting
+
+            console.log("Returning from server to start timer on brower");
+            startTimer(timerServerID, serverTime);//NOTE: March 13 2025: the reason why we manually load the server's time for this timer is because each start and stop keeps the timers insynch with the server. 
+            startAscendingTimer(timerServerID, ascendingTime);
+            timerElement.style.backgroundColor = "green";  // Optional: change color to show it's running
+            let startPauseBtn = document.querySelector(`[data-id="${timerServerID}-5"]`)
+            startPauseBtn.textContent = "⏸️";  // Change button text to 'Pause' or 'Stop'
+            startPauseBtn.dataset.status = "currently_running";
+
+
+          } //end if(timerElement)
+          break;
+
+        case "returnedStopTimer":
+          let timerServerIDStop = data.msg.timerServerID;
+          let shouldStartStop = data.msg.shouldStart;
+          let ELMxIDStop = data.msg.ELMxID;
+          let serverTimeStop = data.msg.serverTime;
+          let ascendingTimeStop = data.msg.ascendingTime;
+          // let timerElement = document.querySelector(`[data-id='${timerServerID}']`);
+          let timerElementStop = document.getElementById(timerServerIDStop);
+
+          //stopTimer(data);
+          console.log("returnedStopTimer:" + timerServerIDStop + " " + JSON.stringify(timerElementStop));
+          if (timerElementStop) {
+
+
+            console.log("Returning from server to stop timer on brower");
+            let localTimerIDStop = allTimersByServerID[timerServerIDStop]
+            let localAscendingTimerIDStop = allAscendingTimersByServerID[timerServerIDStop]
+            console.log("localTimerIDStop:" + localTimerIDStop + " " + JSON.stringify(allTimersByServerID));
+            clearInterval(localTimerIDStop);
+            clearInterval(localAscendingTimerIDStop);
+            delete allTimersByServerID[timerServerIDStop];
+            delete allAscendingTimersByServerID[timerServerIDStop];
+            let startPauseBtnStop = document.querySelector(`[data-id="${timerServerIDStop}-5"]`)
+            startPauseBtnStop.textContent = "▶️";  // Change button text to 'Play' or 'Start'
+            console.log("stopTimer by running out and setting orange:" + serverTimeStop);
+            if (serverTimeStop <= 0) {
+              console.log("stopTimer2 by running out and setting orange:" + serverTimeStop);
+              timerElementStop.style.backgroundColor = "orange";
+            } else {
+              timerElementStop.style.backgroundColor = "";  // Reset background color
+            }//end 
+            startPauseBtnStop.dataset.status = "currently_paused";
+
+          }//end timerElementStop
+          break;
+
+        case "returntoservervote":
+          console.log("Vote update from server:", data);
+
+          if (!data.id) {
+            console.warn("⚠️ Missing ID in server response:", data);
+            return;
+          }
+
+          // Find all elements with the matching data-id across tabs
+          const voteDisplays = document.querySelectorAll(`[data-id='${data.id}']`);
+
+          if (voteDisplays.length > 0) {
+            voteDisplays.forEach((voteDisplay) => {
+              // If the server sends "added", set button to unvote
+              if (data.msg.includes("added")) {
+                voteDisplay.textContent = "UnVote";
+                voteDisplay.style.backgroundColor = "green";  // Set background to green for unvote
+              }
+              // If the server sends "removed", set button back to vote
+              else if (data.msg.includes("removed")) {
+                voteDisplay.textContent = "Vote";
+                voteDisplay.style.backgroundColor = "";  // Reset background color
+              }
+            });
+          } else {
+            console.warn(`⚠️ No element found for data-id '${data.id}'`);
+          }
+          break;
+
+
+
+        case "returnedFromServerUpdateVoteButton":
+          console.log("Received update from server for vote button:", data);
+
+          let voteButtonID = data.msg.voteButtonID;
+          let isEnabled = data.msg.isEnabled;
+
+          // Find the vote button using the ID
+          let voteButton = document.querySelector(`.vote-btn[data-id='${voteButtonID}']`);
+
+          if (voteButton) {
+            if (isEnabled) {
+              voteButton.classList.remove('disabled');
+              voteButton.disabled = false;
+            } else {
+              voteButton.classList.add('disabled');
+              voteButton.disabled = true;
+            }
+          } else {
+            console.error(`Vote button with ID ${voteButtonID} not found.`);
+          }
+          break;
+
+
+
+
+
+        case "returnedFromServerSubmenuClick":
+          console.log("Testing what is this first data:", data.msg.timerFromNewName);
+
+          const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID, clickCount, timerFromNewName } = data.msg;
+          console.log("Testing what is this data:", data.msg);
+
+          // Retrieve previous selections from localStorage (track per formButtonID)
+          let previousSelections = JSON.parse(localStorage.getItem("previousSelections")) || {};
+
+          // Reset only the previously selected elements for the same formButtonID
+          if (previousSelections[formButtonID]) {
+            const prevSelection = previousSelections[formButtonID];
+
+            // Reset background only for the previously selected submenu item
+            if (prevSelection.timerServerDropdownID) {
+              document.querySelectorAll(`.submenu-item[data-timerServerID="${prevSelection.timerServerDropdownID}"]`).forEach(button => {
+                button.style.backgroundColor = "";
+              });
+            }
+
+            // Reset background only for the previously selected dropdown item
+            if (prevSelection.timerDropdownID) {
+              document.querySelectorAll(`.dropdown-item[data-timer-id="${prevSelection.timerDropdownID}"]`).forEach(parentButton => {
+                parentButton.style.backgroundColor = "";
+              });
+            }
+
+            // Reset background only for the previously selected form button
+            if (prevSelection.formButtonID) {
+              document.querySelectorAll(`.form-btn[data-id="${prevSelection.formButtonID}"]`).forEach(formBtn => {
+                formBtn.style.backgroundColor = "";
+              });
+            }
+          }
+
+          // Update new selection (change background color only for the newly selected elements)
+          document.querySelectorAll(`.submenu-item[data-timerServerID="${timerServerDropdownID}"]`).forEach(button => {
+            button.style.backgroundColor = "green"; // Highlight clicked submenu button
+          });
+
+          document.querySelectorAll(`.dropdown-item[data-timer-id="${timerDropdownID}"]`).forEach(parentButton => {
+            parentButton.style.backgroundColor = "green"; // Highlight correct parent dropdown item
+          });
+
+          document.querySelectorAll(`.form-btn[data-id="${formButtonID}"]`).forEach(formBtn => {
+            formBtn.style.backgroundColor = "green"; // Highlight correct form button
+          });
+
+          // Save the current selection **per formButtonID**
+          previousSelections[formButtonID] = {
+            timerServerDropdownID,
+            timerDropdownID,
+            formButtonID
+          };
+
+          localStorage.setItem("previousSelections", JSON.stringify(previousSelections));
+
+          // Sync changes across tabs
+          localStorage.setItem("backgroundSync", Date.now());
+
+          // Update the click count display
+          updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID);
+          break;
+
+
+
+        case "returnedPeopleDropdownClick":
+          console.log("Received peopleDropdownClick response:", data.msg);
+
+          const { selectedAction, buttonID, buttonPeopleText, timerPeopleNewName } = data.msg;
+
+          console.log("Processed data:", data.msg);
+
+          if (!window.previousPeopleSelections) {
+            window.previousPeopleSelections = {};
+          }
+
+          if (window.previousPeopleSelections[buttonID]) {
+            document.querySelectorAll(`.dropdown-item[data-action="${window.previousPeopleSelections[buttonID]}"]`).forEach(button => {
+              button.style.backgroundColor = "";
+            });
+          }
+
+          document.querySelectorAll(`.dropdown-item[data-action="${selectedAction}"]`).forEach(button => {
+            button.style.backgroundColor = "green";
+          });
+
+          document.querySelectorAll(`.people-btn[data-id="${buttonID}"]`).forEach(peopleBtn => {
+            peopleBtn.style.backgroundColor = "brown";
+          });
+
+          window.previousPeopleSelections[buttonID] = selectedAction;
+
+          // Update the displayed selection
+          const selectedPeopleDisplay = document.getElementById("selected-people-display");
+          if (selectedPeopleDisplay) {
+            selectedPeopleDisplay.textContent = `Selected: ${buttonPeopleText}`;
+          }
+
+          // Update people selection count display
+          updatePeopleClickCountDisplay(selectedAction, buttonID, buttonPeopleText, timerPeopleNewName);
+
+          break;
+
+
+
+
+
+        default:
+          console.log('Unrecognized command:', data.cmd);
+          break;
+
+
+
+
+
+
+
+
+
+
+
+        case 'voteCountReturned':
+
+          break;
+
+
+
+          // Update UI elements dynamically
+          document.getElementById("mainTimer").value = data.mainTimer;
+          document.getElementById("voteData").textContent = `Total Votes: ${data.totalVotes}`;
+          document.getElementById("individualCount").innerText = data.counters.Individual;
+          document.getElementById("particularCount").innerText = data.counters.Particular;
+          document.getElementById("universalCount").innerText = data.counters.Universal;
+      }//end MAIN SWITCH/SWITCH MAIN
+
+    };//end socket.message
+
+
+
+
+
+    /////////////////////////////////////////////////////////////////
+    let workerDispatch = (cmd, msg) => {
+      console.log("WorkerDispatch cmd:" + cmd);
+      switch (cmd) {
+        case 'getNewAWSCreds':
+          console.log("Getting workerDispatch awsCres");
+          //worker.postMessage({'cmd': 'getNewAWSCreds', 'msg': msg});
+          break;
+      }//end cmd 
+    };//end workerDispatch
+
+    socket.onclose = function () {
+      console.log("Disconnected from WebSocket server. Reconnecting...");
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+    };
+
+    socket.onerror = function (error) {
+      console.error("WebSocket Error:", error);
+    };
+
+    // Function to send updated timer data to WebSocket server
+    function sendTimerUpdate() {
+      socket.send(JSON.stringify("inside of send find update"));
+
+      const updatedData = {
+        mainTimer: document.getElementById("mainTimer").value,
+        totalVotes: parseInt(document.getElementById("voteData").textContent.replace(/\D/g, ""), 10),
+        counters: {
+          Individual: parseInt(document.getElementById("individualCount").innerText, 10),
+          Particular: parseInt(document.getElementById("particularCount").innerText, 10),
+          Universal: parseInt(document.getElementById("universalCount").innerText, 10),
+        },
+      };
+      // socket.send(JSON.stringify(updatedData));
+
+
+      // Attach event listener to timer input field
+      document.getElementById("mainTimer").addEventListener("input", sendTimerUpdate);
+
+      // Attach event listener to vote reset buttonresetVotesBtn
+      // document.getElementById("resetVotesBtn").addEventListener("click", () => {
+      document.getElementById("voteData").textContent = "Total Votes: 0";
+      totalVotes = 0;
+      resetVotesBtn.style.backgroundColor = 'black';
+      resetVotesBtn.style.color = 'white';
+      // socket.send(JSON.stringify("does it reatch timer"));
+      //resetVotes();
+      //sendTimerUpdate();
+      socket.send(JSON.stringify("vote is reset1"));
+
+      // });//end eventListener
+    } //end sendTimerUpdate();
+
+  </script>
+
+
+  <script>
+    let timerList = "initialize";//we can't load these with getElementID because DOMContentLoaded not loaded yet
+    let addTimerBtn = "initialize"; // see setGlobalVariablesOnceDOMContentLoaded which sets them once DOM is loaded
+    let defaultTimeInput = "initialize";
+    let notifyCheckbox = "initialize";
+    let voteDataDiv = "initialize";
+    let contentDisplayContainer = "initialize";
+    console.log("DOMContentLoaded: timerList:" + JSON.stringify(timerList));
+    let totalVotes = 0; // Global vote count to track total votes
+    let currentRunningTimer = null; // Track the currently running timer
+    let allTimersByServerID = {};//form {"serverIDOfTimer": setIntervalID} we need this for clearInterval particularly if multiple timers running
+    let allAscendingTimersByServerID = {};
+
+    const counters = {//used in updateCounterDisplay
+      Individual: 0,
+      Particular: 0,
+      Universal: 0
+    };
+
+    function setGlobalVariablesOnceDOMContentLoaded() {
+      timerList = document.getElementById("timerList");
+      addTimerBtn = document.getElementById("addTimerBtn");
+      defaultTimeInput = document.getElementById("defaultTime");
+      notifyCheckbox = document.getElementById("notifyCheckbox");
+      voteDataDiv = document.getElementById("voteData"); // Total vote di
+      contentDisplayContainer = document.getElementById("contentDisplayContainer");
+
+    }//end setGlobalVariablesOnceDOMContentLoaded
+
+    function synchronizeScreenDraw() {
+      //this function is called once DOMContentLoaded loads to go to server and then draw all DOM elemtns and timers.
+      //we must wait to call this because the websocket starts before DOM is loaded and will give error. 
+      //we must load websocket and then DOM and then this function
+
+      const timerList = document.getElementById("timerList");
+      const addTimerBtn = document.getElementById("addTimerBtn");
+      const defaultTimeInput = document.getElementById("defaultTime");
+      const notifyCheckbox = document.getElementById("notifyCheckbox");
+      const voteDataDiv = document.getElementById("voteData"); // Total vote display
+
+      const contentDisplayContainer = document.getElementById("contentDisplayContainer");
+      console.log("DOMContentLoaded: timerList:" + JSON.stringify(timerList));
+
+
+
+      let totalVotes = 0; // Global vote count to track total votes
+      let currentRunningTimer = null; // Track the currently running timer
+
+      addTimerBtn.style.color = "green"; // Optional: Set the color to green
+
+
+
+
+      addTimerBtn.addEventListener("click", addTimer);
+
+
+      notifyCheckbox.addEventListener("change", function () {
+        if (this.checked) {
+          requestNotificationPermission();
+        }
+      });
+
+      addTimerBtn.addEventListener("click", addTimer);
+      resetVotesBtn.addEventListener("click", resetVotes); // Add listener for reset vote button
+
+    };//end  synchronizeScreenDraw();
+
+
+
+    // let resetCycleCompleted = false; // Tracks if the first reset cycle has been completed
+
+    // function resetVotes() {
+    //   console.log("In resetVotes (with colours)");
+
+    //   // Reset vote tracking data
+    //   clickCountsMap = {};
+    //   formButtonSelections = {};
+    //   voterMap = {};
+    //   alreadyClicked = {};
+
+    //   // Reset total vote count display
+    //   totalVotes = 0;
+    //   voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
+
+    //   // Reset vote buttons
+    //   document.querySelectorAll(".vote-btn").forEach(voteBtn => {
+    //     voteBtn.style.backgroundColor = "";
+    //     voteBtn.textContent = "Vote";
+    //     voteBtn.setAttribute("data-voted", "false");
+    //     voteBtn.disabled = true; // Enable voting again
+    //   });
+
+    //   // Reset content buttons
+    //   document.querySelectorAll(".content-btn").forEach(contentBtn => {
+    //     contentBtn.style.backgroundColor = "";
+    //     contentBtn.setAttribute("data-voted", "false");
+    //     contentBtn.disabled = false;
+    //   });
+
+    //   // Reset the background color for all people buttons
+    //   document.querySelectorAll(".people-btn").forEach(peopleBtn => {
+    //     peopleBtn.style.backgroundColor = "";
+    //   });
+
+    //   // Reset previous selections stored in localStorage
+    //   localStorage.removeItem("previousSelections");
+
+    //   // Clear UI elements that track votes
+    //   const clickCountsList = document.getElementById("click-counts-list");
+    //   clickCountsList.innerHTML = ''; // Clear vote count list
+
+    //   // Reset dropdown buttons
+    //   resetDropdownButtons();
+
+    //   // Notify other tabs that the votes were reset by storing a timestamp in localStorage
+    //   console.log("Date.now()" + Date.now());
+    //   localStorage.setItem("voteReset", Date.now());
+
+    //   // Ensure the update is sent via WebSocket
+    //   sendTimerUpdate();
+
+    // }
+
+    // // Listen for reset events from other tabs
+    // window.addEventListener("storage", (event) => {
+    //   if (event.key === "voteReset") {
+    //     console.log("Vote reset detected from another tab");
+    //     resetVotes(); // Trigger reset in the current tab
+    //   }
+    // });
+
+
+
+
+
+    // function resetDropdownButtons() {
+    //   const buttons = document.querySelectorAll("#formbtn, .dropdown-item, .submenu-item");
+
+    //   buttons.forEach(button => {
+    //     button.style.backgroundColor = ""; // Reset background color for all buttons
+    //   });
+    // }//end resetDropdownButtons
+
+
+
+    let resetClickCount = 0; // Reset click count tracked in session
+    let currentVetoStage = 0; // Start with "f0"
+
+    function updateResetClickDisplay() {
+      const resetCountDisplay = document.getElementById("reset-count-display");
+      if (resetCountDisplay) {
+        resetCountDisplay.textContent = `Total Meeting Cycles: F${resetClickCount} times`;
+      }
+    }
+
+    function resetVotes(isManualReset = true) {
+      console.log("In resetVotes (with colours)");
+      const resetVotesBtn = document.getElementById("resetVotesBtn");
+
+      if (isManualReset) {
+        document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+        console.log('numberCitizenTimers', numberCitizenTimers);
+
+        const totalVotesOfForm = Object.values(clickCountsMap).reduce((sum, count) => sum + count, 0);
+        console.log('Total Votes totalVotesOfForm:', totalVotesOfForm);
+
+        if (numberCitizenTimers === totalVotesOfForm) {
+          if (resetVotesBtn) {
+            resetVotesBtn.style.backgroundColor = 'blue';
+            resetVotesBtn.style.color = 'white';
+          }
+
+          clickCountsMap = {};
+          formButtonSelections = {};
+          voterMap = {};
+          alreadyClicked = {};
+
+          // Reset total vote count display
+          totalVotes = 0;
+          voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
+
+          // Reset vote buttons
+          document.querySelectorAll(".vote-btn").forEach(voteBtn => {
+            voteBtn.style.backgroundColor = "";
+            voteBtn.textContent = "Vote";
+            voteBtn.setAttribute("data-voted", "false");
+            voteBtn.disabled = true;
+          });
+
+          // Reset content buttons
+          document.querySelectorAll(".content-btn").forEach(contentBtn => {
+            contentBtn.style.backgroundColor = "";
+            contentBtn.setAttribute("data-voted", "false");
+            contentBtn.disabled = false;
+          });
+
+          // Reset people buttons
+          document.querySelectorAll(".people-btn").forEach(peopleBtn => {
+            peopleBtn.style.backgroundColor = "";
+          });
+
+          const clickCountsList = document.getElementById("click-counts-list");
+          if (clickCountsList) clickCountsList.innerHTML = '';
+
+          resetClickCount++;
+          resetDropdownButtons();
+
+          updateResetClickDisplay();
+
+          // Determine the highest vote and check if it belongs to us
+          let highestVotedOption = null;
+          let highestVoteCount = 0;
+          let ourVotedOption = "our_option"; // Replace with actual identifier of "our" option
+
+          for (const [option, count] of Object.entries(clickCountsMap)) {
+            if (count > highestVoteCount) {
+              highestVoteCount = count;
+              highestVotedOption = option;
+            }
+          }
+
+          console.log("Highest voted option:", highestVotedOption, "with votes:", highestVoteCount);
+
+          // Check if the highest vote is for us
+          if (highestVotedOption === ourVotedOption) {
+            currentVetoStage = 0; // Keep at f0 if we are winning
+          } else {
+            currentVetoStage++; // Increase veto stage (f1, f2, f3...)
+          }
+
+          // Apply veto stage
+          document.querySelectorAll("input[data-id$='-4']").forEach(vetoInput => {
+            let newVetoValue = `f${currentVetoStage}`;
+            vetoInput.value = newVetoValue;
+            console.log(`Updated veto field: ${vetoInput.getAttribute("data-id")} to '${newVetoValue}'`);
+
+            // Send update to the server
+            let vetoResponse = {
+              "cmd": "resetVetoName",
+              "msg": {
+                "ELMxID": 0,
+                "vetoNewTitleID": vetoInput.getAttribute("data-id"),
+                "vetoNewName": newVetoValue // Send updated veto value
+              }
+            };
+            socket.send(JSON.stringify(vetoResponse));
+            console.log("Veto reset sent to socket:", vetoResponse);
+          });
+
+        } else {
+          console.log("Number Citizen Timers and Total Votes don't match.");
+        }
+
+        // Notify the server about the reset
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({ cmd: "voteReset", msg: resetClickCount }));
+        }
+      }
+
+      // Notify other clients via WebSocket
+      sendTimerUpdate();
+    }
+
+    // Listen for reset events from WebSocket
+    if (socket) {
+      socket.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "voteReset") {
+          console.log("Vote reset detected from WebSocket message");
+          resetVotes(false); // Prevent incrementing the count again
+        }
+      });
+    }
+
+
+    function resetDropdownButtons() {
+      document.querySelectorAll("#formbtn, .dropdown-item, .submenu-item").forEach(button => {
+        button.style.backgroundColor = "";
+      });
+    }
+
+    // Ensure reset count is displayed on page load
+    document.addEventListener("DOMContentLoaded", updateResetClickDisplay);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function sendSystemNotification(title, options) {
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, options);
+      } else if (Notification.permission === "denied") {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            new Notification(title, options);
+
+          }
+        });
+      }
+    }//end sendSystemNotification
+
+
+
+
+
+    function requestNotificationPermission() {
+      if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            console.log("Notification permission granted.");
+          }
+        });
+      }
+    } //requestNotificationPermission
+
+    function setupTimerControls(timerComponent, initialTime) {
+      const timerTitle = timerComponent.querySelector(".timer-title");
+      const timerAsc = timerComponent.querySelector(".timer-asc");
+
+      const timerValue = timerComponent.querySelector(".timer-value");
+      const startPauseBtn = timerComponent.querySelector(".start-pause-btn");
+      const resetInitialBtn = timerComponent.querySelector(".reset-initial-btn");
+      const resetDefaultBtn = timerComponent.querySelector(".reset-default-btn");
+      const removeBtn = timerComponent.querySelector(".remove-btn");
+      let intervalId = null;
+      let ascIntervalId = null;
+
+      let wasRunning = false;
+      let ascSeconds = 0;
+
+
+
+      // Vote button functionality
+
+      const voteBtn = timerComponent.querySelector(".vote-btn");
+      const timerVoteID = voteBtn.getAttribute("data-id"); // Get dynamic data-id
+
+
+
+      // Function to handle voting
+      voteBtn.addEventListener("click", () => {
+        let hasVoted = voteBtn.getAttribute("data-voted") === "true"; // Track vote per button
+
+        if (!hasVoted) {
+          // Increment total vote count (before sending to server)
+          totalVotes++;
+          voteBtn.setAttribute("data-voted", "true"); // Mark as voted
+          voteBtn.textContent = "UnVote"; // Change text to UnVote
+          voteBtn.style.backgroundColor = "green"; // Set background to green for voted button
+          socket.send(JSON.stringify({ cmd: "addVote", msg: "Vote added", id: timerVoteID }));
+
+          // Update totalVotes in localStorage (sync across all tabs)
+          localStorage.setItem('totalVotes', totalVotes);
+        } else {
+          totalVotes = Math.max(0, totalVotes - 1); // Prevent negative votes
+          voteBtn.setAttribute("data-voted", "false"); // Mark as unvoted
+          voteBtn.textContent = "Vote"; // Reset text to Vote
+          voteBtn.style.backgroundColor = ""; // Reset background color
+          socket.send(JSON.stringify({ cmd: "removeVote", msg: "Vote Removed", id: timerVoteID }));
+
+          // Update totalVotes in localStorage (sync across all tabs)
+          localStorage.setItem('totalVotes', totalVotes);
+        }
+
+        // Update the vote count display (local tab update)
+        voteDataDiv.textContent = `Total Votes: ${totalVotes}`;
+
+        // Handle the reset vote button color based on percentage
+        const votePercentage = numberCitizenTimers > 0 ? (totalVotes / numberCitizenTimers) * 100 : 0;
+
+        // Update the votePercentage in localStorage to sync across tabs
+        localStorage.setItem('votePercentage', votePercentage);
+
+        // Update the resetVotesBtn color based on votePercentage
+        const resetVotesBtn = document.getElementById("resetVotesBtn");
+
+        if (votePercentage === 0) {
+          resetVotesBtn.style.backgroundColor = 'black';
+          resetVotesBtn.style.color = 'white';
+        } else if (votePercentage < 10) {
+          resetVotesBtn.style.backgroundColor = 'black';
+          resetVotesBtn.style.color = 'white';
+        } else if (votePercentage >= 10 && votePercentage < 70) {
+          resetVotesBtn.style.backgroundColor = 'red';
+          resetVotesBtn.style.color = 'black';
+        } else if (votePercentage >= 70 && votePercentage < 100) {
+          resetVotesBtn.style.backgroundColor = 'orange';
+          resetVotesBtn.style.color = 'black';
+        } else if (votePercentage === 100) {
+          resetVotesBtn.style.backgroundColor = 'green';
+          resetVotesBtn.style.color = 'black';
+        }
+      });
+
+      // Listen for changes to totalVotes or votePercentage in localStorage (to sync across all tabs)
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'totalVotes' || e.key === 'votePercentage') {
+          const newVotePercentage = parseFloat(localStorage.getItem('votePercentage'));
+          const resetVotesBtn = document.getElementById("resetVotesBtn");
+
+          // Update the resetVotesBtn color based on the updated votePercentage
+          if (newVotePercentage === 0) {
+            resetVotesBtn.style.backgroundColor = 'black';
+            resetVotesBtn.style.color = 'white';
+          } else if (newVotePercentage < 10) {
+            resetVotesBtn.style.backgroundColor = 'black';
+            resetVotesBtn.style.color = 'white';
+          } else if (newVotePercentage >= 10 && newVotePercentage < 70) {
+            resetVotesBtn.style.backgroundColor = 'red';
+            resetVotesBtn.style.color = 'black';
+          } else if (newVotePercentage >= 70 && newVotePercentage < 100) {
+            resetVotesBtn.style.backgroundColor = 'orange';
+            resetVotesBtn.style.color = 'black';
+          } else if (newVotePercentage === 100) {
+            resetVotesBtn.style.backgroundColor = 'green';
+            resetVotesBtn.style.color = 'black';
+          }
+        }
+      });
+
+
+
+
+      function toggleTimer(shouldStart) {
+        if (shouldStart) {
+          if (currentRunningTimer && currentRunningTimer !== timerComponent) {
+            currentRunningTimer.querySelector(".start-pause-btn").click(); // Stop other timers
+          }
+          startTimer();
+          startAscendingTimer();
+        } else {
+          clearInterval(intervalId);
+          clearInterval(ascIntervalId);
+          intervalId = null;
+          ascIntervalId = null;
+          startPauseBtn.textContent = "▶️";
+          timerComponent.style.backgroundColor = "";
+        }
+
+        // Send update to the server
+        const timerServerID = startPauseBtn.getAttribute("data-id");
+        socket.send(JSON.stringify({
+          cmd: "toggleTimer",
+          msg: {
+            ELMxID: 0,
+            timerServerID: timerServerID,
+            shouldStart: shouldStart,
+
+          }
+        }));
+
+        console.log("Sent toggleTimer request to server:", timerServerID, shouldStart);
+      }
+
+
+
+      function startTimer() {
+        // Clear background color when timer starts
+        timerComponent.style.backgroundColor = "#c5eba9"; // Turn bg color to light green
+
+        let [minutes, seconds] = timerValue.value.split(":").map(num => parseInt(num, 10));
+        let totalSeconds = minutes * 60 + seconds;
+
+        intervalId = setInterval(() => {
+          if (totalSeconds <= 0) {
+            clearInterval(intervalId);
+            intervalId = null;
+            timerComponent.style.backgroundColor = "orange";
+            onComplete();
+            startPauseBtn.textContent = "▶️";
+            //stop the ascending timer when the count down reaches
+            if (ascIntervalId) {
+              clearInterval(ascIntervalId);
+              ascIntervalId = null;
+            }
+
+
+            return;
+          }
+          totalSeconds--;
+
+          const mins = Math.floor(totalSeconds / 60).toString();
+          const secs = (totalSeconds % 60).toString().padStart(2, "0");
+          timerValue.value = `${mins}:${secs}`;
+        }, 1000);
+
+        // currentRunningTimer = timerComponent; // Set the current running timer
+        startPauseBtn.textContent = "⏸️";
+      }
+
+
+
+
+
+      function startAscendingTimer() {
+        let [ascMinutes, ascSecondsRaw] = timerAsc.value.split(":").map(num => parseInt(num, 10));
+        ascSeconds = ascMinutes * 60 + ascSecondsRaw;
+
+        ascIntervalId = setInterval(() => {
+          ascSeconds++;
+          const mins = Math.floor(ascSeconds / 60).toString();
+          const secs = (ascSeconds % 60).toString().padStart(2, "0");
+          timerAsc.value = `${mins}:${secs}`;
+        }, 1000);
+      }//end startAscendingTimer
+
+
+      function stopTimerOnEdit(input) {
+        input.addEventListener("focus", () => {
+          if (intervalId !== null) {
+            wasRunning = true;
+            toggleTimer(false);
+          }
+        });
+
+        input.addEventListener("blur", () => {
+          if (wasRunning) {
+            toggleTimer(true);
+            wasRunning = false;
+          }
+        });
+      }
+
+      stopTimerOnEdit(timerValue);
+      stopTimerOnEdit(timerAsc);
+
+
+      timerValue.addEventListener("focus", () => {
+        if (intervalId !== null) {
+          wasRunning = true;
+          toggleTimer(false);
+        }
+      });
+
+      timerValue.addEventListener("blur", () => {
+        if (wasRunning) {
+          toggleTimer(true);
+          wasRunning = false; // Reset the flag
+        }
+      });
+
+
+      timerAsc.addEventListener("blur", () => {
+        if (wasRunning) {
+          toggleTimer(true);
+          wasRunning = false; // Reset the flag
+        }
+      });
+
+      resetDefaultBtn.addEventListener("click", () => {
+        clearInterval(intervalId);
+        clearInterval(ascIntervalId);
+
+        intervalId = null;
+        ascIntervalId = null;
+
+        timerValue.value = document.getElementById("defaultTime"); //defaultTimeInput.value; // Reset to the current default time
+        // timerValue.value = defaultTimeInput.value; // Reset to the current default time
+        timerAsc.value = "00:00";
+        ascSeconds = 0;
+
+        timerComponent.style.backgroundColor = ""; // Remove background color
+        startPauseBtn.textContent = "▶️";
+      });
+
+      resetInitialBtn.addEventListener("click", () => {
+        clearInterval(intervalId);
+        clearInterval(ascIntervalId);
+
+        intervalId = null;
+        ascIntervalId = null;
+        timerAsc.value = "00:00";
+        ascSeconds = 0;
+
+        timerValue.value = initialTime; // Reset to the initial time
+        timerComponent.style.backgroundColor = ""; // Remove background color
+        startPauseBtn.textContent = "▶️";
+      });
+
+      // Assuming removeBtn is defined outside of the event listener.
+      removeBtn.addEventListener("click", function () {
+        // `this` refers to the button that was clicked (the one triggering the event)
+        const clickedBtn = this; // Get the button clicked
+
+        // Update the number of citizen timers
+        numberCitizenTimers -= 1;
+        document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+
+        const voteBtn = timerComponent.querySelector(".vote-btn"); // Make sure timerComponent is defined before
+        const timerID = clickedBtn.getAttribute("data-id"); // Extract the timer ID from the clicked button
+
+        console.log("HAS VOTED:" + (voteBtn.textContent === "Unvote"));
+        console.log("voteBtn: ", voteBtn); // Check if the element is found
+        console.log("voteBtn textContent: " + voteBtn.textContent);
+
+        if (voteBtn.textContent === "Unvote") {
+          console.log("HERE: " + (totalVotes - 1));
+          totalVotes -= 1;
+          voteDataDiv.textContent = `Total Votes: ${totalVotes}`; // Update the display
+        }
+
+        const resetVotesBtn = document.getElementById("resetVotesBtn");
+
+        // Calculate the percentage of totalVotes compared to numberCitizenTimers
+        const votePercentage = (totalVotes / numberCitizenTimers) * 100;
+        console.log("VotePercentage Of Timers first:" + totalVotes + " " + numberCitizenTimers + " " + votePercentage);
+
+        // Use a switch-case style logic to determine the button's color
+        if (totalVotes == 0 && numberCitizenTimers == 0) {
+          resetVotesBtn.style.backgroundColor = 'black';
+          resetVotesBtn.style.color = 'white';
+        } else if (votePercentage < 10) {
+          resetVotesBtn.style.backgroundColor = 'black';
+          resetVotesBtn.style.color = 'white';
+        } else if (votePercentage >= 10 && votePercentage < 70) {
+          resetVotesBtn.style.backgroundColor = 'red';
+          resetVotesBtn.style.color = 'black';
+        } else if (votePercentage >= 70 && votePercentage < 100) {
+          resetVotesBtn.style.backgroundColor = 'orange';
+          resetVotesBtn.style.color = 'black';
+        } else if (votePercentage === 100) {
+          resetVotesBtn.style.backgroundColor = 'green';
+          resetVotesBtn.style.color = 'black';
+        }
+
+
+        // Prepare data to send to the server
+        let responseObject = {
+          cmd: "removeTimer",
+          msg: {
+            timerServerID: timerID,
+            ELMxID: 0
+          }
+        };
+
+        socket.send(JSON.stringify(responseObject));
+
+        console.log("Sent removeTimer request to server:", responseObject);
+      });
+
+
+      function playSound() {
+        const audio = new Audio("complete.mp3"); // Correct path to the sound file
+        audio.play();
+      }
+
+      function onComplete() {
+        playSound();
+        // Check if system notifications are enabled and send a notification
+        if (notifyCheckbox.checked) {
+          sendSystemNotification(`${timerTitle.value || "Timer"} Completed`, {
+            body: `Your ${timerTitle.value ? timerTitle.value + " " : ""}timer has finished.`,
+          });
+        }
+      }
+    }//end setupTimerControls
+
+    let clickCountsMap = {}; // Stores total votes for each name
+    let formButtonSelections = {}; // Maps formButtonID to its selected timerServerDropdownID
+    // let alreadyClicked = new Set(); // Tracks which buttons have already been clicked
+    let voterMap = {}; // Stores list of voters for each name
+
+    let alreadyClicked = {}; // Now an object instead of a Set
+
+    function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID) {
+      const clickCountsList = document.getElementById("click-counts-list");
+      const name = timerServerDropdownID.split('-').slice(1).join('-');
+
+      console.log("timerFromNewName: " + timerFromNewName);
+
+      // Ensure we track votes per user
+      if (!alreadyClicked[timerFromNewName]) {
+        alreadyClicked[timerFromNewName] = new Set();
+      }
+
+      // Check if this user has already voted for this option
+      if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
+        alert(`You have already voted for ${name}!`);
+        return;
+      }
+
+      // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
+      if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
+        const previousTimerServerDropdownID = formButtonSelections[formButtonID];
+        const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
+
+        if (clickCountsMap[previousName]) {
+          clickCountsMap[previousName] -= 1;
+
+          // Remove the previous voter from the list
+          if (voterMap[previousName]) {
+            voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
+            if (voterMap[previousName].length === 0) {
+              delete voterMap[previousName];
+            }
+          }
+
+          if (clickCountsMap[previousName] <= 0) {
+            delete clickCountsMap[previousName];
+          }
+
+          // Remove previous selection from alreadyClicked
+          alreadyClicked[timerFromNewName].delete(previousTimerServerDropdownID);
+        }
+      }
+
+      // Mark this selection for the formButtonID
+      formButtonSelections[formButtonID] = timerServerDropdownID;
+
+      // Increment vote count correctly
+      clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
+
+      // Store the voter's name
+      if (!voterMap[name]) {
+        voterMap[name] = [];
+      }
+      if (!voterMap[name].includes(timerFromNewName)) {
+        voterMap[name].push(timerFromNewName);
+      }
+
+      // Mark this vote in alreadyClicked
+      alreadyClicked[timerFromNewName].add(timerServerDropdownID);
+
+
+      // Print the total count of votes (ignoring the keys)
+      // const totalVotesOfForm = Object.values(clickCountsMap).reduce((sum, count) => sum + count, 0);
+      // console.log('Total Votes totalVotesOfForm:', totalVotesOfForm);
+
+
+
+      // Find the person with the highest vote count
+      let highestVotesName = "";
+      let highestVotesCount = 0;
+
+      for (let [key, count] of Object.entries(clickCountsMap)) {
+        if (count > highestVotesCount) {
+          highestVotesName = key;
+          highestVotesCount = count;
+        }
+      }
+      //working 2
+      console.log(`Person with highest vote count: ${highestVotesName} with ${highestVotesCount} votes`);
+      // Display the message in HTML inside the #form-data-display element
+      const formDataDisplay = document.getElementById('form-data-display');
+      if (formDataDisplay) {
+        const message = ` ${highestVotesName} with ${highestVotesCount} votes`;
+        formDataDisplay.innerHTML = `⭐ <span>Form:</span> <p>${message}</p>`;
+      }
+
+      // Clear and update display
+      clickCountsList.innerHTML = '';
+      for (let [key, count] of Object.entries(clickCountsMap)) {
+        if (count > 0) {
+          const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+          const listItem = document.createElement("li");
+          listItem.textContent = `(${voters}) voted for (${key}): ${count} Vote${count > 1 ? 's' : ''}`;
+          clickCountsList.appendChild(listItem);
+        }
+      }
+    }
+
+
+
+
+
+    function getTimersAsJson() {
+      const timers = [];
+
+      document.querySelectorAll(".timer").forEach(timerComponent => {
+        const title = timerComponent.querySelector(".timer-title")?.value || "Untitled";
+        const timeValue = timerComponent.querySelector(".timer-value")?.value || "00:00";
+        const voteBtn = timerComponent.querySelector(".vote-btn");
+        const hasVoted = voteBtn && voteBtn.textContent === "Unvote"; // Check if voted
+        const assignedCategories = [...timerComponent.querySelectorAll(".dropdown-item.active")]
+          .map(btn => btn.dataset.type); // Categories assigned
+
+        timers.push({
+          title: title,
+          time: timeValue,
+          voted: hasVoted,
+          categories: assignedCategories.length > 0 ? assignedCategories : ["None"]
+        });
+      });
+
+      const jsonOutput = JSON.stringify(timers, null, 2);
+      console.log(jsonOutput); // Display in console
+      return jsonOutput;
+    }//end getTimersAsJson
+
+
+    //addbutton
+    function addTimer() {
+
+      const defaultTime = defaultTimeInput.value;
+      // numberCitizenTimers++; // Update total number for VoteReset and color
+      // 
+      // const timerComponent = createTimerComponent(defaultTime, timerList);
+      // setupTimerControls(timerComponent, defaultTime);
+      // 
+      // document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+
+      const message = {
+        cmd: 'addTimerToServer',
+        msg: {
+          defaultTime: defaultTime,//10:23
+          ELMxID: 0, //this is hardcoded still as of Feb 17 2025
+          // timerComponent: timerComponent.outerHTML // Pass the HTML of the timer component
+        }
+      };
+
+      socket.send(JSON.stringify(message));
+
+    }//end addTimer
+
+
+    ////////Next Function (they must be in this order)
+
+    function addContentSection(type, title, time) {
+      const contentSection = document.createElement("div");
+      contentSection.className = "content-section";
+
+      let timerRunning = false;
+      let timerInterval;
+      let currentTime = time; // Save the original time for later use
+
+      contentSection.innerHTML = `
+        <strong>${type}:</strong> ${title} - Time: <span class="time-display" contenteditable="true">${time}</span>
+        <button class="remove-content-btn">❌</button>
+        <button class="play-pause-btn">▶️</button>
+      `;
+
+      contentDisplayContainer.appendChild(contentSection);
+
+      const removeContentBtn = contentSection.querySelector(".remove-content-btn");
+      removeContentBtn.addEventListener("click", () => {
+        contentSection.remove();
+        counters[type]--;
+
+        updateCounterDisplay();
+      });
+
+      const playPauseBtn = contentSection.querySelector(".play-pause-btn");
+      const timeDisplay = contentSection.querySelector(".time-display");
+
+      playPauseBtn.addEventListener("click", () => {
+        if (timerRunning) {
+          clearInterval(timerInterval);
+          playPauseBtn.innerText = "▶️";
+        } else {
+          // When starting, get the time from the contenteditable element
+          let editedTime = timeDisplay.innerText;
+          let [minutes, seconds] = editedTime.split(":").map(Number);
+
+          timerInterval = setInterval(() => {
+            if (seconds > 0) {
+              seconds--;
+            } else if (minutes > 0) {
+              minutes--;
+              seconds = 59;
+            } else {
+              clearInterval(timerInterval);
+            }
+            editedTime = `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+            timeDisplay.innerText = editedTime;
+          }, 1000);
+          playPauseBtn.innerText = "⏸️";
+        }
+        timerRunning = !timerRunning;
+      });
+    }//end addContentSection
+
+    function openContentForm(contentType, timerComponent, assignedCategories) {
+      const existingForm = document.getElementById("contentForm");
+      if (existingForm) {
+        existingForm.remove();
+      }
+
+      const formHTML = `
+        <div id="contentForm">
+          <input type="text" id="topicName" placeholder="Enter Topic Name"/>
+          <input type="text" id="topicTime" value="2:00" placeholder="Enter Time (e.g., 2 min)"/>
+          <button id="submitContentBtn">Submit</button>
+        </div>
+      `;
+
+      const contentForm = document.createElement("div");
+      contentForm.innerHTML = formHTML;
+      document.body.appendChild(contentForm);
+
+      const submitContentBtn = contentForm.querySelector("#submitContentBtn");
+      submitContentBtn.addEventListener("click", () => {
+        const topicName = document.getElementById("topicName").value;
+        const topicTime = document.getElementById("topicTime").value;
+
+        if (topicName && topicTime) {
+          addContentSection(contentType, topicName, topicTime);
+          assignedCategories.add(contentType);
+          counters[contentType]++;
+          updateCounterDisplay();
+          contentForm.remove();
+        }
+      });
+    }//end openCounterForm
+
+
+
+
+
+    let peopleClickCounts = {}; // Stores total selections for each action
+    let peopleSelections = {}; // Maps buttonID to its selected action
+    let peopleVoterMap = {}; // Stores list of voters per action
+
+    function updatePeopleClickCountDisplay(selectedAction, buttonID, buttonPeopleText, timerPeopleNewName) {
+      const peopleClickCountsList = document.getElementById("people-click-counts-list");
+      const actionName = selectedAction; // Name of the selected action
+
+      console.log(`Updating click count display for: ${actionName}, Timer Name: ${timerPeopleNewName}`);
+
+      // Ensure we track voters per action (not per user)
+      if (!peopleVoterMap[actionName]) {
+        peopleVoterMap[actionName] = new Set();
+      }
+
+      // Prevent duplicate selection by the same user
+      if (peopleVoterMap[actionName].has(timerPeopleNewName)) {
+        alert(`"${timerPeopleNewName}" has already selected "${actionName}"!`);
+        return;
+      }
+
+      // If this buttonID previously selected a different action, decrease its count
+      if (peopleSelections[buttonID] && peopleSelections[buttonID] !== selectedAction) {
+        const previousAction = peopleSelections[buttonID];
+
+        if (peopleClickCounts[previousAction]) {
+          peopleClickCounts[previousAction] -= 1;
+
+          // Remove the previous voter from the list
+          if (peopleVoterMap[previousAction]) {
+            peopleVoterMap[previousAction].delete(timerPeopleNewName);
+          }
+
+          if (peopleClickCounts[previousAction] <= 0) {
+            delete peopleClickCounts[previousAction];
+          }
+        }
+      }
+
+      // Mark this selection for the buttonID
+      peopleSelections[buttonID] = selectedAction;
+
+      // Increment vote count correctly
+      peopleClickCounts[actionName] = (peopleClickCounts[actionName] || 0) + 1;
+
+      // Store the voter
+      peopleVoterMap[actionName].add(timerPeopleNewName);
+
+      // Clear and update display
+      peopleClickCountsList.innerHTML = '';
+      for (let [key, count] of Object.entries(peopleClickCounts)) {
+        if (count > 0) {
+          const voters = Array.from(peopleVoterMap[key]).join(", ") || "Unknown";
+          const listItem = document.createElement("li");
+          listItem.textContent = `(${voters}) selected "${key}": ${count} time${count > 1 ? 's' : ''}`;
+          peopleClickCountsList.appendChild(listItem);
+        }
+      }
+    }
+
+
+
+
+
+
+
+
+    function updateCounterDisplay() {
+      document.getElementById("individualCount").innerText = counters.Individual;
+      document.getElementById("particularCount").innerText = counters.Particular;
+      document.getElementById("universalCount").innerText = counters.Universal;
+    }
+
+    function addContentSection(type, title, time) {
+      const contentSection = document.createElement("div");
+      contentSection.className = "content-section";
+
+      let timerRunning = false;
+      let timerInterval;
+      let currentTime = time; // Save the original time for later use
+
+      contentSection.innerHTML = `
+        <strong>${type}:</strong> ${title} - Time: <span class="time-display" contenteditable="true">${time}</span>
+        <button class="remove-content-btn">❌</button>
+        <button class="play-pause-btn">▶️</button>
+      `;
+
+      contentDisplayContainer.appendChild(contentSection);
+
+      const removeContentBtn = contentSection.querySelector(".remove-content-btn");
+      removeContentBtn.addEventListener("click", () => {
+        contentSection.remove();
+        counters[type]--;
+        updateCounterDisplay();
+      });
+
+      const playPauseBtn = contentSection.querySelector(".play-pause-btn");
+      const timeDisplay = contentSection.querySelector(".time-display");
+
+      playPauseBtn.addEventListener("click", () => {
+        if (timerRunning) {
+          clearInterval(timerInterval);
+          playPauseBtn.innerText = "▶️";
+        } else {
+          // When starting, get the time from the contenteditable element
+          let editedTime = timeDisplay.innerText;
+          let [minutes, seconds] = editedTime.split(":").map(Number);
+
+          timerInterval = setInterval(() => {
+            if (seconds > 0) {
+              seconds--;
+            } else if (minutopicTimetes > 0) {
+              minutes--;
+              seconds = 59;
+            } else {
+              clearInterval(timerInterval);
+            }
+            editedTime = `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+            timeDisplay.innerText = editedTime;
+          }, 1000);
+          playPauseBtn.innerText = "⏸️";
+        }
+        timerRunning = !timerRunning;
+      });
+    }
+
+
+    //////////////////////Next Function
+
+    function openContentForm(contentType, timerComponent, assignedCategories) {
+      const existingForm = document.getElementById("contentForm");
+      if (existingForm) {
+        existingForm.remove();
+      }
+
+      const formHTML = `
+        <div id="contentForm">
+          <input type="text" id="topicName" placeholder="Enter Topic Name"/>
+          <input type="text" id="topicTime" value="2:00" placeholder="Enter Time (e.g., 2 min)"/>
+          <button id="submitContentBtn">Submit</button>
+        </div>
+      `;
+
+      const contentForm = document.createElement("div");
+      contentForm.innerHTML = formHTML;
+      document.body.appendChild(contentForm);
+
+      const submitContentBtn = contentForm.querySelector("#submitContentBtn");
+      submitContentBtn.addEventListener("click", () => {
+        const topicName = document.getElementById("topicName").value;
+        const topicTime = document.getElementById("topicTime").value;
+
+        if (topicName && topicTime) {
+          addContentSection(contentType, topicName, topicTime);
+          assignedCategories.add(contentType);
+          counters[contentType]++;
+          updateCounterDisplay();
+          contentForm.remove();
+        }
+      });
+    }
+
+    ///////////////NEXT FUNCTION (they must go in this order. )
+
+    function createTimerComponent(allThisTimerDataFromServer, timerList, totalVotes) {
+      //NOTE: Feb 19 2025: this timer function is called AFTER we return from server with server made global ID for this timer. The server keeps track of the ID not browser.
+      let defaultTime = allThisTimerDataFromServer.remainingTime;//the timer on server is super precise so simplify here for drawing
+      let minutes = Math.floor(defaultTime / 60); // Get the number of minutes
+      let seconds = defaultTime % 60; // Get the remaining seconds
+
+      // Format seconds as two digits (e.g., 5 becomes "05")
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+      let formattedTime = `${minutes}:${seconds}`;
+      defaultTime = formattedTime;
+      let ascendingTime = allThisTimerDataFromServer.ascendingTime;
+      minutes = Math.floor(ascendingTime / 60);
+      seconds = ascendingTime % 60; // Get the remaining seconds
+
+      // Format seconds as two digits (e.g., 5 becomes "05")
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+      formattedTime = `${minutes}:${seconds}`;
+
+      //asccendingTime = formattedTime;
+      console.log("scendingCathcupTime:" + ascendingTime + " " + minutes + " " + seconds + " " + formattedTime);
+      //formattedTime = minutes+":"+seconds;
+      //ascendingTime=formattedTime
+      let newTimerID = allThisTimerDataFromServer.timerServerID;
+      let timerTitle = allThisTimerDataFromServer.name;
+      globalTimerIDs++
+      console.log("Start createTimerComponent defaultTime:" + JSON.stringify(defaultTime) + ": timerTitle: " + timerTitle + " timerList:" + JSON.stringify(timerList));
+      const timerComponent = document.createElement("div");
+      timerComponent.className = "timer";
+      timerComponent.id = newTimerID; //NOTE: March 13 2025: adding this ID to quickly find the DIV to make the timer green etc. Before the ID was not attached but only to the input parts below
+      timerComponent.flow = "flow timer default";
+      timerComponent.content = "content timer default";
+      timerComponent.people = "people timer default";
+      timerComponent.votesubmit = "votesubmit timer default";
+
+      // Create the input elements first
+      //const timerTitleInput = document.createElement("input");
+      //timerTitleInput.setAttribute("type", "text");
+      //timerTitleInput.setAttribute("placeholder", "Timer Title");
+      //timerTitleInput.setAttribute("class", "timer-title");
+      //timerTitleInput.setAttribute("id", `${newTimerID}-100`);
+      //
+      //timerComponent.appendChild(timerTitleInput);
+
+      timerComponent.innerHTML = `
+        <input data-id="${newTimerID}-1" type="text" value="${timerTitle}" placeholder="${timerTitle}" class="timer-title"/>
+        <input data-id="${newTimerID}-2" type="text" value="${defaultTime}" class="timer-value"/> 
+        <input data-id="${newTimerID}-3" type="text" value="${formattedTime}" class="timer-asc"/>
+        <input data-id="${newTimerID}-4" type="text" placeholder="veto" class="timer-veto"/> <!-- Shorter width for veto -->
+
+        <div class="flex-row">
+      
+          <button data-id="${newTimerID}-5" data-status="currently_paused" class="start-pause-btn">▶️</button>
+          <button id2="${newTimerID}"-6 class="reset-initial-btn">⏏️</button>
+          <button id2="${newTimerID}"-7 class="reset-default-btn">⤵️</button>
+          <button data-id="${newTimerID}-8" class="remove-btn">❌</button>
+          <button data-id="${newTimerID}-9" class="form-btn" id="formbtn">Form</button>
+          <button id2="${newTimerID}"-10 class="content-btn" id="contentdata">Content</button>
+          <button data-id="${newTimerID}-11" class="people-btn" id="peoplebtn">People</button>
+          <button data-id="${newTimerID}-12" class="vote-btn" id="vote-btn" disabled >Vote</button>
+        </div>
+      `;
+
+
+
+      timerList.appendChild(timerComponent);
+
+      console.log("Event Listener set in createTimerComponent: ");
+
+      if (allThisTimerDataFromServer.isRunning) {//meaning when someone logs in if the timer is running it will be running right on login
+        startTimer(newTimerID, allThisTimerDataFromServer.remainingTime)
+        startAscendingTimer(newTimerID, allThisTimerDataFromServer.ascendingTime);
+      }
+
+      if (allThisTimerDataFromServer.remainingTime <= 0) {//the timer is out so make the background orange
+        timerComponent.style.backgroundColor = 'orange';
+      }
+
+      //setTimeout(function() {
+      const titleInputField = timerComponent.querySelector(`[data-id="${newTimerID}-1"]`);//timerComponent.querySelector('.timer-title'); // Use class selector
+      console.log("titleInputField using querySelector:" + JSON.stringify(titleInputField));
+      //}, 1000);
+
+
+
+
+      titleInputField.addEventListener('blur', function () {
+
+        const timerNewName = titleInputField.value; // Get the value entered by the user
+        const timerNewTitleID = titleInputField.getAttribute('data-id'); // Get the value entered by the user
+        let resetTimerName_timerServerID = "";
+        const parts = timerNewTitleID.split('-');
+        const firstPart = parts[0];
+        resetTimerName_timerServerID = firstPart;//this firstPart is the timerServerID        
+        console.log(firstPart);
+        const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
+        console.log("Event Listener set in createTimerComponent: " + timerNewName);
+        // Send the new timer name to the server when the user unfocuses the input field
+        socket.send(JSON.stringify("inside of blur updateTimerTitleName"));
+        let responseObject = { "cmd": "resetTimerName", "msg": { "ELMxID": 0, "timerServerID": resetTimerName_timerServerID, "timerNewName": timerNewName } }
+        //workerDispatch(JSON.stringify(responseObject))
+        socket.send(JSON.stringify(responseObject));
+        console.log("Timer title sending to socket: " + timerNewName);
+      });//end event handler blur
+      ////////////////////////////////////////////////////////////////////////////////////
+
+      // Select the input field for default time (assuming this is within a timer component)
+      const defaultTimeInputField = timerComponent.querySelector(`[data-id="${newTimerID}-2"]`); // Use correct data-id for default time
+
+      defaultTimeInputField.addEventListener('focus', function () {
+
+
+        stopTimer(newTimerID);
+
+
+
+      });//end click
+
+      defaultTimeInputField.addEventListener('blur', function () {
+        // Get the value entered by the user
+        const defaultTime = defaultTimeInputField.value;
+
+        // Get the data-id attribute value of the input field
+        const defaultTimeElementID = defaultTimeInputField.getAttribute('data-id');
+
+        let resetDefaultTime_timerServerID = "";
+        const parts = defaultTimeElementID.split('-'); // Split the ID to get the timerServerID
+        const firstPart = parts[0]; // The first part is the timerServerID
+        resetDefaultTime_timerServerID = firstPart; // Set timerServerID to firstPart
+
+        console.log("resetDefaultTime_timerServerID: " + resetDefaultTime_timerServerID);
+
+        const ELMxID = 0; // You can dynamically set this as needed
+        console.log("Event Listener set for default time update: " + defaultTime);
+
+        let timeParts = defaultTime.split(":");
+
+        // Convert minutes and seconds to integers
+        let minutes = parseInt(timeParts[0], 10);
+        let seconds = parseInt(timeParts[1], 10);
+
+        // Convert the total time to seconds
+        let totalSeconds = (minutes * 60) + seconds;
+
+        // Send the updated default time to the server when the user unfocuses the input field
+        socket.send(JSON.stringify("inside of blur updateDefaultTime"));
+
+
+        // Create a response object to send to the server
+        let responseObject = {
+          "cmd": "resetDefaultTime",
+          "msg": {
+            "ELMxID": ELMxID,
+            "timerServerID": resetDefaultTime_timerServerID,
+            "defaultTime": totalSeconds
+          }
+        };
+
+        // Send the response object to the server (via socket)
+        console.log("responce of default timer" + responseObject);
+        socket.send(JSON.stringify(responseObject));
+
+        console.log("Default time sent to server: " + defaultTime);
+      });
+
+
+
+
+      const timerAscInputField = timerComponent.querySelector(`[data-id="${newTimerID}-3"]`); // Use the correct data-id for the ascending timer
+      console.log("timerAscInputField using querySelector: " + JSON.stringify(timerAscInputField));
+
+      timerAscInputField.addEventListener('blur', function () {
+        // Get the value entered by the user
+        const timerAscValue = timerAscInputField.value;
+
+        // Get the data-id attribute value of the input field
+        const timerAscElementID = timerAscInputField.getAttribute('data-id');
+
+        let resetTimerAsc_timerServerID = "";
+        const parts = timerAscElementID.split('-'); // Split the ID to get the timerServerID
+        const firstPart = parts[0]; // The first part is the timerServerID
+        resetTimerAsc_timerServerID = firstPart; // Set timerServerID to firstPart
+
+        console.log("resetTimerAsc_timerServerID: " + resetTimerAsc_timerServerID);
+
+        const ELMxID = 0; // You can dynamically set this as needed
+        console.log("Event Listener set for ascending timer update: " + timerAscValue);
+
+        // Send the updated ascending timer value to the server when the user unfocuses the input field
+        socket.send(JSON.stringify("inside of blur updateAscendingTimer"));
+
+        // Create a response object to send to the server
+        let responseObject = {
+          "cmd": "resetTimerAsc",
+          "msg": {
+            "ELMxID": ELMxID,
+            "timerServerID": resetTimerAsc_timerServerID,
+            "timerAscValue": timerAscValue
+          }
+        };
+
+        // Send the response object to the server (via socket)
+        console.log("Response for ascending timer: " + JSON.stringify(responseObject));
+        socket.send(JSON.stringify(responseObject));
+
+        console.log("Ascending timer value sent to server: " + timerAscValue);
+      });
+
+
+
+      // setTimeout(function() {
+      const vetoInputField = timerComponent.querySelector(`[data-id="${newTimerID}-4"]`);
+      console.log("vetoInputField using querySelector:" + JSON.stringify(vetoInputField));
+      // }, 1000);
+
+      vetoInputField.addEventListener('blur', function () {
+
+        console.log(`veto section :  ${highestVotesName} with ${highestVotesCount} votes`);
+
+
+        const vetoNewName = vetoInputField.value; // Get the value entered by the user
+        const vetoNewTitleID = vetoInputField.getAttribute('data-id'); // Get the attribute ID
+        const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
+        console.log("Event Listener set in createTimerComponent: " + vetoNewName);
+
+        // Send the new veto name to the server when the user unfocuses the input field
+        socket.send(JSON.stringify("inside of blur updateVetoName"));
+        //working 1
+        let responseObject = {
+          "cmd": "resetVetoName",
+          "msg": {
+            "ELMxID": ELMxID,
+            "vetoNewTitleID": vetoNewTitleID,
+            "vetoNewName": vetoNewName
+          }
+        };
+
+        socket.send(JSON.stringify(responseObject));
+        console.log("Veto title sending to socket: " + vetoNewName);
+      });//end event handler blur
+
+
+
+      const startPauseBtn = timerComponent.querySelector(`[data-id="${newTimerID}-5"]`);
+      console.log("startPauseBtn using querySelector: " + JSON.stringify(startPauseBtn));
+      startPauseBtn.addEventListener('click', function () {
+        const ELMxID = 0; // You can change this to the actual ELMxID if dynamic
+        let startPauseBtn_status = startPauseBtn.getAttribute("data-status");
+
+        let timerServerID = startPauseBtn.getAttribute("data-id"); // Extract the timer ID
+        timerServerID = parseInt(timerServerID.split('-')[0], 10);
+        console.log("Event Listener (start/pause): " + startPauseBtn_status + " timerServerID" + timerServerID);
+
+        // Toggle timer locally using our defined function
+        //toggleTimer(isStarting);
+
+
+        if (startPauseBtn_status == "currently_paused") {//then it means we've clicked it which will switch it to its opposite
+          // Prepare data to send to the server
+          let responseObject = {
+            cmd: "startTimer",
+            msg: {
+              ELMxID: ELMxID,
+              timerServerID: timerServerID,
+            }//end msg
+          };//end responseObject
+
+          // Send the request to the server to update the timer state for all clients
+          socket.send(JSON.stringify(responseObject));
+          console.log("startTimer sending to socket: " + JSON.stringify(responseObject));
+
+        } else {//it means the timer was running and we clicked it so now we are pausing it
+
+          let responseObject = {
+            cmd: "stopTimer",
+            msg: {
+              ELMxID: ELMxID,
+              timerServerID: timerServerID,
+            }//end msg
+          };//end responseObject
+
+          // Send the request to the server to update the timer state for all clients
+          socket.send(JSON.stringify(responseObject));
+          console.log("stopTimer sending to socket: " + JSON.stringify(responseObject));
+
+        }//end if startPaustBTN_status
+
+      });//end startPauseBtn.adddEventListener
+
+
+
+
+
+      const contentBtn2 = document.getElementById("contentdata");
+      console.log("CONTENTBUTTON:" + contentBtn2)
+
+
+
+      // Create dropdown menu inside content-btn
+      const contentBtn = timerComponent.querySelector(".content-btn");
+      const dropdownMenu = document.createElement("div");
+      dropdownMenu.classList.add("dropdown-menu");
+      dropdownMenu.innerHTML = `
+            <button class="dropdown-item" data-type="Individual">Individual</button>
+            <button class="dropdown-item" data-type="Particular">Particular</button>
+            <button class="dropdown-item" data-type="Universal">Universal</button>
+          `;
+
+      // confisuan
+      timerComponent.appendChild(dropdownMenu);
+
+
+
+      let assignedCategories = new Set();
+
+      contentBtn.addEventListener("click", () => {
+        dropdownMenu.classList.toggle("show-dropdown");
+      });
+
+      // dropdownMenu.addEventListener("click", (e) => {
+      //   const selectedContent = e.target.dataset.type;
+      //   openContentForm(selectedContent, timerComponent, assignedCategories);
+      // });
+
+      dropdownMenu.addEventListener("click", (e) => {
+        if (e.target.classList.contains("dropdown-item")) {
+          document.querySelectorAll(".dropdown-item").forEach(item => {
+            item.style.backgroundColor = ""; // Reset to default
+          });
+
+          const selectedContent = e.target.dataset.type;
+
+          // Call function to open content form
+          openContentForm(selectedContent, timerComponent, assignedCategories);
+
+          // Change clicked button background color to green
+          e.target.style.backgroundColor = "yellow";
+
+          // Change content button background to yellow when content is added
+          contentBtn.style.backgroundColor = "yellow";
+        }
+      });
+
+
+
+      document.addEventListener("click", (event) => {
+        if (!contentBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
+          dropdownMenu.classList.remove("show-dropdown");
+        }
+        if (!peopleBtn.contains(event.target) && !peopleDropdownMenu.contains(event.target)) {
+          peopleDropdownMenu.classList.remove("show-dropdown");
+        }
+        if (!formBtn.contains(event.target) && !formDropdownMenu.contains(event.target)) {
+          formDropdownMenu.classList.remove("show-dropdown");
+        }
+      });
+
+      // Create dropdown menu inside form-btn
+      const formBtn = timerComponent.querySelector(".form-btn");
+      const formDropdownMenu = document.createElement("div");
+      formDropdownMenu.classList.add("dropdown-menu");
+
+      // Create Main Menu Items
+      formDropdownMenu.innerHTML = `
+    <div class="dropdown-item" id="turnbutton" data-timer-id="${newTimerID}-turn">1. Turn
+      <div class="submenu">
+        <button class="submenu-item" data-timerServerID="${newTimerID}-straightturn" id="straightturn">Straight Turn</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-directiveTurn" id="directiveTurn">Directive Turn</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-popcornTurn" id="popcornTurn">Popcorn Turn</button>
+      </div>
+    </div>
+    <div class="dropdown-item" id="freeflowbutton" data-timer-id="${newTimerID}-freeflow">2. Free Flow
+      <div class="submenu">
+        <button class="submenu-item" data-timerServerID="${newTimerID}-fastFreeFlow">Fast Free Flow</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-teamFreeFlow">Team Free Flow</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-spreadFreeFlow">Spread Free Flow</button>
+      </div>
+    </div>
+    <div class="dropdown-item" id="godmodebutton" data-timer-id="${newTimerID}-godmode">3. God Mode
+      <div class="submenu">
+        <button class="submenu-item" data-timerServerID="${newTimerID}-god">God</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-diety">Diety</button>
+        <button class="submenu-item" data-timerServerID="${newTimerID}-spirit">Spirit</button>
+      </div>
+    </div>
+  `;
+      formBtn.appendChild(formDropdownMenu);
+
+
+
+      // Toggle dropdown visibility
+      formBtn.addEventListener("click", () => {
+        formDropdownMenu.classList.toggle("show-dropdown");
+      });
+
+
+
+
+
+      // Create dropdown menu inside people-btn
+      const peopleBtn = timerComponent.querySelector(".people-btn");
+      const peopleDropdownMenu = document.createElement("div");
+      // const timerNewName = titleInputField.value;
+
+      // console.log("timerNewName test" + timerNewName);
+      peopleDropdownMenu.classList.add("dropdown-menu");
+
+      peopleDropdownMenu.innerHTML = `
+  <button class="dropdown-item" data-action="${newTimerID}-same">Same People</button>
+  <button class="dropdown-item" data-action="${newTimerID}-remove">Remove People</button>
+  <button class="dropdown-item" data-action="${newTimerID}-add">Add People</button>
+`;
+
+      // Append the dropdown to the button
+      peopleBtn.appendChild(peopleDropdownMenu);
+
+      // Toggle dropdown visibility
+      peopleBtn.addEventListener("click", () => {
+        peopleDropdownMenu.classList.toggle("show-dropdown");
+      });
+
+
+
+      // Handle click events for people dropdown
+      peopleDropdownMenu.addEventListener("click", (e) => {
+
+        const timerNewName = titleInputField ? titleInputField.value.trim() : ""; // Fetch updated value
+        // console.log("Updated timerNewName:", timerNewName);
+
+
+
+
+        if (e.target.classList.contains("dropdown-item")) {
+          // Reset the background color for all items
+          const items = peopleDropdownMenu.querySelectorAll(".dropdown-item");
+
+
+          items.forEach(item => {
+            item.style.backgroundColor = ""; // Reset all item backgrounds
+          });
+
+          // Apply background color to the clicked item
+          // e.target.style.backgroundColor = "green"; // You can change the color as needed
+          // peopleBtn.style.backgroundColor = "green"; // Change to desired color
+
+          const action = e.target.dataset.action;
+
+          let ELMxID = 0;
+          // Construct the data object to send via WebSocket
+
+          console.log("Clicked Button:", e.target);
+          // console.log("Extracted Button Text:", e.target.innerText.trim());
+          buttonPeopleText = e.target.innerText.trim();
+
+          const data = {
+            cmd: "peopleDropdownClick",
+            msg: {
+              action: action,
+              "ELMxID": ELMxID,
+              buttonID: peopleBtn.getAttribute("data-id"),
+              timerPeopleNewName: timerNewName,
+              buttonPeopleText: buttonPeopleText
+            }
+          };
+
+          // Send the data via WebSocket
+          socket.send(JSON.stringify(data));
+
+          console.log(`Sent action to server: ${action}`);
+
+          // Close the dropdown after selection
+          peopleDropdownMenu.classList.remove("show-dropdown");
+        }
+      });
+
+
+      function setupDropdown(dropdownMenu) {
+        const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
+        const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
+        const formbtn = document.getElementById("formbtn"); // Get form button
+
+        // Object to store click counts
+        if (!window.submenuClickCounts) {
+          window.submenuClickCounts = {};
+        }
+
+
+
+        function activateButton(selectedButton) {
+          console.log("In activateButton");
+
+          // Reset the background color for all submenu items
+          parentButtons.forEach(button => button.style.backgroundColor = "");
+          allButtons.forEach(button => button.style.backgroundColor = "");
+
+          // Activate the clicked submenu item
+          selectedButton.style.backgroundColor = "green";
+          const formbtn = selectedButton.closest(".form-btn");
+
+          // Find and activate the parent button
+          const parentButton = selectedButton.closest(".dropdown-item");
+          if (parentButton) parentButton.style.backgroundColor = "green";
+          if (formbtn) formbtn.style.backgroundColor = "green";
+
+          // Track submenu item clicks
+          const buttonText = selectedButton.innerText.trim();
+          if (!window.submenuClickCounts) {
+            window.submenuClickCounts = {}; // Initialize if undefined
+          }
+          if (!window.submenuClickCounts[buttonText]) {
+            window.submenuClickCounts[buttonText] = 0;
+          }
+          window.submenuClickCounts[buttonText] += 1;
+
+          console.log(`${buttonText} clicked ${window.submenuClickCounts[buttonText]} times`);
+
+          // Get the necessary data attributes from the selected button
+          const timerSubmenuServerID = selectedButton.getAttribute("data-timerServerID"); // Extract the unique timerServerID
+          const timerdropdownID = selectedButton.closest(".dropdown-item").getAttribute("data-timer-id");  // Get the timer ID from the parent dropdown item
+          const formButtonID = selectedButton.closest(".form-btn") ? selectedButton.closest(".form-btn").getAttribute("data-id") : null;  // Get the data-id from the form button (if clicked)
+          const timerNewName = titleInputField.value; // Get the value entered by the user
+
+          console.log("Timer Dropdown ID:", timerdropdownID);
+          console.log("Timer Server ID:", timerSubmenuServerID);
+          console.log("Form Button ID:", formButtonID);
+
+
+          // Prevent sending duplicate WebSocket messages
+          if (selectedButton.dataset.clicked) return;
+          selectedButton.dataset.clicked = true; // Mark as clicked to prevent multiple sends
+
+          setTimeout(() => {
+            delete selectedButton.dataset.clicked; // Allow future clicks after delay
+          }, 500); // Adjust delay if needed
+
+
+
+          // Construct the data object to send via WebSocket
+          const data = {
+            cmd: "submenuClick",
+            msg: {
+              ELMxID: 0,
+              timerSubmenuServerID: timerSubmenuServerID,
+              formButtonID: formButtonID,  // Pass the formButtonID here
+              timerdropdownID: timerdropdownID,
+              timerFromNewName: timerNewName,
+              buttonText: buttonText
+            }
+          };
+
+
+          console.log("data of timer server id", JSON.stringify(data));
+
+          // Send the data via WebSocket
+          socket.send(JSON.stringify(data));
+        }
+
+
+        // Attach event listeners dynamically for the current dropdown
+        allButtons.forEach(button => {
+          button.addEventListener("click", () => {
+            activateButton(button);
+            console.log('Sub item clicked');
+          });
+        });
+      }
+
+      // Initial setup for existing dropdowns
+      document.querySelectorAll(".dropdown-menu").forEach(setupDropdown);
+
+      // Observe for new dropdowns being added dynamically
+      const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+          mutation.addedNodes.forEach(node => {
+            if (node.classList && node.classList.contains("dropdown-menu")) {
+              setupDropdown(node);
+            }
+          });
+        });
+      });
+
+      // Start observing the document for new dropdowns
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      //Change the Reset Button Colour in case in mid vote, colours will update
+      // Get the button DOM element
+      const resetVotesBtn = document.getElementById("resetVotesBtn");
+
+
+
+      // Calculate the percentage of totalVotes compared to numberCitizenTimers
+      const votePercentage = (totalVotes / numberCitizenTimers) * 100;
+      console.log("VotePercentage Of Timers:" + totalVotes + " " + numberCitizenTimers + " " + votePercentage);
+
+      // Use a switch-case style logic to determine the button's color
+      if (totalVotes == 0 && numberCitizenTimers == 0) {
+        resetVotesBtn.style.backgroundColor = 'black';
+        resetVotesBtn.style.color = 'white';
+      } else if (votePercentage < 10) {
+        resetVotesBtn.style.backgroundColor = 'black';
+        resetVotesBtn.style.color = 'white';
+      } else if (votePercentage >= 10 && votePercentage < 70) {
+        resetVotesBtn.style.backgroundColor = 'red';
+        resetVotesBtn.style.color = 'black';
+      } else if (votePercentage >= 70 && votePercentage < 100) {
+        resetVotesBtn.style.backgroundColor = 'orange';
+        resetVotesBtn.style.color = 'black';
+      } else if (votePercentage === 100) {
+        resetVotesBtn.style.backgroundColor = 'green';
+        resetVotesBtn.style.color = 'black';
+      }
+
+
+
+
+
+      // Function to enable the vote button when all required buttons are clicked
+      function enableVoteButton(flexRow) {
+        const buttons = flexRow.querySelectorAll('.form-btn, .content-btn, .people-btn');
+        const voteBtn = flexRow.querySelector('.vote-btn');
+
+        // Check if all required buttons are clicked
+        const allClicked = [...buttons].every(button => button.classList.contains('clicked'));
+
+        // Enable or disable the vote button accordingly
+        if (allClicked) {
+          voteBtn.classList.remove('disabled');
+          voteBtn.disabled = false;
+        } else {
+          voteBtn.classList.add('disabled');
+          voteBtn.disabled = true;
+        }
+
+
+
+        // Send update to the server
+        const voteButtonID = voteBtn.getAttribute("data-id"); // Assuming each vote button has a unique ID
+        socket.send(JSON.stringify({
+          cmd: "updateVoteButton",
+          msg: {
+            ELMxID: 0,
+            voteButtonID: voteButtonID,
+            isEnabled: allClicked
+          }
+        }));
+
+        console.log("Sent updateVoteButton request to server:", voteButtonID, allClicked);
+
+
+
+      }
+
+      // Event listener for dynamically added buttons
+      document.addEventListener('click', function (event) {
+        if (event.target.matches('.form-btn, .content-btn, .people-btn')) {
+          event.target.classList.add('clicked');
+          const flexRow = event.target.closest('.flex-row');
+          if (flexRow) {
+            enableVoteButton(flexRow);
+          }
+        }
+      });
+
+
+      return timerComponent;
+    }//end createTimerComponent
+
+
+
+
+
+
+
+    //********************************************************************
+
+
+
+
+
+
+    //MAIN Start Of Page Loading (the above createTimerComponent is called within AFTER the DOM loads) 
+    document.addEventListener("DOMContentLoaded", () => {
+
+      //Mark/Nabin, where you left off: comment out these const variables and put them in setGlobalVariableOnceDOMContentLoaded and call global versions of these from within the function and set them to the new DOM elements created
+      setGlobalVariablesOnceDOMContentLoaded();
+      synchronizeScreenDraw();
+      const timerList = document.getElementById("timerList");
+      const addTimerBtn = document.getElementById("addTimerBtn");
+      const defaultTimeInput = document.getElementById("defaultTime");
+      const notifyCheckbox = document.getElementById("notifyCheckbox");
+      const voteDataDiv = document.getElementById("voteData"); // Total vote display
+
+      const contentDisplayContainer = document.getElementById("contentDisplayContainer");
+      console.log("DOMContentLoaded: timerList:" + JSON.stringify(timerList));
+
+
+      let totalVotes = 0; // Global vote count to track total votes
+      let currentRunningTimer = null; // Track the currently running timer
+
+      addTimerBtn.style.color = "green"; // Optional: Set the color to green
+
+
+
+
+      addTimerBtn.addEventListener("click", addTimer);
+
+
+      notifyCheckbox.addEventListener("change", function () {
+        if (this.checked) {
+          requestNotificationPermission();
+        }
+      });
+
+      addTimerBtn.addEventListener("click", addTimer);
+      //resetVotesBtn.addEventListener("click", resetVotes); // Add listener for reset vote button
+
+    }); ////end DOMContentLoaded
+
+
+
+  </script>
 </body>
+
 </html>
