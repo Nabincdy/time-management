@@ -1341,8 +1341,9 @@
         case "returnedFromServerSubmenuClick":
           console.log("Testing what is this first data:", data.msg.timerFromNewName);
 
-          const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID, clickCount, timerFromNewName } = data.msg;
+          const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID, clickCount, timerFromNewName, newtimerinputfiled } = data.msg;
           console.log("Testing what is this data:", data.msg);
+          console.log("Testing what is this newtimerinputfiled:", data.msg.newtimerinputfiled);
 
           // Retrieve previous selections from localStorage (track per formButtonID)
           let previousSelections = JSON.parse(localStorage.getItem("previousSelections")) || {};
@@ -1400,7 +1401,7 @@
 
           // Update the click count display
           // working 1
-          updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID);
+          updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID, newtimerinputfiled);
           break;
 
 
@@ -1659,160 +1660,11 @@
 
       // Ensure the update is sent via WebSocket
       sendTimerUpdate();
-      // showResetPopup();
     }
 
 
 
-    function showResetPopup() {
-      // Create the popup
-      const popup = document.createElement("div");
-      popup.style.position = "fixed";
-      popup.style.top = "50%";
-      popup.style.left = "50%";
-      popup.style.transform = "translate(-50%, -50%)";
-      popup.style.backgroundColor = "white";
-      popup.style.padding = "20px";
-      popup.style.boxShadow = "0px 0px 10px rgba(0,0,0,0.5)";
-      popup.style.borderRadius = "5px";
-      popup.style.zIndex = "1000";
-      popup.style.textAlign = "center";
 
-      // Create input field for time
-      const inputField = document.createElement("input");
-      inputField.type = "text";
-      inputField.id = "manage";
-      inputField.placeholder = "Enter Time (MM:SS)";
-      inputField.value = "1:00"; // Default value
-      inputField.style.width = "100%";
-      inputField.style.padding = "10px";
-      inputField.style.marginBottom = "10px";
-
-      // Create timer display
-      const timerDisplay = document.createElement("p");
-      timerDisplay.style.fontSize = "18px";
-      timerDisplay.style.fontWeight = "bold";
-      timerDisplay.style.marginBottom = "10px";
-      timerDisplay.textContent = `Time Left: 1:00`; // Initial display
-
-      // Flag to check if timer is running
-      let timerRunning = false;
-      let countdown;
-
-      // Create submit button
-      const submitButton = document.createElement("button");
-      submitButton.textContent = "Start Timer";
-      submitButton.style.backgroundColor = "blue";
-      submitButton.style.color = "white";
-      submitButton.style.padding = "10px";
-      submitButton.style.border = "none";
-      submitButton.style.cursor = "pointer";
-      submitButton.style.width = "100%";
-      submitButton.style.marginBottom = "10px";
-
-      // Create remove button
-      const removeButton = document.createElement("button");
-      removeButton.textContent = "Remove";
-      removeButton.style.backgroundColor = "red";
-      removeButton.style.color = "white";
-      removeButton.style.padding = "10px";
-      removeButton.style.border = "none";
-      removeButton.style.cursor = "pointer";
-      removeButton.style.width = "100%";
-
-      // Start timer when submit button is clicked
-      submitButton.addEventListener("click", () => {
-        const userInput = inputField.value.trim();
-
-        // Validate input time format
-        const timePattern = /^([0-5]?[0-9]):([0-5]?[0-9])$/;
-        const match = userInput.match(timePattern);
-        if (!match) {
-          alert("Please enter a valid time in MM:SS format.");
-          return;
-        }
-
-        // Parse time
-        let minutes = parseInt(match[1], 10);
-        let seconds = parseInt(match[2], 10);
-        let totalSeconds = minutes * 60 + seconds;
-
-        // Start the countdown only if it's not already running
-        if (!timerRunning) {
-          timerRunning = true;
-          startCountdown(totalSeconds);
-        }
-      });
-
-      // Start countdown function
-      function startCountdown(totalSeconds) {
-        countdown = setInterval(() => {
-          if (totalSeconds <= 0) {
-            clearInterval(countdown);
-            timerRunning = false;
-            alert("Time's up! The popup will now close.");
-            closePopup();
-          } else {
-            totalSeconds--;
-            timerDisplay.textContent = `Time Left: ${formatTime(totalSeconds)}`;
-          }
-        }, 1000);
-      }
-
-      // Helper function to format time as MM:SS
-      function formatTime(seconds) {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-      }
-
-      // Close popup function
-      function closePopup() {
-        clearInterval(countdown); // Stop the timer when popup is closed
-        document.body.removeChild(popup);
-      }
-
-      // Remove popup function
-      removeButton.addEventListener("click", () => {
-        clearInterval(countdown); // Stop the timer if it's running
-        closePopup(); // Close the popup immediately
-      });
-
-      // Highest vote logic
-      function displayHighestVotes() {
-        let highestVotesName = "";
-        let highestVotesCount = 0;
-
-        // Assuming clickCountsMap is an object that stores the names and vote counts
-        for (let [key, count] of Object.entries(clickCountsMap)) {
-          if (count > highestVotesCount) {
-            highestVotesName = key;
-            highestVotesCount = count;
-          }
-        }
-
-        console.log(`Person with highest vote count: ${highestVotesName} with ${highestVotesCount} votes`);
-
-        // Display the message in HTML inside the #form-data-display element
-        const formDataDisplay = document.getElementById('form-data-display');
-        if (formDataDisplay) {
-          const message = `${highestVotesName} with ${highestVotesCount} votes`;
-          formDataDisplay.innerHTML = `⭐ <span>Form:</span> <p>${message}</p>`;
-        }
-      }
-
-      // Call displayHighestVotes when the timer starts
-      submitButton.addEventListener("click", () => {
-        displayHighestVotes(); // Display highest votes when timer starts
-      });
-
-      // Append elements to popup
-      popup.appendChild(inputField);
-      popup.appendChild(timerDisplay);
-      popup.appendChild(submitButton);
-      popup.appendChild(removeButton); // Append remove button
-      document.body.appendChild(popup);
-    }
 
 
     // Listen for reset events from other tabs
@@ -2208,113 +2060,123 @@
     }//end setupTimerControls
 
     let clickCountsMap = {}; // Stores total votes for each name
-    let formButtonSelections = {}; // Maps formButtonID to its selected timerServerDropdownID
-    let voterMap = {}; // Stores list of voters for each name
-    let manageValuesMap = {}; // Stores "manage" input values for each vote
-    let alreadyClicked = {}; // Now an object instead of a Set
+let formButtonSelections = {}; // Maps formButtonID to its selected timerServerDropdownID
+let voterMap = {}; // Stores list of voters for each name
+let manageValuesMap = {}; // Stores "manage" input values for each vote
+let newtimerinputfiledMap = {}; // Stores "newtimerinputfiled" for each voter
+let alreadyClicked = {}; // Now an object instead of a Set
 
-    function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID) {
-      const clickCountsList = document.getElementById("click-counts-list");
-      const name = timerServerDropdownID.split('-').slice(1).join('-');
+function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID, newtimerinputfiled) {
+  const clickCountsList = document.getElementById("click-counts-list");
+  const name = timerServerDropdownID.split('-').slice(1).join('-');
 
-      console.log("timerFromNewName: " + timerFromNewName);
-      const manageInput = document.getElementById("manage");
-      const manageValue = manageInput ? manageInput.value.trim() : "1:00"; // Default to "N/A" if input is not found
+  console.log("timerFromNewName: " + timerFromNewName);
+  const manageInput = document.getElementById("manage");
+  const manageValue = manageInput ? manageInput.value.trim() : "1:00"; // Default to "N/A" if input is not found
 
-      // Ensure we track votes per user
-      if (!alreadyClicked[timerFromNewName]) {
-        alreadyClicked[timerFromNewName] = new Set();
-      }
+  // Ensure we track votes per user
+  if (!alreadyClicked[timerFromNewName]) {
+    alreadyClicked[timerFromNewName] = new Set();
+  }
 
-      // Check if this user has already voted for this option
-      if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
-        alert(`You have already voted for ${name}!`);
-        return;
-      }
+  // Check if this user has already voted for this option
+  if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
+    alert(`You have already voted for ${name}!`);
+    return;
+  }
 
-      // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
-      if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
-        const previousTimerServerDropdownID = formButtonSelections[formButtonID];
-        const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
+  // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
+  if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
+    const previousTimerServerDropdownID = formButtonSelections[formButtonID];
+    const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
 
-        if (clickCountsMap[previousName]) {
-          clickCountsMap[previousName] -= 1;
+    if (clickCountsMap[previousName]) {
+      clickCountsMap[previousName] -= 1;
 
-          // Remove the previous voter from the list
-          if (voterMap[previousName]) {
-            voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
-            if (voterMap[previousName].length === 0) {
-              delete voterMap[previousName];
-            }
-          }
-
-          if (clickCountsMap[previousName] <= 0) {
-            delete clickCountsMap[previousName];
-          }
-
-          // Remove previous selection from alreadyClicked
-          alreadyClicked[timerFromNewName].delete(previousTimerServerDropdownID);
+      // Remove the previous voter from the list
+      if (voterMap[previousName]) {
+        voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
+        if (voterMap[previousName].length === 0) {
+          delete voterMap[previousName];
         }
       }
 
-      // Mark this selection for the formButtonID
-      formButtonSelections[formButtonID] = timerServerDropdownID;
-
-      // Increment vote count correctly
-      clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
-
-      // Store the voter's name
-      if (!voterMap[name]) {
-        voterMap[name] = [];
-      }
-      if (!voterMap[name].includes(timerFromNewName)) {
-        voterMap[name].push(timerFromNewName);
+      if (clickCountsMap[previousName] <= 0) {
+        delete clickCountsMap[previousName];
       }
 
-      // Store "manage" value for each vote
-      manageValuesMap[name] = manageValue;
-
-      // Mark this vote in alreadyClicked
-      alreadyClicked[timerFromNewName].add(timerServerDropdownID);
-
-      // Clear and update display
-      clickCountsList.innerHTML = '';
-      for (let [key, count] of Object.entries(clickCountsMap)) {
-        if (count > 0) {
-          const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
-          const manageValueForKey = manageValuesMap[key] || "N/A";
-
-          // Create list item
-          const listItem = document.createElement("li");
-
-          // Create span for the text content
-          const textSpan = document.createElement("span");
-          textSpan.textContent = `(${voters}) voted for (${key}) For `;
-
-          // Create an editable input field for manageValue
-          const manageEditInput = document.createElement("input");
-          manageEditInput.type = "text";
-          manageEditInput.value = manageValueForKey;
-          manageEditInput.style.margin = "0 5px";
-
-          // Create save button
-          const saveButton = document.createElement("button");
-          saveButton.textContent = "Save";
-          saveButton.onclick = function () {
-            manageValuesMap[key] = manageEditInput.value.trim(); // Update stored value
-            textSpan.textContent = `(${voters}) voted for (${key}) For (${manageValuesMap[key]}):  min`;
-          };
-
-          // Append elements
-          listItem.appendChild(textSpan);
-          listItem.appendChild(manageEditInput);
-          listItem.appendChild(saveButton);
-          listItem.appendChild(document.createTextNode(` ${count} Vote${count > 1 ? 's' : ''}`));
-
-          clickCountsList.appendChild(listItem);
-        }
-      }
+      // Remove previous selection from alreadyClicked
+      alreadyClicked[timerFromNewName].delete(previousTimerServerDropdownID);
     }
+  }
+
+  // Mark this selection for the formButtonID
+  formButtonSelections[formButtonID] = timerServerDropdownID;
+
+  // Increment vote count correctly
+  clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
+
+  // Store the voter's name
+  if (!voterMap[name]) {
+    voterMap[name] = [];
+  }
+  if (!voterMap[name].includes(timerFromNewName)) {
+    voterMap[name].push(timerFromNewName);
+  }
+
+  // Store "manage" value for each vote
+  manageValuesMap[name] = manageValue;
+
+  // Store "newtimerinputfiled" for each vote (per voter)
+  if (!newtimerinputfiledMap[name]) {
+    newtimerinputfiledMap[name] = {};
+  }
+  newtimerinputfiledMap[name][timerFromNewName] = newtimerinputfiled;
+
+  // Mark this vote in alreadyClicked
+  alreadyClicked[timerFromNewName].add(timerServerDropdownID);
+
+  // Clear and update display
+  clickCountsList.innerHTML = '';
+  for (let [key, count] of Object.entries(clickCountsMap)) {
+    if (count > 0) {
+      const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+      const manageValueForKey = manageValuesMap[key] || "N/A";
+
+      // Now display each voter's "newtimerinputfiled" value
+      const newTimerInputs = Object.values(newtimerinputfiledMap[key] || {}).join(", ") || "No input provided";
+
+      // Create list item
+      const listItem = document.createElement("li");
+
+      // Create span for the text content
+      const textSpan = document.createElement("span");
+      textSpan.textContent = `(${voters}) voted for (${key}) For : (${newTimerInputs}) min`;
+
+      // Create an editable input field for manageValue
+      const manageEditInput = document.createElement("input");
+      manageEditInput.type = "text";
+      manageEditInput.value = manageValueForKey;
+      manageEditInput.style.margin = "0 5px";
+
+      // Create save button
+      const saveButton = document.createElement("button");
+      saveButton.textContent = "Save";
+      saveButton.onclick = function () {
+        manageValuesMap[key] = manageEditInput.value.trim(); // Update stored value
+        textSpan.textContent = `(${voters}) voted for (${key}) For : (${newtimerinputfiledMap[key]}) min`;
+      };
+
+      // Append elements
+      listItem.appendChild(textSpan);
+      listItem.appendChild(manageEditInput);
+      listItem.appendChild(saveButton);
+      listItem.appendChild(document.createTextNode(` ${count} Vote${count > 1 ? 's' : ''}`));
+
+      clickCountsList.appendChild(listItem);
+    }
+  }
+}
 
 
 
@@ -2689,6 +2551,9 @@
           <button data-id="${newTimerID}-12" class="vote-btn" id="vote-btn" disabled >Vote</button>
         </div>
       `;
+      // <input  data-id="${newTimerID}-timersenddata" class="datainputtimer" style="margin:0px 10px; display:none;" type="text" id="fname" name="fname"><br>
+
+      // <button data-id="${newTimerID}-send" style="display:none;">Send</button>
 
 
 
@@ -3104,85 +2969,97 @@
         const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
         const formbtn = document.getElementById("formbtn"); // Get form button
 
-        // Object to store click counts
         if (!window.submenuClickCounts) {
           window.submenuClickCounts = {};
         }
 
-
-
         function activateButton(selectedButton) {
           console.log("In activateButton");
 
-          // Reset the background color for all submenu items
           parentButtons.forEach(button => button.style.backgroundColor = "");
           allButtons.forEach(button => button.style.backgroundColor = "");
 
-          // Activate the clicked submenu item
           selectedButton.style.backgroundColor = "green";
           const formbtn = selectedButton.closest(".form-btn");
 
-          // Find and activate the parent button
           const parentButton = selectedButton.closest(".dropdown-item");
           if (parentButton) parentButton.style.backgroundColor = "green";
           if (formbtn) formbtn.style.backgroundColor = "green";
 
-          // Track submenu item clicks
           const buttonText = selectedButton.innerText.trim();
-          if (!window.submenuClickCounts) {
-            window.submenuClickCounts = {}; // Initialize if undefined
-          }
-          if (!window.submenuClickCounts[buttonText]) {
-            window.submenuClickCounts[buttonText] = 0;
-          }
-          window.submenuClickCounts[buttonText] += 1;
-
+          window.submenuClickCounts[buttonText] = (window.submenuClickCounts[buttonText] || 0) + 1;
           console.log(`${buttonText} clicked ${window.submenuClickCounts[buttonText]} times`);
 
-          // Get the necessary data attributes from the selected button
-          const timerSubmenuServerID = selectedButton.getAttribute("data-timerServerID"); // Extract the unique timerServerID
-          const timerdropdownID = selectedButton.closest(".dropdown-item").getAttribute("data-timer-id");  // Get the timer ID from the parent dropdown item
-          const formButtonID = selectedButton.closest(".form-btn") ? selectedButton.closest(".form-btn").getAttribute("data-id") : null;  // Get the data-id from the form button (if clicked)
-          const timerNewName = titleInputField.value; // Get the value entered by the user
+          const timerSubmenuServerID = selectedButton.getAttribute("data-timerServerID");
+          const timerdropdownID = selectedButton.closest(".dropdown-item").getAttribute("data-timer-id");
+          const formButtonID = selectedButton.closest(".form-btn")?.getAttribute("data-id");
+          const timerNewName = titleInputField.value;
 
           console.log("Timer Dropdown ID:", timerdropdownID);
           console.log("Timer Server ID:", timerSubmenuServerID);
           console.log("Form Button ID:", formButtonID);
 
-
-          // Prevent sending duplicate WebSocket messages
           if (selectedButton.dataset.clicked) return;
-          selectedButton.dataset.clicked = true; // Mark as clicked to prevent multiple sends
+          selectedButton.dataset.clicked = true;
+
+          let inputField = document.querySelector(`input[data-id="${newTimerID}-timersenddata"]`);
+          let sendButton = document.querySelector(`button[data-id="${newTimerID}-send"]`);
+
+          if (!inputField) {
+            inputField = document.createElement("input");
+            inputField.setAttribute("type", "text");
+            inputField.setAttribute("data-id", `${newTimerID}-timersenddata`);
+            inputField.classList.add("datainputtimer");
+            inputField.style.margin = "0px 10px";
+            inputField.style.display = "block";
+            formbtn.parentNode.insertBefore(inputField, formbtn.nextSibling);
+          } else {
+            inputField.style.display = "block";
+            inputField.value = "1:00";
+          }
+
+          if (!sendButton) {
+            sendButton = document.createElement("button");
+            sendButton.innerText = "Send";
+            sendButton.setAttribute("data-id", `${newTimerID}-send`);
+            sendButton.classList.add("send-btn");
+            inputField.parentNode.insertBefore(sendButton, inputField.nextSibling);
+          }
+
+          // Enable button only when input is filled
+          inputField.addEventListener("input", function () {
+            sendButton.disabled = !inputField.value.trim();
+          });
+
+          sendButton.addEventListener("click", function () {
+            if (!inputField.value.trim()) {
+              alert("Please enter a valid value before sending.");
+              return;
+            }
+
+            const newtimerinputfiled = inputField.value;
+            const data = {
+              cmd: "submenuClick",
+              msg: {
+                ELMxID: 0,
+                timerSubmenuServerID: timerSubmenuServerID,
+                formButtonID: formButtonID,
+                newtimerinputfiled: newtimerinputfiled,
+                timerdropdownID: timerdropdownID,
+                timerFromNewName: timerNewName,
+                buttonText: buttonText
+              }
+            };
+
+            console.log("Sending data:", JSON.stringify(data));
+            socket.send(JSON.stringify(data));
+          });
 
           setTimeout(() => {
-            delete selectedButton.dataset.clicked; // Allow future clicks after delay
-          }, 500); // Adjust delay if needed
-
-
-
-          // Construct the data object to send via WebSocket
-          const data = {
-            cmd: "submenuClick",
-            msg: {
-              ELMxID: 0,
-              timerSubmenuServerID: timerSubmenuServerID,
-              formButtonID: formButtonID,  // Pass the formButtonID here
-              timerdropdownID: timerdropdownID,
-              timerFromNewName: timerNewName,
-              buttonText: buttonText
-            }
-          };
-
-          showResetPopup();
-
-          console.log("data of timer server id", JSON.stringify(data));
-
-          // Send the data via WebSocket
-          socket.send(JSON.stringify(data));
+            delete selectedButton.dataset.clicked;
+          }, 500);
         }
 
-
-        // Attach event listeners dynamically for the current dropdown
         allButtons.forEach(button => {
           button.addEventListener("click", () => {
             activateButton(button);

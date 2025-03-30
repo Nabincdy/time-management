@@ -246,6 +246,16 @@ globalELMxArray = {
             "totalVotePeopleTime": "not yet",
             "individualParticipantVotes": {
                 "participant1": {
+
+                    "vetoes":{ //globalELMxArray[0].votes.individualParticipantVotes.participant1.vetoes.formVeto = current  + 1;
+                        "formVeto": 0, 
+                        "formTimeVeto": 1,
+                        "contentVeto": 0,
+                        "contentTimeVeto": 2,
+                        "peopleVeto": 1,
+                        "peopleTimeVeto": 1
+                         },
+                         
                     "participant1CurrentVoting": {
                         "VoteForm": "not yet",
                         "voteFormString": "not yet",
@@ -788,7 +798,7 @@ wss.on("connection", (ws) => {
 
                     // Extract necessary data
                     // let { formButtonID, timerdropdownID, timerSubmenuServerID, buttonText } = message.msg;
-                    let { formButtonID, timerdropdownID, timerSubmenuServerID, buttonText, timerFromNewName } = message.msg;
+                    let { formButtonID, timerdropdownID, timerSubmenuServerID, buttonText, timerFromNewName, newtimerinputfiled } = message.msg;
 
                     console.log('Show received data:', JSON.stringify(message.msg));
                     console.log(`Button "${buttonText}" clicked for TimerServerID: ${timerSubmenuServerID}`);
@@ -819,6 +829,7 @@ wss.on("connection", (ws) => {
                             formButtonID: formButtonID,  // Pass back the formButtonID for frontend use
                             timerDropdownID: timerdropdownID,  // Pass the timerDropdownID for frontend use
                             timerServerDropdownID: timerSubmenuServerID,
+                            newtimerinputfiled: newtimerinputfiled,
                             timerFromNewName: timerFromNewName, // Change here to match frontend key
                             clickCount: globalButtonClickData[buttonKey]  // Include updated click count
                         }
