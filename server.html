@@ -2060,123 +2060,123 @@
     }//end setupTimerControls
 
     let clickCountsMap = {}; // Stores total votes for each name
-let formButtonSelections = {}; // Maps formButtonID to its selected timerServerDropdownID
-let voterMap = {}; // Stores list of voters for each name
-let manageValuesMap = {}; // Stores "manage" input values for each vote
-let newtimerinputfiledMap = {}; // Stores "newtimerinputfiled" for each voter
-let alreadyClicked = {}; // Now an object instead of a Set
+    let formButtonSelections = {}; // Maps formButtonID to its selected timerServerDropdownID
+    let voterMap = {}; // Stores list of voters for each name
+    let manageValuesMap = {}; // Stores "manage" input values for each vote
+    let newtimerinputfiledMap = {}; // Stores "newtimerinputfiled" for each voter
+    let alreadyClicked = {}; // Now an object instead of a Set
 
-function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID, newtimerinputfiled) {
-  const clickCountsList = document.getElementById("click-counts-list");
-  const name = timerServerDropdownID.split('-').slice(1).join('-');
+    function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID, newtimerinputfiled) {
+      const clickCountsList = document.getElementById("click-counts-list");
+      const name = timerServerDropdownID.split('-').slice(1).join('-');
 
-  console.log("timerFromNewName: " + timerFromNewName);
-  const manageInput = document.getElementById("manage");
-  const manageValue = manageInput ? manageInput.value.trim() : "1:00"; // Default to "N/A" if input is not found
+      console.log("timerFromNewName: " + timerFromNewName);
+      const manageInput = document.getElementById("manage");
+      const manageValue = manageInput ? manageInput.value.trim() : "1:00"; // Default to "N/A" if input is not found
 
-  // Ensure we track votes per user
-  if (!alreadyClicked[timerFromNewName]) {
-    alreadyClicked[timerFromNewName] = new Set();
-  }
+      // Ensure we track votes per user
+      if (!alreadyClicked[timerFromNewName]) {
+        alreadyClicked[timerFromNewName] = new Set();
+      }
 
-  // Check if this user has already voted for this option
-  if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
-    alert(`You have already voted for ${name}!`);
-    return;
-  }
+      // Check if this user has already voted for this option
+      if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
+        alert(`You have already voted for ${name}!`);
+        return;
+      }
 
-  // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
-  if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
-    const previousTimerServerDropdownID = formButtonSelections[formButtonID];
-    const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
+      // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
+      if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
+        const previousTimerServerDropdownID = formButtonSelections[formButtonID];
+        const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
 
-    if (clickCountsMap[previousName]) {
-      clickCountsMap[previousName] -= 1;
+        if (clickCountsMap[previousName]) {
+          clickCountsMap[previousName] -= 1;
 
-      // Remove the previous voter from the list
-      if (voterMap[previousName]) {
-        voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
-        if (voterMap[previousName].length === 0) {
-          delete voterMap[previousName];
+          // Remove the previous voter from the list
+          if (voterMap[previousName]) {
+            voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
+            if (voterMap[previousName].length === 0) {
+              delete voterMap[previousName];
+            }
+          }
+
+          if (clickCountsMap[previousName] <= 0) {
+            delete clickCountsMap[previousName];
+          }
+
+          // Remove previous selection from alreadyClicked
+          alreadyClicked[timerFromNewName].delete(previousTimerServerDropdownID);
         }
       }
 
-      if (clickCountsMap[previousName] <= 0) {
-        delete clickCountsMap[previousName];
+      // Mark this selection for the formButtonID
+      formButtonSelections[formButtonID] = timerServerDropdownID;
+
+      // Increment vote count correctly
+      clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
+
+      // Store the voter's name
+      if (!voterMap[name]) {
+        voterMap[name] = [];
+      }
+      if (!voterMap[name].includes(timerFromNewName)) {
+        voterMap[name].push(timerFromNewName);
       }
 
-      // Remove previous selection from alreadyClicked
-      alreadyClicked[timerFromNewName].delete(previousTimerServerDropdownID);
+      // Store "manage" value for each vote
+      manageValuesMap[name] = manageValue;
+
+      // Store "newtimerinputfiled" for each vote (per voter)
+      if (!newtimerinputfiledMap[name]) {
+        newtimerinputfiledMap[name] = {};
+      }
+      newtimerinputfiledMap[name][timerFromNewName] = newtimerinputfiled;
+
+      // Mark this vote in alreadyClicked
+      alreadyClicked[timerFromNewName].add(timerServerDropdownID);
+
+      // Clear and update display
+      clickCountsList.innerHTML = '';
+      for (let [key, count] of Object.entries(clickCountsMap)) {
+        if (count > 0) {
+          const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+          const manageValueForKey = manageValuesMap[key] || "N/A";
+
+          // Now display each voter's "newtimerinputfiled" value
+          const newTimerInputs = Object.values(newtimerinputfiledMap[key] || {}).join(", ") || "No input provided";
+
+          // Create list item
+          const listItem = document.createElement("li");
+
+          // Create span for the text content
+          const textSpan = document.createElement("span");
+          textSpan.textContent = `(${voters}) voted for (${key}) For : (${newTimerInputs}) min`;
+
+          // Create an editable input field for manageValue
+          // const manageEditInput = document.createElement("input");
+          // manageEditInput.type = "text";
+          // manageEditInput.value = manageValueForKey;
+          // manageEditInput.style.margin = "0 5px";
+
+          // // Create save button
+          // const saveButton = document.createElement("button");
+          // saveButton.textContent = "Save";
+          // saveButton.onclick = function () {
+          //   manageValuesMap[key] = manageEditInput.value.trim(); // Update stored value
+          //   textSpan.textContent = `(${voters}) voted for (${key}) For : (${newtimerinputfiledMap[key]}) min`;
+          // };
+
+          // Append elements
+          listItem.appendChild(textSpan);
+          // listItem.appendChild(manageEditInput);
+          // listItem.appendChild(saveButton);
+          listItem.appendChild(document.createTextNode(` ${count} Vote${count > 1 ? 's' : ''}`));
+
+          clickCountsList.appendChild(listItem);
+        }
+      }
     }
-  }
-
-  // Mark this selection for the formButtonID
-  formButtonSelections[formButtonID] = timerServerDropdownID;
-
-  // Increment vote count correctly
-  clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
-
-  // Store the voter's name
-  if (!voterMap[name]) {
-    voterMap[name] = [];
-  }
-  if (!voterMap[name].includes(timerFromNewName)) {
-    voterMap[name].push(timerFromNewName);
-  }
-
-  // Store "manage" value for each vote
-  manageValuesMap[name] = manageValue;
-
-  // Store "newtimerinputfiled" for each vote (per voter)
-  if (!newtimerinputfiledMap[name]) {
-    newtimerinputfiledMap[name] = {};
-  }
-  newtimerinputfiledMap[name][timerFromNewName] = newtimerinputfiled;
-
-  // Mark this vote in alreadyClicked
-  alreadyClicked[timerFromNewName].add(timerServerDropdownID);
-
-  // Clear and update display
-  clickCountsList.innerHTML = '';
-  for (let [key, count] of Object.entries(clickCountsMap)) {
-    if (count > 0) {
-      const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
-      const manageValueForKey = manageValuesMap[key] || "N/A";
-
-      // Now display each voter's "newtimerinputfiled" value
-      const newTimerInputs = Object.values(newtimerinputfiledMap[key] || {}).join(", ") || "No input provided";
-
-      // Create list item
-      const listItem = document.createElement("li");
-
-      // Create span for the text content
-      const textSpan = document.createElement("span");
-      textSpan.textContent = `(${voters}) voted for (${key}) For : (${newTimerInputs}) min`;
-
-      // Create an editable input field for manageValue
-      const manageEditInput = document.createElement("input");
-      manageEditInput.type = "text";
-      manageEditInput.value = manageValueForKey;
-      manageEditInput.style.margin = "0 5px";
-
-      // Create save button
-      const saveButton = document.createElement("button");
-      saveButton.textContent = "Save";
-      saveButton.onclick = function () {
-        manageValuesMap[key] = manageEditInput.value.trim(); // Update stored value
-        textSpan.textContent = `(${voters}) voted for (${key}) For : (${newtimerinputfiledMap[key]}) min`;
-      };
-
-      // Append elements
-      listItem.appendChild(textSpan);
-      listItem.appendChild(manageEditInput);
-      listItem.appendChild(saveButton);
-      listItem.appendChild(document.createTextNode(` ${count} Vote${count > 1 ? 's' : ''}`));
-
-      clickCountsList.appendChild(listItem);
-    }
-  }
-}
 
 
 
@@ -3013,7 +3013,6 @@ function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNew
             inputField.style.margin = "0px 10px";
             inputField.style.display = "block";
             inputField.value = "1:00";
-
             formbtn.parentNode.insertBefore(inputField, formbtn.nextSibling);
           } else {
             inputField.style.display = "block";
