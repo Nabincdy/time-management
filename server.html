@@ -3012,6 +3012,8 @@ function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNew
             inputField.classList.add("datainputtimer");
             inputField.style.margin = "0px 10px";
             inputField.style.display = "block";
+            inputField.value = "1:00";
+
             formbtn.parentNode.insertBefore(inputField, formbtn.nextSibling);
           } else {
             inputField.style.display = "block";
