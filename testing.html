@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400..800&display=swap" rel="stylesheet" />
-  <!-- <link rel="stylesheet" href="style.css"> -->
+  <link rel="stylesheet" href="scroll.css">
 
   <style>
     .inline-block {
@@ -273,7 +273,7 @@
     .show-dropdown {
       display: flex;
       opacity: 1;
-      left: 25%;
+      left: 33%;
       transform: scale(1);
     }
 
@@ -442,7 +442,7 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      max-width: 500px;
+      max-width: 700px;
       background: #f8f9fa;
       border-radius: 8px;
       padding: 15px;
@@ -496,6 +496,357 @@
     }
 
     /* people section end */
+
+    /*donate css button*/
+    #donateUserTIme {
+      background-color: #ff69b4;
+      /* Hot pink */
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+    }
+
+    #donateUserTIme:hover {
+      background-color: #ff1493;
+      /* Deep pink on hover */
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(255, 20, 147, 0.4);
+    }
+
+    #donateUserTIme:active {
+      background-color: #e0137d;
+      transform: translateY(0);
+      box-shadow: 0 3px 8px rgba(224, 19, 125, 0.3);
+    }
+
+
+    .user-card {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 5px 16px;
+      margin: 0px 3px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      max-width: 400px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+
+    .time-display {
+      /* display: flex; */
+      /* justify-content: space-between; */
+      align-items: center;
+    }
+
+    .time-label {
+      font-weight: 600;
+      color: #555;
+    }
+
+    .time-value {
+      font-size: 18px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .donation-controls {
+      display: flex;
+      flex-direction: flex;
+      gap: 10px;
+    }
+
+    .time-inputs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .time-inputs input {
+      width: 90px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .donation-target {
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .donate-btn {
+      background-color: #ff69b4;
+      /* Pink */
+      color: white;
+      border: none;
+      /* padding: 10px; */
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(255, 105, 180, 0.2);
+    }
+
+    .donate-btn:hover {
+      background-color: #ff1493;
+      box-shadow: 0 6px 14px rgba(255, 20, 147, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .donate-btn:active {
+      background-color: #e0137d;
+      box-shadow: 0 3px 8px rgba(224, 19, 125, 0.2);
+      transform: translateY(0);
+    }
+
+
+    /*scroll effect in form submenu */
+
+    .scroll-container {
+      display: flex;
+      justify-content: center;
+      gap: 0px;
+      /* margin: 20px 0; */
+      position: relative;
+    }
+
+    .scroll-box {
+      width: 60px;
+      height: 40px;
+      overflow-y: scroll;
+      text-align: center;
+      font-weight: bold;
+      user-select: none;
+      scroll-snap-type: y mandatory;
+      border: 1px solid #ccc;
+    }
+
+    .scroll-box div {
+      padding: 10px;
+      scroll-snap-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    /* Apply new height when scrolling */
+    .scroll-box.scrolling {
+      height: 300px;
+    }
+
+    .scroll-box::-webkit-scrollbar {
+      display: none;
+    }
+
+    .selected {
+      font-size: 18px;
+      font-weight: bold;
+      background: #007bff;
+      color: white;
+    }
+
+    .formbtntimersubmenu {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .formbtntimersubmenu:hover {
+      background-color: #0056b3;
+    }
+
+    #form-submenu-timer-status {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+
+    #donationHistoryContainer {
+      margin: 10px 0px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 500px;
+    }
+
+    #donationHistoryContainer h3 {
+      font-size: 1.5em;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    #donationConsoleOutput {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #donationConsoleOutput li {
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
+      color: #555;
+    }
+
+    /*scroll effect in form submenu end*/
+
+
+
+
+    /*togle cycle start*/
+
+    .toggle-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+
+    .toggle-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .table-container {
+      margin-top: 10px;
+      overflow: hidden;
+      transition: max-height 0.4s ease-out;
+    }
+
+    .hidden {
+      max-height: 0;
+      visibility: hidden;
+      transition: max-height 0.4s ease-in, visibility 0.2s ease-in;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+    .timer-veto {
+      width: 150px;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      color: #333;
+      transition: border-color 0.3s, background-color 0.3s;
+    }
+
+    /* Change border color when the input field is focused */
+    .timer-veto:focus {
+      border-color: #4CAF50;
+      background-color: #e8f5e9;
+      outline: none;
+    }
+
+    /* Add a box shadow effect for better focus */
+    .timer-veto:focus {
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+    }
+
+    /* Optional: Add placeholder text styling */
+    .timer-veto::placeholder {
+      color: #999;
+      /* Gray placeholder text */
+      font-style: italic;
+    }
+
+    /*togle cycle end*/
+
+    /* veto selection start */
+
+    .vetoSelectionData {
+      display: flex;
+      flex-wrap: wrap;
+      /* Allows wrapping if there's not enough space */
+      gap: 10px;
+      justify-content: flex-start;
+      /* Aligns items to the left */
+    }
+
+    .vetoSelection {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .vetoSelectionSubmenu {
+      display: none;
+      /* Hide the radio buttons */
+    }
+
+    .vetoSelectionLabel {
+      padding: 10px 20px;
+      background-color: #b5b800;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      display: inline-block;
+    }
+
+    .vetoSelectionLabel:hover {
+      background-color: purple;
+      transform: scale(1.05);
+      /* Slightly enlarges the button on hover */
+    }
+
+    .vetoSelectionSubmenu:checked+.vetoSelectionLabel {
+      background-color: purple;
+      /* Change background when selected */
+      transform: scale(1.05);
+      /* Enlarge the selected label */
+    }
+
+    label {
+      cursor: pointer;
+    }
+
+    #updateVeto {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #updateVeto:hover {
+      background-color: purple;
+    }
+
+    /* veto selection end */
   </style>
 </head>
 
@@ -508,6 +859,7 @@
 
     <h1>Showing up on time helps give Sacred time. Otherwise others can donate some of their sacred time.</h1>
     <br />
+
 
     <label class="defaultTimeLabel">
       Default Time:
@@ -547,6 +899,60 @@
     <div id="numberCitizenTimers">Number Citizen Timers: 0</div>
 
     <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button>
+    <!-- <button id="updateVeto" title="Update Veto">Update Veto</button> -->
+
+
+
+    <div class="vetoSelectionData" style="display: none;">
+      <div class="vetoSelection">
+        <input type="radio" class="vetoSelectionSubmenu" name="vetoSelection" id="straightturn" value="straightturn">
+        <label class="vetoSelectionLabel" for="straightturn">Straight Turn</label>
+      </div>
+
+      <div class="vetoSelection">
+        <input type="radio" class="vetoSelectionSubmenu" name="vetoSelection" id="directiveTurn" value="directiveTurn">
+        <label class="vetoSelectionLabel" for="directiveTurn">Directive Turn</label>
+      </div>
+
+      <div class="vetoSelection">
+        <input type="radio" class="vetoSelectionSubmenu" name="vetoSelection" id="popcornTurn" value="popcornTurn">
+        <label class="vetoSelectionLabel" for="popcornTurn">Popcorn Turn</label>
+      </div>
+
+      <div class="vetoSelection">
+        <input type="radio" class="vetoSelectionSubmenu" name="vetoSelection" id="fastFreeFlow" value="fastFreeFlow">
+        <label class="vetoSelectionLabel" for="fastFreeFlow">Fast Free Flow</label>
+      </div>
+
+      <div class="vetoSelection">
+        <input type="radio" class="vetoSelectionSubmenu" name="vetoSelection" id="teamFreeFlow" value="teamFreeFlow">
+        <label class="vetoSelectionLabel" for="teamFreeFlow">Team Free Flow</label>
+      </div>
+
+      <div class="vetoSelection">
+        <input type="radio" class="vetoSelectionSubmenu" name="vetoSelection" id="spreadFreeFlow"
+          value="spreadFreeFlow">
+        <label class="vetoSelectionLabel" for="spreadFreeFlow">Spread Free Flow</label>
+      </div>
+
+      <div class="vetoSelection">
+        <input type="radio" class="vetoSelectionSubmenu" name="vetoSelection" id="god" value="god">
+        <label class="vetoSelectionLabel" for="god">God</label>
+      </div>
+
+      <div class="vetoSelection">
+        <input type="radio" class="vetoSelectionSubmenu" name="vetoSelection" id="diety" value="diety">
+        <label class="vetoSelectionLabel" for="diety">Diety</label>
+      </div>
+
+      <div class="vetoSelection">
+        <input type="radio" class="vetoSelectionSubmenu" name="vetoSelection" id="spirit" value="spirit">
+        <label class="vetoSelectionLabel" for="spirit">Spirit</label>
+      </div>
+    </div>
+
+
+
 
     <!-- <div id="voteData">Total Votes: 0</div> -->
     <h3>Vote Counts:</h3>
@@ -557,84 +963,14 @@
     </div>
 
 
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
 
-      .toggle-btn {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        cursor: pointer;
-        font-size: 16px;
-        border-radius: 5px;
-      }
 
-      .toggle-btn:hover {
-        background-color: #0056b3;
-      }
+    <div id="donationHistoryContainer">
+      <h3>🕒 Donation History</h3>
+      <ul id="donationConsoleOutput"></ul>
+    </div>
 
-      .table-container {
-        margin-top: 10px;
-        overflow: hidden;
-        transition: max-height 0.4s ease-out;
-      }
 
-      .hidden {
-        max-height: 0;
-        visibility: hidden;
-        transition: max-height 0.4s ease-in, visibility 0.2s ease-in;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-      }
-
-      th,
-      td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: left;
-      }
-
-      th {
-        background-color: #f4f4f4;
-      }
-
-      .timer-veto {
-        width: 40px;
-        padding: 8px 12px;
-        font-size: 14px;
-        border: 2px solid #ccc;
-        border-radius: 4px;
-        background-color: #f9f9f9;
-        color: #333;
-        transition: border-color 0.3s, background-color 0.3s;
-      }
-
-      /* Change border color when the input field is focused */
-      .timer-veto:focus {
-        border-color: #4CAF50;
-        background-color: #e8f5e9;
-        outline: none;
-      }
-
-      /* Add a box shadow effect for better focus */
-      .timer-veto:focus {
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
-      }
-
-      /* Optional: Add placeholder text styling */
-      .timer-veto::placeholder {
-        color: #999;
-        /* Gray placeholder text */
-        font-style: italic;
-      }
-    </style>
 
 
 
@@ -694,22 +1030,8 @@
         }
       }
     </script>
-
-
-
-    <div id="mainTimerContainer" class="timer">
-      <input type="text" id2="mainTimerID2-1" id="timerTitle" class="timer-title" value="Total Time"
-        oninput="updateTimerTitle()" />
-      <input type="text" id2="mainTimerID2-2" id="mainTimer" class="timer-value" value="60:00" />
-      <!-- <input type="text" id="mainTimer" class="timer-value" value="10:00" oninput="updateMainTimerFromInput()" /> -->
-
-      <button id="toggleStartPauseBtn" onclick="toggleStartPause()">▶️</button>
-      <button onclick="resetMainTimer()">🔄</button>
-    </div>
   </div>
 
-  <div id="timerList">
-  </div>
 
   <div id="contentDisplayContainer">
     <h2>Content Display</h2>
@@ -720,6 +1042,12 @@
     Particular: <span id="particularCount">0</span> |
     Universal: <span id="universalCount">0</span>
   </div>
+
+
+  <div id="timerList">
+  </div>
+
+
 
   <script>
     let mainTimerInterval;
@@ -734,6 +1062,31 @@
       let seconds = mainTimerSeconds % 60;
       document.getElementById("mainTimer").value = `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }
+
+
+    function displayDonationMessageOnHTML(message, isTemporary = false, isRepeated = false) {
+      const output = document.getElementById("donationConsoleOutput");
+      if (output) {
+        const li = document.createElement("li");
+        li.textContent = message;
+
+        if (isRepeated) {
+          li.style.backgroundColor = "#ffcccc"; // Light red background
+          li.style.padding = "5px";
+          li.style.borderRadius = "4px";
+        }
+
+        output.appendChild(li);
+
+        if (isTemporary) {
+          setTimeout(() => {
+            output.removeChild(li);
+          }, 3000);
+        }
+      }
+    }
+
+
 
 
 
@@ -1038,12 +1391,8 @@
           //newTimerComponent.innerHTML = data.timerComponent;
           //timerContainer.appendChild(newTimerComponent);
           const timerComponent = createTimerComponent(allThisTimerData, timerContainer); //this has no socket.send in it
-
           setupTimerControls(timerComponent, browserIndTimerDefault);
-
           document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
-
-
           break;
 
         case "returnedFromServerResetTimerName":
@@ -1160,8 +1509,6 @@
           let timeString = `${minutes}:${remainingSeconds}`;
 
           defaultTimerInputField.value = timeString;
-
-
           break;
 
 
@@ -1203,8 +1550,11 @@
           if (vetoInputField) {
             vetoInputField.value = vetoNewName;
           }
-
           break;
+
+
+
+
 
         case "returnedFromServerManualSetVetoTime":
           // input msg: { ELMxID: 0, vetoManualTimeID: '', vetoNewManualTime: '00:30' }
@@ -1336,6 +1686,61 @@
 
 
 
+        case "returnedFromServerSetVetoUserId":
+          console.log("Received set veto user data:", JSON.stringify(data.msg));
+
+          const setVetoName = data.msg.vetoNewName;
+          const setVetoElementID = data.msg.vetoElementID;
+          const newtimeruserid = data.msg.newTimerUserID;
+          console.log("newtimeruserid:", newtimeruserid);
+
+          console.log("setVetoElementID:", setVetoElementID);
+
+          const setVetoInputField = document.querySelector(`[data-id="${setVetoElementID}"]`);
+          console.log("Updating field for set veto:", setVetoName, "Element:", setVetoInputField);
+
+          if (setVetoInputField) {
+            setVetoInputField.value = setVetoName;
+          }
+          break;
+
+        case "returnedFromServerUpdateMultipleVetoValue":
+          // console.log("testing my scric:", JSON.stringify(data.msg));
+
+          // let vetoMultipleName = data.msg.vetoNewName;
+          // let vetoMultipleElementID = data.msg.vetoElementID;
+          // console.log("vetoElementID:" + vetoMultipleElementID);
+
+          // const vetoMupltipleInputField = document.querySelector(`[data-id="${vetoMultipleElementID}"]`); // Select the veto input field
+
+          // console.log("deleted ddd:" + vetoMultipleName + " element" + JSON.stringify(vetoMupltipleInputField));
+
+          // if (vetoMupltipleInputField) {
+          //   vetoMupltipleInputField.value = vetoMultipleName;
+          // }
+
+          console.log("testing my scric:", JSON.stringify(data.msg));
+          console.log("Received update from server:", data.msg);
+
+          const vetoMultipleName = data.msg.vetoNewName;
+          const vetoMultipleElementID = data.msg.vetoElementID;
+          console.log("vetoElementID:", vetoMultipleElementID);
+
+          const vetoMupltipleInputField = document.querySelector(`[data-id="${vetoMultipleElementID}"]`);
+          console.log("deleted ddd:", vetoMultipleName + " element", JSON.stringify(vetoMupltipleInputField));
+
+          if (vetoMupltipleInputField) {
+            // Update input field only if new veto name differs from current
+            if (vetoMupltipleInputField.value !== vetoMultipleName) {
+              vetoMupltipleInputField.value = vetoMultipleName;
+            }
+          }
+          break;
+
+
+
+
+
 
 
         case "returnedFromServerSubmenuClick":
@@ -1343,7 +1748,7 @@
 
           const { timerServerDropdownID, clickedButton, formButtonID, timerDropdownID, clickCount, timerFromNewName, newtimerinputfiled } = data.msg;
           console.log("Testing what is this data:", data.msg);
-          console.log("Testing what is this newtimerinputfiled data:", data.msg.newtimerinputfiled);
+          console.log("Testing what is this newtimerinputfiled:", data.msg.newtimerinputfiled);
 
           // Retrieve previous selections from localStorage (track per formButtonID)
           let previousSelections = JSON.parse(localStorage.getItem("previousSelections")) || {};
@@ -1400,8 +1805,8 @@
           localStorage.setItem("backgroundSync", Date.now());
 
           // Update the click count display
-          // working 1
           updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID, newtimerinputfiled);
+          sendTimerUpdate(timerServerDropdownID);
           break;
 
 
@@ -1443,6 +1848,40 @@
           updatePeopleClickCountDisplay(selectedAction, buttonID, buttonPeopleText, timerPeopleNewName);
 
           break;
+
+
+
+
+        case "donateTimeResult":
+          const {
+            fromUserID,
+            toUserID,
+            timerName,
+            donatedMinutes,
+            donatedSeconds,
+            totalSeconds,
+            donorNewTime,
+            recipientNewTime,
+            recipientName,
+            donorName
+          } = data.msg;
+
+          // ⛔ Check for self-donation
+          if (fromUserID === toUserID) {
+            const errorMsg = `❌ Invalid donation: You cannot donate time to yourself (${donorName || fromUserID}).`;
+            console.warn(errorMsg);
+            displayDonationMessageOnHTML(errorMsg, true); // Show in HTML
+            break;
+          }
+
+          const donationMessage = `${timerName} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
+          console.log(donationMessage);
+          displayDonationMessageOnHTML(donationMessage);
+
+          updateTimerDisplay(fromUserID, donorNewTime);
+          updateTimerDisplay(toUserID, recipientNewTime);
+          break;
+
 
 
 
@@ -1505,37 +1944,61 @@
     };
 
     // Function to send updated timer data to WebSocket server
-    function sendTimerUpdate() {
-      socket.send(JSON.stringify("inside of send find update"));
-
-      const updatedData = {
-        mainTimer: document.getElementById("mainTimer").value,
-        totalVotes: parseInt(document.getElementById("voteData").textContent.replace(/\D/g, ""), 10),
-        counters: {
-          Individual: parseInt(document.getElementById("individualCount").innerText, 10),
-          Particular: parseInt(document.getElementById("particularCount").innerText, 10),
-          Universal: parseInt(document.getElementById("universalCount").innerText, 10),
-        },
-      };
-      // socket.send(JSON.stringify(updatedData));
 
 
-      // Attach event listener to timer input field
-      document.getElementById("mainTimer").addEventListener("input", sendTimerUpdate);
 
-      // Attach event listener to vote reset buttonresetVotesBtn
-      // document.getElementById("resetVotesBtn").addEventListener("click", () => {
-      document.getElementById("voteData").textContent = "Total Votes: 0";
-      totalVotes = 0;
-      resetVotesBtn.style.backgroundColor = 'black';
-      resetVotesBtn.style.color = 'white';
-      // socket.send(JSON.stringify("does it reatch timer"));
-      //resetVotes();
-      //sendTimerUpdate();
-      socket.send(JSON.stringify("vote is reset1"));
 
-      // });//end eventListener
-    } //end sendTimerUpdate();
+    function updateTimerDisplay(userID, newTimeInSeconds) {
+      const elementID = `${userID}-2`;  // The ID for the user's timer input field (assuming format like "userID-2")
+      const timerInputField = document.querySelector(`[data-id="${elementID}"]`);
+
+      if (timerInputField) {
+        // Format the time as mm:ss (no milliseconds)
+        let minutes = Math.floor(newTimeInSeconds / 60);
+        let seconds = Math.floor(newTimeInSeconds % 60);
+        seconds = seconds < 10 ? "0" + seconds : seconds;  // Add leading zero to seconds if less than 10
+
+        const formattedTime = `${minutes}:${seconds}`;
+
+        // Replace the old timer value with the formatted time
+        timerInputField.value = formattedTime; // Update the input field with the new time
+
+        console.log(`⏳ Updated timer for user ${userID}: ${formattedTime}`);
+
+        // Find the running timer for the user and update it
+        if (allTimersByServerID[userID]) {
+          // Clear the previous interval (if any)
+          clearInterval(allTimersByServerID[userID]);
+          delete allTimersByServerID[userID];
+
+          // Set the new time to the timer
+          let totalSeconds = newTimeInSeconds;
+
+          // Start a new interval to continue from the updated time
+          allTimersByServerID[userID] = setInterval(() => {
+            if (totalSeconds <= 0) {
+              clearInterval(allTimersByServerID[userID]);
+              delete allTimersByServerID[userID];
+              console.log("⏰ Timer finished for user", userID);
+              return;
+            }
+
+            totalSeconds--;  // Decrease the time
+            let updatedMinutes = Math.floor(totalSeconds / 60);
+            let updatedSeconds = Math.floor(totalSeconds % 60);
+            updatedSeconds = updatedSeconds < 10 ? "0" + updatedSeconds : updatedSeconds;
+
+            // Update the display with the new time (formatted as mm:ss)
+            timerInputField.value = `${updatedMinutes}:${updatedSeconds}`;
+          }, 1000);  // Update every second (no milliseconds displayed)
+        }
+      } else {
+        console.error(`❌ Timer input field not found for user ${userID}.`);
+      }
+    }
+
+
+
 
   </script>
 
@@ -1602,10 +2065,11 @@
         }
       });
 
-      addTimerBtn.addEventListener("click", addTimer);
+      // addTimerBtn.addEventListener("click", addTimer);
       resetVotesBtn.addEventListener("click", resetVotes); // Add listener for reset vote button
 
     };//end  synchronizeScreenDraw();
+
 
 
 
@@ -1614,11 +2078,19 @@
     function resetVotes() {
       console.log("In resetVotes (with colours)");
 
+      // Save voterMap data for fallback purposes
+      const savedVoterMap = { ...voterMap };
+
       // Reset vote tracking data
       clickCountsMap = {};
       formButtonSelections = {};
-      voterMap = {};
       alreadyClicked = {};
+      newtimerinputfiledMap = {}; // Include this if needed
+      manageValuesMap = {};       // Include this if needed
+
+      // Ensure fallback data (e.g., "nobody") is preserved in voterMap
+      voterMap = {};
+      // voterMap = savedVoterMap;
 
       // Reset total vote count display
       totalVotes = 0;
@@ -1629,7 +2101,7 @@
         voteBtn.style.backgroundColor = "";
         voteBtn.textContent = "Vote";
         voteBtn.setAttribute("data-voted", "false");
-        voteBtn.disabled = true; // Enable voting again
+        voteBtn.disabled = true;
       });
 
       // Reset content buttons
@@ -1644,176 +2116,249 @@
         peopleBtn.style.backgroundColor = "";
       });
 
-      // Reset previous selections stored in localStorage
+      // Reset localStorage
       localStorage.removeItem("previousSelections");
 
-      // Clear UI elements that track votes
+      // Clear UI vote list
       const clickCountsList = document.getElementById("click-counts-list");
-      clickCountsList.innerHTML = ''; // Clear vote count list
+      clickCountsList.innerHTML = '';
 
-      // Reset dropdown buttons
+      // Reset dropdowns
       resetDropdownButtons();
 
-      // Notify other tabs that the votes were reset by storing a timestamp in localStorage
-      console.log("Date.now()" + Date.now());
+      // Notify other tabs
       localStorage.setItem("voteReset", Date.now());
 
-      // Ensure the update is sent via WebSocket
-      sendTimerUpdate();
-      // showResetPopup();
+
+
+      // // Get all timerServerID values from timer elements
+      // const timerServerIDs = Array.from(document.querySelectorAll("[data-timerServerID]"))
+      //   .map(timer => timer.getAttribute("data-timerServerID"));
+
+      // console.log("Timer Server IDs:", timerServerIDs); // Logs all timer server IDs
+
+
+      // Get all timerServerID values from timer elements
+      const timerServerIDs = Array.from(document.querySelectorAll("[data-timerServerID]"))
+        .map(timer => timer.getAttribute("data-timerServerID"));
+
+      // Group timer IDs by their prefixes (1, 2, 3, etc.)
+      const groupedIDs = {};
+
+      timerServerIDs.forEach(id => {
+        const prefix = id.split('-')[0]; // Extract the prefix (1, 2, 3, etc.)
+        if (!groupedIDs[prefix]) {
+          groupedIDs[prefix] = [];
+        }
+        groupedIDs[prefix].push(id);
+      });
+
+      console.log("Grouped Timer Server IDs:", groupedIDs);
+
+
+      // Send update via WebSocket
+      // sendTimerUpdate(timerServerIDs);
+      // Set the reset flag (only the first time)
+      if (!resetCycleCompleted) {
+        console.log("First reset cycle completed.");
+        resetCycleCompleted = true;
+        // First-time logic (message/tutorial)
+      } else {
+        console.log("Subsequent reset cycle triggered.");
+        // Handle any reset behavior for subsequent cycles
+      }
     }
 
 
 
-    // function showResetPopup() {
-    //   // Create the popup
-    //   const popup = document.createElement("div");
-    //   popup.style.position = "fixed";
-    //   popup.style.top = "50%";
-    //   popup.style.left = "50%";
-    //   popup.style.transform = "translate(-50%, -50%)";
-    //   popup.style.backgroundColor = "white";
-    //   popup.style.padding = "20px";
-    //   popup.style.boxShadow = "0px 0px 10px rgba(0,0,0,0.5)";
-    //   popup.style.borderRadius = "5px";
-    //   popup.style.zIndex = "1000";
-    //   popup.style.textAlign = "center";
+    let vetoClickCountMap = {}; // Store click count for each timerID
 
-    //   // Create input field for time
-    //   const inputField = document.createElement("input");
-    //   inputField.type = "text";
-    //   inputField.id = "manage";
-    //   inputField.placeholder = "Enter Time (MM:SS)";
-    //   inputField.value = "1:00"; // Default value
-    //   inputField.style.width = "100%";
-    //   inputField.style.padding = "10px";
-    //   inputField.style.marginBottom = "10px";
+    document.getElementById('resetVotesBtn').addEventListener('click', sendTimerUpdateFromButton);
 
-    //   // Create timer display
-    //   const timerDisplay = document.createElement("p");
-    //   timerDisplay.style.fontSize = "18px";
-    //   timerDisplay.style.fontWeight = "bold";
-    //   timerDisplay.style.marginBottom = "10px";
-    //   timerDisplay.textContent = `Time Left: 1:00`; // Initial display
+    function sendTimerUpdateFromButton() {
+      console.log("Sending veto name updates...");
 
-    //   // Flag to check if timer is running
-    //   let timerRunning = false;
-    //   let countdown;
+      // Capture current veto values
+      const vetoInputs = document.querySelectorAll('[data-id$="-4"]');
+      const oldVetoMap = {}; // { newTimerID: oldVetoValue }
 
-    //   // Create submit button
-    //   const submitButton = document.createElement("button");
-    //   submitButton.textContent = "Start Timer";
-    //   submitButton.style.backgroundColor = "blue";
-    //   submitButton.style.color = "white";
-    //   submitButton.style.padding = "10px";
-    //   submitButton.style.border = "none";
-    //   submitButton.style.cursor = "pointer";
-    //   submitButton.style.width = "100%";
-    //   submitButton.style.marginBottom = "10px";
+      vetoInputs.forEach(input => {
+        const dataId = input.getAttribute('data-id'); // e.g., "3-4"
+        const newTimerID = dataId.split('-')[0];
+        const oldVetoValue = input.value;
+        oldVetoMap[newTimerID] = oldVetoValue;
+        console.log(`Existing -> newTimerID: ${newTimerID}, Old Veto Value: ${oldVetoValue}`);
+      });
 
-    //   // Create remove button
-    //   const removeButton = document.createElement("button");
-    //   removeButton.textContent = "Remove";
-    //   removeButton.style.backgroundColor = "red";
-    //   removeButton.style.color = "white";
-    //   removeButton.style.padding = "10px";
-    //   removeButton.style.border = "none";
-    //   removeButton.style.cursor = "pointer";
-    //   removeButton.style.width = "100%";
+      // Find the option with the highest total vote
+      let highestVoteCount = 0;
+      let highestVotedName = "";
 
-    //   // Start timer when submit button is clicked
-    //   submitButton.addEventListener("click", () => {
-    //     const userInput = inputField.value.trim();
+      for (let [key, count] of Object.entries(clickCountsMap)) {
+        if (count > highestVoteCount) {
+          highestVoteCount = count;
+          highestVotedName = key;
+        }
+      }
 
-    //     // Validate input time format
-    //     const timePattern = /^([0-5]?[0-9]):([0-5]?[0-9])$/;
-    //     const match = userInput.match(timePattern);
-    //     if (!match) {
-    //       alert("Please enter a valid time in MM:SS format.");
-    //       return;
-    //     }
+      // Log the votes and the highest voted option
+      console.log("Logging votes data before veto selection...");
+      for (let [key, count] of Object.entries(clickCountsMap)) {
+        if (count > 0) {
+          const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+          const manageValueForKey = manageValuesMap[key] || "N/A";
+          const newTimerInputs = Object.values(newtimerinputfiledMap[key] || {}).join(", ") || "No input provided";
 
-    //     // Parse time
-    //     let minutes = parseInt(match[1], 10);
-    //     let seconds = parseInt(match[2], 10);
-    //     let totalSeconds = minutes * 60 + seconds;
+          console.log(`Votes Data hahaha : (${voters}) voted for (${key}) For: (${newTimerInputs}) min. Total Votes: ${count}`);
+        }
+      }
 
-    //     // Start the countdown only if it's not already running
-    //     if (!timerRunning) {
-    //       timerRunning = true;
-    //       startCountdown(totalSeconds);
-    //     }
-    //   });
+      // Now that we have the highest voted name, we can set it as the selected veto value
+      if (!highestVotedName) {
+        alert("No votes to select for veto.");
+        return;
+      }
 
-    //   // Start countdown function
-    //   function startCountdown(totalSeconds) {
-    //     countdown = setInterval(() => {
-    //       if (totalSeconds <= 0) {
-    //         clearInterval(countdown);
-    //         timerRunning = false;
-    //         alert("Time's up! The popup will now close.");
-    //         closePopup();
-    //       } else {
-    //         totalSeconds--;
-    //         timerDisplay.textContent = `Time Left: ${formatTime(totalSeconds)}`;
-    //       }
-    //     }, 1000);
-    //   }
+      // Set the highest voted name as the selected veto
+      const selectedVeto = document.querySelector(`input[name="vetoSelection"][value="${highestVotedName}"]`);
 
-    //   // Helper function to format time as MM:SS
-    //   function formatTime(seconds) {
-    //     const mins = Math.floor(seconds / 60);
-    //     const secs = seconds % 60;
-    //     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-    //   }
+      if (!selectedVeto) {
+        alert("Selected veto option not found.");
+        return;
+      }
 
-    //   // Close popup function
-    //   function closePopup() {
-    //     clearInterval(countdown); // Stop the timer when popup is closed
-    //     document.body.removeChild(popup);
-    //   }
+      const vetoValue = selectedVeto.value;
+      console.log("Selected veto value:", vetoValue);
 
-    //   // Remove popup function
-    //   removeButton.addEventListener("click", () => {
-    //     clearInterval(countdown); // Stop the timer if it's running
-    //     closePopup(); // Close the popup immediately
-    //   });
+      // Update input fields and check for repeats
+      vetoInputs.forEach(input => {
+        const vetoElementID = input.getAttribute('data-id');
+        const newTimerID = vetoElementID.split('-')[0];
+        const oldValue = oldVetoMap[newTimerID];
 
-    //   // Highest vote logic
-    //   function displayHighestVotes() {
-    //     let highestVotesName = "";
-    //     let highestVotesCount = 0;
+        // Initialize click count for this newTimerID if not already present
+        if (!vetoClickCountMap[newTimerID]) {
+          vetoClickCountMap[newTimerID] = 0; // Start count at 0 for each newTimerID
+        }
 
-    //     // Assuming clickCountsMap is an object that stores the names and vote counts
-    //     for (let [key, count] of Object.entries(clickCountsMap)) {
-    //       if (count > highestVotesCount) {
-    //         highestVotesName = key;
-    //         highestVotesCount = count;
-    //       }
-    //     }
+        let vetoMessage;
+        if (oldValue === vetoValue) {
+          // If the veto value is repeated, use the previous veto value or default to f-0 if null
+          vetoMessage = `f-${vetoClickCountMap[newTimerID]}`; // Use the last click count value
+          console.log(`Repeated sentence for newTimerID: ${newTimerID}. Passing previous value: ${vetoMessage}`);
+        } else {
+          // Otherwise, generate a new veto value
+          vetoClickCountMap[newTimerID] += 1; // Increment the count
+          vetoMessage = `f-${vetoClickCountMap[newTimerID]}`; // Assign the new veto value
+        }
 
-    //     console.log(`Person with highest vote count: ${highestVotesName} with ${highestVotesCount} votes`);
+        input.value = vetoMessage;
 
-    //     // Display the message in HTML inside the #form-data-display element
-    //     const formDataDisplay = document.getElementById('form-data-display');
-    //     if (formDataDisplay) {
-    //       const message = `${highestVotesName} with ${highestVotesCount} votes`;
-    //       formDataDisplay.innerHTML = `⭐ <span>Form:</span> <p>${message}</p>`;
-    //     }
-    //   }
+        const responseObject = {
+          cmd: "updateMultipleVetoValue",
+          msg: {
+            ELMxID: 0,
+            vetoElementID: vetoElementID,
+            vetoNewName: vetoMessage
+          }
+        };
 
-    //   // Call displayHighestVotes when the timer starts
-    //   submitButton.addEventListener("click", () => {
-    //     displayHighestVotes(); // Display highest votes when timer starts
-    //   });
+        console.log("Sending responseObject to server:", responseObject);
+        socket.send(JSON.stringify(responseObject));
+      });
 
-    //   // Append elements to popup
-    //   popup.appendChild(inputField);
-    //   popup.appendChild(timerDisplay);
-    //   popup.appendChild(submitButton);
-    //   popup.appendChild(removeButton); // Append remove button
-    //   document.body.appendChild(popup);
-    // }
+      console.log("✅ Veto value update process complete.");
+    }
+
+
+
+
+
+
+
+
+
+
+    function sendTimerUpdate(timerServerDropdownID) {
+      console.log("Sending veto name updates...");
+      console.log("timerServerDropdownID:", timerServerDropdownID);
+
+      const savedVoterMap = { ...voterMap };
+      console.log("savedVoterMap:", savedVoterMap);
+
+      const userKey = Object.keys(voterMap)[0];
+      console.log("userKey (selected):", userKey);
+
+      const matches = timerServerDropdownID.match(/(\d+)-([a-zA-Z]+)/);
+      let number = '';
+      let string = '';
+
+      if (matches) {
+        number = matches[1];
+        string = matches[2];
+      }
+
+      console.log("String:", string);
+
+      if (!window.stringCounts) {
+        window.stringCounts = {};
+      }
+
+      if (window.stringCounts[string]) {
+        window.stringCounts[string]++;
+      } else {
+        window.stringCounts[string] = 1;
+      }
+
+      const count = window.stringCounts[string];
+      let baseVetoMessage = `${string}`;
+
+      const vetoInputs = document.querySelectorAll(`[data-id$='${number}-4']`);
+      console.log("vetoInputs:", vetoInputs);
+
+      vetoInputs.forEach(input => {
+        const vetoElementID = input.getAttribute('data-id');
+        console.log("vetoElementID:", vetoElementID);
+
+        let vetoMessage = baseVetoMessage;
+
+
+        input.value = vetoMessage;
+
+        const responseObject = {
+          cmd: "setVetoUserId",
+          msg: {
+            ELMxID: 0,
+            newTimerID: number, // Ensure newTimerID is available in your context
+            vetoElementID: vetoElementID,
+            vetoNewName: vetoMessage
+          }
+        };
+
+        console.log("Sending responseObject to server:", responseObject);
+        socket.send(JSON.stringify(responseObject));
+      });
+
+      socket.send(JSON.stringify("Veto value updated and sent"));
+      console.log("Veto value updated and sent to server.");
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // Listen for reset events from other tabs
@@ -2208,17 +2753,153 @@
       }
     }//end setupTimerControls
 
+    // let clickCountsMap = {}; // Stores total votes for each name
+    // let formButtonSelections = {}; // Maps formButtonID to its selected timerServerDropdownID
+    // let voterMap = {}; // Stores list of voters for each name
+    // let manageValuesMap = {}; // Stores "manage" input values for each vote
+    // let newtimerinputfiledMap = {}; // Stores "newtimerinputfiled" for each voter
+    // let alreadyClicked = {}; // Now an object instead of a Set
+
+    // function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID, newtimerinputfiled) {
+    //   const clickCountsList = document.getElementById("click-counts-list");
+    //   const name = timerServerDropdownID.split('-').slice(1).join('-');
+
+    //   console.log("timerFromNewName: " + timerFromNewName);
+    //   const manageInput = document.getElementById("manage");
+    //   const manageValue = manageInput ? manageInput.value.trim() : "1:00"; // Default to "N/A" if input is not found
+
+    //   // Ensure we track votes per user
+    //   if (!alreadyClicked[timerFromNewName]) {
+    //     alreadyClicked[timerFromNewName] = new Set();
+    //   }
+
+
+
+    //   // Check if this user has already voted for this option
+    //   if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
+    //     // Allow updating newtimerinputfiled even if already voted
+    //     if (!newtimerinputfiledMap[name]) {
+    //       newtimerinputfiledMap[name] = {};
+    //     }
+    //     newtimerinputfiledMap[name][timerFromNewName] = newtimerinputfiled;
+
+    //     // Just refresh the display to show updated value
+    //     updateClickCountDisplayList();
+    //     // alert(`You have already voted for ${name}, but your time input was updated.`);
+    //     return;
+    //   }
+
+
+
+    //   // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
+    //   if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
+    //     const previousTimerServerDropdownID = formButtonSelections[formButtonID];
+    //     const previousName = previousTimerServerDropdownID.split('-').slice(1).join('-');
+
+    //     if (clickCountsMap[previousName]) {
+    //       clickCountsMap[previousName] -= 1;
+
+    //       // Remove the previous voter from the list
+    //       if (voterMap[previousName]) {
+    //         voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
+    //         if (voterMap[previousName].length === 0) {
+    //           delete voterMap[previousName];
+    //         }
+    //       }
+
+    //       if (clickCountsMap[previousName] <= 0) {
+    //         delete clickCountsMap[previousName];
+    //       }
+
+    //       // Remove previous selection from alreadyClicked
+    //       alreadyClicked[timerFromNewName].delete(previousTimerServerDropdownID);
+    //     }
+    //   }
+
+    //   // Mark this selection for the formButtonID
+    //   formButtonSelections[formButtonID] = timerServerDropdownID;
+
+    //   // Increment vote count correctly
+    //   clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
+
+    //   // Store the voter's name
+    //   if (!voterMap[name]) {
+    //     voterMap[name] = [];
+    //   }
+    //   if (!voterMap[name].includes(timerFromNewName)) {
+    //     voterMap[name].push(timerFromNewName);
+    //   }
+
+    //   // Store "manage" value for each vote
+    //   manageValuesMap[name] = manageValue;
+
+    //   // Store "newtimerinputfiled" for each vote (per voter)
+    //   if (!newtimerinputfiledMap[name]) {
+    //     newtimerinputfiledMap[name] = {};
+    //   }
+    //   newtimerinputfiledMap[name][timerFromNewName] = newtimerinputfiled;
+
+    //   // Mark this vote in alreadyClicked
+    //   alreadyClicked[timerFromNewName].add(timerServerDropdownID);
+    //   // Clear and update display
+    //   clickCountsList.innerHTML = '';
+    //   for (let [key, count] of Object.entries(clickCountsMap)) {
+    //     if (count > 0) {
+    //       const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+    //       const manageValueForKey = manageValuesMap[key] || "N/A";
+
+    //       // Now display each voter's "newtimerinputfiled" value
+    //       const newTimerInputs = Object.values(newtimerinputfiledMap[key] || {}).join(", ") || "No input provided";
+
+    //       // Create list item
+    //       const listItem = document.createElement("li");
+
+    //       // Create span for the text content
+    //       const textSpan = document.createElement("span");
+    //       textSpan.textContent = `(${voters}) voted for (${key}) For : (${newTimerInputs}) min`;
+
+    //       // Append elements
+    //       listItem.appendChild(textSpan);
+    //       listItem.appendChild(document.createTextNode(` ${count} Vote${count > 1 ? 's' : ''}`));
+
+    //       clickCountsList.appendChild(listItem);
+    //     }
+    //   }
+    // }
+
+
+
+    // function updateClickCountDisplayList() {
+    //   const clickCountsList = document.getElementById("click-counts-list");
+    //   clickCountsList.innerHTML = '';
+    //   for (let [key, count] of Object.entries(clickCountsMap)) {
+    //     if (count > 0) {
+    //       const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+    //       const manageValueForKey = manageValuesMap[key] || "N/A";
+    //       const newTimerInputs = Object.values(newtimerinputfiledMap[key] || {}).join(", ") || "No input provided";
+
+    //       const listItem = document.createElement("li");
+    //       const textSpan = document.createElement("span");
+    //       textSpan.textContent = `(${voters}) voted for (${key}) For : (${newTimerInputs}) min`;
+    //       listItem.appendChild(textSpan);
+    //       listItem.appendChild(document.createTextNode(` ${count} Vote${count > 1 ? 's' : ''}`));
+    //       clickCountsList.appendChild(listItem);
+    //     }
+    //   }
+    // }
+
+
     let clickCountsMap = {}; // Stores total votes for each name
     let formButtonSelections = {}; // Maps formButtonID to its selected timerServerDropdownID
     let voterMap = {}; // Stores list of voters for each name
     let manageValuesMap = {}; // Stores "manage" input values for each vote
+    let newtimerinputfiledMap = {}; // Stores "newtimerinputfiled" for each voter
     let alreadyClicked = {}; // Now an object instead of a Set
-    //working 2
+
     function updateClickCountDisplay(timerServerDropdownID, clickCount, timerFromNewName, formButtonID, newtimerinputfiled) {
       const clickCountsList = document.getElementById("click-counts-list");
       const name = timerServerDropdownID.split('-').slice(1).join('-');
 
-      console.log("timerFromNewName: " + timerFromNewName);
       const manageInput = document.getElementById("manage");
       const manageValue = manageInput ? manageInput.value.trim() : "1:00"; // Default to "N/A" if input is not found
 
@@ -2228,10 +2909,15 @@
       }
 
       // Check if this user has already voted for this option
-      // if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
-      //   alert(`You have already voted for ${name}!`);
-      //   return;
-      // }
+      if (alreadyClicked[timerFromNewName].has(timerServerDropdownID)) {
+        if (!newtimerinputfiledMap[name]) {
+          newtimerinputfiledMap[name] = {};
+        }
+        newtimerinputfiledMap[name][timerFromNewName] = newtimerinputfiled;
+
+        updateClickCountDisplayList();
+        return;
+      }
 
       // If this formButtonID previously selected a different timerServerDropdownID, decrease its count
       if (formButtonSelections[formButtonID] && formButtonSelections[formButtonID] !== timerServerDropdownID) {
@@ -2241,7 +2927,6 @@
         if (clickCountsMap[previousName]) {
           clickCountsMap[previousName] -= 1;
 
-          // Remove the previous voter from the list
           if (voterMap[previousName]) {
             voterMap[previousName] = voterMap[previousName].filter(voter => voter !== timerFromNewName);
             if (voterMap[previousName].length === 0) {
@@ -2253,18 +2938,13 @@
             delete clickCountsMap[previousName];
           }
 
-          // Remove previous selection from alreadyClicked
           alreadyClicked[timerFromNewName].delete(previousTimerServerDropdownID);
         }
       }
 
-      // Mark this selection for the formButtonID
       formButtonSelections[formButtonID] = timerServerDropdownID;
-
-      // Increment vote count correctly
       clickCountsMap[name] = (clickCountsMap[name] || 0) + 1;
 
-      // Store the voter's name
       if (!voterMap[name]) {
         voterMap[name] = [];
       }
@@ -2272,10 +2952,13 @@
         voterMap[name].push(timerFromNewName);
       }
 
-      // Store "manage" value for each vote
       manageValuesMap[name] = manageValue;
 
-      // Mark this vote in alreadyClicked
+      if (!newtimerinputfiledMap[name]) {
+        newtimerinputfiledMap[name] = {};
+      }
+      newtimerinputfiledMap[name][timerFromNewName] = newtimerinputfiled;
+
       alreadyClicked[timerFromNewName].add(timerServerDropdownID);
 
       // Clear and update display
@@ -2285,38 +2968,53 @@
           const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
           const manageValueForKey = manageValuesMap[key] || "N/A";
 
-          // Create list item
+          const newTimerInputValues = Object.values(newtimerinputfiledMap[key] || {});
+          const newTimerInputs = newTimerInputValues.join(", ") || "No input provided";
+
+          const totalTime = newTimerInputValues.reduce((sum, val) => {
+            const num = parseFloat(val);
+            return sum + (isNaN(num) ? 0 : num);
+          }, 0);
+          const totalVoters = voterMap[key] ? voterMap[key].length : 1;
+          const finalTimeAfterDivide = (totalTime / totalVoters).toFixed(2);
+
           const listItem = document.createElement("li");
-
-          // Create span for the text content
           const textSpan = document.createElement("span");
-          textSpan.textContent = `(${voters}) voted for (${key}) For (${newtimerinputfiled}) `;
-
-          // Create an editable input field for manageValue
-          const manageEditInput = document.createElement("input");
-          manageEditInput.type = "text";
-          manageEditInput.value = manageValueForKey;
-          manageEditInput.style.margin = "0 5px";
-
-          // Create save button
-          const saveButton = document.createElement("button");
-          saveButton.textContent = "Save";
-          saveButton.onclick = function () {
-            manageValuesMap[key] = manageEditInput.value.trim(); // Update stored value
-            textSpan.textContent = `(${voters}) voted for (${key}) For (${manageValuesMap[key]}):  min`;
-          };
-
-          // Append elements
+          textSpan.textContent = `(${voters}) voted for (${key}) For: (${newTimerInputs}) min, and the final time is (${finalTimeAfterDivide}) min`;
           listItem.appendChild(textSpan);
-          listItem.appendChild(manageEditInput);
-          listItem.appendChild(saveButton);
           listItem.appendChild(document.createTextNode(` ${count} Vote${count > 1 ? 's' : ''}`));
-
           clickCountsList.appendChild(listItem);
         }
       }
     }
 
+    function updateClickCountDisplayList() {
+      const clickCountsList = document.getElementById("click-counts-list");
+      clickCountsList.innerHTML = '';
+      for (let [key, count] of Object.entries(clickCountsMap)) {
+        if (count > 0) {
+          const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+          const manageValueForKey = manageValuesMap[key] || "N/A";
+
+          const newTimerInputValues = Object.values(newtimerinputfiledMap[key] || {});
+          const newTimerInputs = newTimerInputValues.join(", ") || "No input provided";
+
+          const totalTime = newTimerInputValues.reduce((sum, val) => {
+            const num = parseFloat(val);
+            return sum + (isNaN(num) ? 0 : num);
+          }, 0);
+          const totalVoters = voterMap[key] ? voterMap[key].length : 1;
+          const finalTimeAfterDivide = (totalTime / totalVoters).toFixed(2);
+
+          const listItem = document.createElement("li");
+          const textSpan = document.createElement("span");
+          textSpan.textContent = `(${voters}) voted for (${key}) For: (${newTimerInputs}) min, and the final time is (${finalTimeAfterDivide}) min`;
+          listItem.appendChild(textSpan);
+          listItem.appendChild(document.createTextNode(` ${count} Vote${count > 1 ? 's' : ''}`));
+          clickCountsList.appendChild(listItem);
+        }
+      }
+    }
 
 
 
@@ -2348,16 +3046,23 @@
 
 
     //addbutton
+
+
+
+    //     let timerInitialized = false;
+
+    // function initializeFirstTimer() {
+    //   if (!timerInitialized) {
+    //     addTimer(); // automatically calls it
+    //     timerInitialized = true;
+    //   }
+    // }
+
+
     function addTimer() {
 
+      // const defaultTime = defaultTimeInput.value || "00:30";
       const defaultTime = defaultTimeInput.value;
-      // numberCitizenTimers++; // Update total number for VoteReset and color
-      // 
-      // const timerComponent = createTimerComponent(defaultTime, timerList);
-      // setupTimerControls(timerComponent, defaultTime);
-      // 
-      // document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
-
       const message = {
         cmd: 'addTimerToServer',
         msg: {
@@ -2368,6 +3073,8 @@
       };
 
       socket.send(JSON.stringify(message));
+
+      console.log("testig k ho data " + JSON.stringify(message));
 
     }//end addTimer
 
@@ -2381,9 +3088,11 @@
       let timerRunning = false;
       let timerInterval;
       let currentTime = time; // Save the original time for later use
+      // <strong>${type}:</strong> ${title} - Time: <span class="time-display" contenteditable="true">${time}</span>
 
       contentSection.innerHTML = `
-        <strong>${type}:</strong> ${title} - Time: <span class="time-display" contenteditable="true">${time}</span>
+                <strong>${type} Added By : ${timerName} </strong> The Title Name is  ${title} - For : <span class="time-display" contenteditable="true">${time} Min</span>
+
         <button class="remove-content-btn">❌</button>
         <button class="play-pause-btn">▶️</button>
       `;
@@ -2426,7 +3135,9 @@
         }
         timerRunning = !timerRunning;
       });
-    }//end addContentSection
+    }
+    //end addContentSection
+
 
     function openContentForm(contentType, timerComponent, assignedCategories) {
       const existingForm = document.getElementById("contentForm");
@@ -2436,7 +3147,7 @@
 
       const formHTML = `
         <div id="contentForm">
-          <input type="text" id="topicName" placeholder="Enter Topic Name"/>
+          <input type="text" id="topicName" placeholder="${contentType} Selected is"/>
           <input type="text" id="topicTime" value="2:00" placeholder="Enter Time (e.g., 2 min)"/>
           <button id="submitContentBtn">Submit</button>
         </div>
@@ -2460,8 +3171,6 @@
         }
       });
     }//end openCounterForm
-
-
 
 
 
@@ -2545,6 +3254,7 @@
       let timerRunning = false;
       let timerInterval;
       let currentTime = time; // Save the original time for later use
+      // <strong>${type}:</strong> ${title} - Time: <span class="time-display" contenteditable="true">${time}</span>
 
       contentSection.innerHTML = `
         <strong>${type}:</strong> ${title} - Time: <span class="time-display" contenteditable="true">${time}</span>
@@ -2594,6 +3304,7 @@
 
     //////////////////////Next Function
 
+
     function openContentForm(contentType, timerComponent, assignedCategories) {
       const existingForm = document.getElementById("contentForm");
       if (existingForm) {
@@ -2602,7 +3313,7 @@
 
       const formHTML = `
         <div id="contentForm">
-          <input type="text" id="topicName" placeholder="Enter Topic Name"/>
+          <input type="text" id="topicName" placeholder="${contentType} Selected is"/>
           <input type="text" id="topicTime" value="2:00" placeholder="Enter Time (e.g., 2 min)"/>
           <button id="submitContentBtn">Submit</button>
         </div>
@@ -2626,6 +3337,8 @@
         }
       });
     }
+
+
 
     ///////////////NEXT FUNCTION (they must go in this order. )
 
@@ -2673,7 +3386,7 @@
       //timerComponent.appendChild(timerTitleInput);
 
       timerComponent.innerHTML = `
-        <input data-id="${newTimerID}-1" type="text" value="${timerTitle}" placeholder="${timerTitle}" class="timer-title"/>
+        <input data-id="${newTimerID}-1" type="text" value="${timerTitle}" placeholder="Timer Title" class="timer-title"/>
         <input data-id="${newTimerID}-2" type="text" value="${defaultTime}" class="timer-value"/> 
         <input data-id="${newTimerID}-3" type="text" value="${formattedTime}" class="timer-asc"/>
         <input data-id="${newTimerID}-4" type="text" placeholder="veto" class="timer-veto"/> <!-- Shorter width for veto -->
@@ -2688,9 +3401,12 @@
           <button id2="${newTimerID}"-10 class="content-btn" id="contentdata">Content</button>
           <button data-id="${newTimerID}-11" class="people-btn" id="peoplebtn">People</button>
           <button data-id="${newTimerID}-12" class="vote-btn" id="vote-btn" disabled >Vote</button>
-          <input  data-id="${newTimerID}-timersenddata" class="datainputtimer" style="margin:0px 10px; display:none;" type="text" id="fname" name="fname"><br>
+          <button data-id="${newTimerID}-13" class="donateUserTIme" id="donateUserTIme">Donate</button>
         </div>
       `;
+      // <input  data-id="${newTimerID}-timersenddata" class="datainputtimer" style="margin:0px 10px; display:none;" type="text" id="fname" name="fname"><br>
+
+      // <button data-id="${newTimerID}-send" style="display:none;">Send</button>
 
 
 
@@ -2736,16 +3452,55 @@
       ////////////////////////////////////////////////////////////////////////////////////
 
       // Select the input field for default time (assuming this is within a timer component)
+      // const defaultTimeInputField = timerComponent.querySelector(`[data-id="${newTimerID}-2"]`); // Use correct data-id for default time
+
+      // defaultTimeInputField.addEventListener('focus', function () {
+
+
+      //   stopTimer(newTimerID);
+
+
+
+      // });//end click
+
+
+
+      // Select the input field for default time (assuming this is within a timer component)
       const defaultTimeInputField = timerComponent.querySelector(`[data-id="${newTimerID}-2"]`); // Use correct data-id for default time
 
       defaultTimeInputField.addEventListener('focus', function () {
+        const focus_ELMxID = 0; // You can dynamically set this as needed. This is currently hardcoded as April 6 2025
+
+        // Get the value entered by the user
+        const defaultTime = defaultTimeInputField.value;
+
+        // Get the data-id attribute value of the input field
+        const focusTimeElementID = defaultTimeInputField.getAttribute('data-id');
+
+        let focusTime_timerServerID = "";
+        const parts = focusTimeElementID.split('-'); // Split the ID to get the timerServerID
+        const firstPart = parts[0]; // The first part is the timerServerID
+        focusTime_timerServerID = firstPart; // Set timerServerID to firstPart
 
 
         stopTimer(newTimerID);
+        let responseObject = {
+          cmd: "stopTimer",
+          msg: {
+            ELMxID: focus_ELMxID,
+            timerServerID: focusTime_timerServerID,
+          }//end msg
+        };//end responseObject
+
+        // Send the request to the server to update the timer state for all clients
+        socket.send(JSON.stringify(responseObject));
+        console.log("stopTimer sending to socket: " + JSON.stringify(responseObject));
+
+        console.log("Default time sent to server: " + defaultTime);
 
 
+      });//endfocus
 
-      });//end click
 
       defaultTimeInputField.addEventListener('blur', function () {
         // Get the value entered by the user
@@ -2788,7 +3543,7 @@
         };
 
         // Send the response object to the server (via socket)
-        console.log("responce of default timer" + responseObject);
+        console.log("responce of default timer hi" + JSON.stringify(responseObject));
         socket.send(JSON.stringify(responseObject));
 
         console.log("Default time sent to server: " + defaultTime);
@@ -2918,55 +3673,49 @@
 
 
 
+
+
       const contentBtn2 = document.getElementById("contentdata");
-      console.log("CONTENTBUTTON:" + contentBtn2)
+console.log("CONTENTBUTTON:" + contentBtn2);
 
+// Create dropdown menu inside content-btn
+const contentBtn = timerComponent.querySelector(".content-btn");
+const dropdownMenu = document.createElement("div");
+dropdownMenu.classList.add("dropdown-menu");
+dropdownMenu.innerHTML = `
+  <button class="dropdown-item" data-type="Individual">Individual</button>
+  <button class="dropdown-item" data-type="Particular">Particular</button>
+  <button class="dropdown-item" data-type="Universal">Universal</button>
+`;
 
+// Append dropdown to timer component
+timerComponent.appendChild(dropdownMenu);
 
-      // Create dropdown menu inside content-btn
-      const contentBtn = timerComponent.querySelector(".content-btn");
-      const dropdownMenu = document.createElement("div");
-      dropdownMenu.classList.add("dropdown-menu");
-      dropdownMenu.innerHTML = `
-            <button class="dropdown-item" data-type="Individual">Individual</button>
-            <button class="dropdown-item" data-type="Particular">Particular</button>
-            <button class="dropdown-item" data-type="Universal">Universal</button>
-          `;
+let assignedCategories = new Set();
 
-      // confisuan
-      timerComponent.appendChild(dropdownMenu);
+contentBtn.addEventListener("click", () => {
+  dropdownMenu.classList.toggle("show-dropdown");
+});
 
+dropdownMenu.addEventListener("click", (e) => {
+  if (e.target.classList.contains("dropdown-item")) {
+    document.querySelectorAll(".dropdown-item").forEach(item => {
+      item.style.backgroundColor = ""; // Reset
+    });
 
+    const selectedContent = e.target.dataset.type;
 
-      let assignedCategories = new Set();
+    // 🟡 Get the timer name (assume it's in an input or span)
+    const timerTitleInput = timerComponent.querySelector('[data-id$="-1"]'); // assuming your input has data-id ending in -1
+    const timerName = timerTitleInput?.value || timerTitleInput?.innerText || "Unnamed Timer";
 
-      contentBtn.addEventListener("click", () => {
-        dropdownMenu.classList.toggle("show-dropdown");
-      });
+    // 🟢 Call with timer name now
+    openContentForm(selectedContent, timerComponent, assignedCategories);
 
-      // dropdownMenu.addEventListener("click", (e) => {
-      //   const selectedContent = e.target.dataset.type;
-      //   openContentForm(selectedContent, timerComponent, assignedCategories);
-      // });
-
-      dropdownMenu.addEventListener("click", (e) => {
-        if (e.target.classList.contains("dropdown-item")) {
-          document.querySelectorAll(".dropdown-item").forEach(item => {
-            item.style.backgroundColor = ""; // Reset to default
-          });
-
-          const selectedContent = e.target.dataset.type;
-
-          // Call function to open content form
-          openContentForm(selectedContent, timerComponent, assignedCategories);
-
-          // Change clicked button background color to green
-          e.target.style.backgroundColor = "yellow";
-
-          // Change content button background to yellow when content is added
-          contentBtn.style.backgroundColor = "yellow";
-        }
-      });
+    e.target.style.backgroundColor = "brown";
+    contentBtn.style.backgroundColor = "brown";
+  }
+});
 
 
 
@@ -3101,127 +3850,267 @@
       });
 
 
+
+
+
+      let clickCount = 0;
+      let userNames = {}; // Store usernames dynamically
+
+      function updateUsernames() {
+        document.querySelectorAll(`[data-id$="-1"]`).forEach(input => {
+          let timerID = input.getAttribute("data-id").split("-")[0];
+          userNames[timerID] = input.value.trim() || `User ${timerID}`;
+        });
+      }
+
+      // Function to generate user options excluding the current user
+      function getUserOptions(currentUserID) {
+        updateUsernames();
+        let options = "";
+
+        Object.entries(userNames).forEach(([userID, userName]) => {
+          // if (userID !== currentUserID) {
+          options += `<option value="${userID}">${userName}</option>`;
+          // }
+        });
+
+        return options;
+      }
+
+      // Function to update all donation dropdowns
+      function updateUserDropdowns() {
+        document.querySelectorAll(".donation-controls select").forEach(selectElement => {
+          let currentUserID = selectElement.closest(".user-card")?.getAttribute("data-user-id");
+          selectElement.innerHTML = getUserOptions(currentUserID);
+        });
+      }
+
+
+      // Auto-update usernames when input fields change
+      document.addEventListener("input", function (event) {
+        if (event.target.matches(`[data-id$="-1"]`)) {
+          updateUsernames();
+          updateUserDropdowns();
+        }
+      });
+
+      // Observe changes in the number of citizens
+      const citizenCountElement = document.getElementById("numberCitizenTimers");
+      if (typeof window.citizenObserver === "undefined" && citizenCountElement) {
+        window.citizenObserver = new MutationObserver(() => {
+          updateUserDropdowns();
+        });
+
+        window.citizenObserver.observe(citizenCountElement, { childList: true, subtree: true });
+      }
+
+      // Helper to attach Donate button logic
+      function attachDonateButton(cardElement, userID, timerName) {
+        const donateBtn = cardElement.querySelector(".donate-btn");
+        donateBtn?.addEventListener("click", () => {
+          const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
+          const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
+          const recipientSelect = cardElement.querySelector("select");
+
+          const donateMinutes = parseInt(minutesInput?.value || "0");
+          const donateSeconds = parseInt(secondsInput?.value || "0");
+          // const recipientID = recipientSelect?.value;
+          const recipientID = parseInt(recipientSelect?.value);
+
+          const totalSeconds = donateMinutes * 60 + donateSeconds;
+
+          if (!recipientID || totalSeconds <= 0) {
+            alert("Please select a recipient and enter valid time to donate.");
+            return;
+          }
+
+          const donationData = {
+            cmd: "donateTime",
+            msg: {
+              ELMxID: 0,
+              fromUserID: userID,
+              toUserID: recipientID,
+              timerName: timerName,
+              minutes: donateMinutes,
+              seconds: donateSeconds,
+              totalSeconds: totalSeconds
+            }
+          };
+
+          socket.send(JSON.stringify(donationData));
+          console.log("Donation sent via WebSocket:", donationData);
+        });
+      }
+
+
+
+      document.querySelectorAll(`[data-id="${newTimerID}-13"]`).forEach(button => {
+        button.addEventListener("click", function () {
+          const timerTitleInput = document.querySelector(`[data-id="${newTimerID}-1"]`);
+          const timerTitle = timerTitleInput ? timerTitleInput.value.trim() : "Untitled Timer";
+          const currentUserID = newTimerID;
+
+          const defaultTimeInput = document.querySelector(`[data-id="${newTimerID}-2"]`);
+          const timerValue = defaultTimeInput ? defaultTimeInput.value : "00:00";
+          let [minutes, seconds] = timerValue.split(":").map(Number);
+          minutes = isNaN(minutes) ? 0 : minutes;
+          seconds = isNaN(seconds) ? 0 : seconds;
+          const formattedTime = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+
+          let existingCard = this.nextElementSibling;
+
+          // TOGGLE: If card exists and has .user-card, remove it
+          if (existingCard && existingCard.classList.contains("user-card")) {
+            existingCard.remove();  // Hides the user card
+          } else {
+            // Otherwise, create and insert the user card
+            let userOptions = getUserOptions(currentUserID);
+
+            let userCardHTML = `
+        <div class="user-card" data-user-id="${currentUserID}">
+          <div class="donation-controls">
+            <input type="number" min="0" max="60" value="1"> min
+            <input type="number" min="0" max="59" value="0"> sec
+            <select>${userOptions}</select>
+            <button class="donate-btn">Donate</button>
+          </div>
+        </div>
+      `;
+
+            let wrapper = document.createElement("div");
+            wrapper.innerHTML = userCardHTML;
+            let cardElement = wrapper.firstElementChild;
+
+            this.after(cardElement); // Insert after button
+
+            // You can add or show the formatted time here if needed
+            attachDonateButton(cardElement, currentUserID, timerTitle);
+          }
+        });
+      });
+
+
+      // Periodic dropdown updates
+
+      // if (typeof window.userUpdateInterval === "undefined") {
+      //   window.userUpdateInterval = setInterval(updateUserDropdowns, 2000);
+      // }
+
+
+
       function setupDropdown(dropdownMenu) {
         const parentButtons = dropdownMenu.querySelectorAll(".dropdown-item");
         const allButtons = dropdownMenu.querySelectorAll(".submenu-item");
         const formbtn = document.getElementById("formbtn"); // Get form button
 
-        // Object to store click counts
         if (!window.submenuClickCounts) {
           window.submenuClickCounts = {};
         }
 
 
-
         function activateButton(selectedButton) {
           console.log("In activateButton");
 
-          // Reset the background color for all submenu items
+          // Reset background colors
           parentButtons.forEach(button => button.style.backgroundColor = "");
           allButtons.forEach(button => button.style.backgroundColor = "");
 
-          // Activate the clicked submenu item
+          // Highlight the selected button
           selectedButton.style.backgroundColor = "green";
           const formbtn = selectedButton.closest(".form-btn");
 
-          // Find and activate the parent button
           const parentButton = selectedButton.closest(".dropdown-item");
           if (parentButton) parentButton.style.backgroundColor = "green";
           if (formbtn) formbtn.style.backgroundColor = "green";
 
-          // Track submenu item clicks
+          // Get button text and track clicks
           const buttonText = selectedButton.innerText.trim();
-          if (!window.submenuClickCounts) window.submenuClickCounts = {}; // Initialize if undefined
           window.submenuClickCounts[buttonText] = (window.submenuClickCounts[buttonText] || 0) + 1;
-
           console.log(`${buttonText} clicked ${window.submenuClickCounts[buttonText]} times`);
 
-          // Get necessary data attributes from the selected button
-          const timerSubmenuServerID = selectedButton.getAttribute("data-timerServerID"); // Unique ID
-          const timerdropdownID = selectedButton.closest(".dropdown-item").getAttribute("data-timer-id");
-          const formButtonID = selectedButton.closest(".form-btn") ? selectedButton.closest(".form-btn").getAttribute("data-id") : null;
-          const timerNewName = titleInputField.value; // Get user-entered value
+          // Get IDs
+          const timerSubmenuServerID = selectedButton.getAttribute("data-timerServerID");
+          const timerdropdownID = selectedButton.closest(".dropdown-item")?.getAttribute("data-timer-id");
+          const formButtonID = selectedButton.closest(".form-btn")?.getAttribute("data-id");
+          const timerNewName = titleInputField.value;
 
           console.log("Timer Dropdown ID:", timerdropdownID);
           console.log("Timer Server ID:", timerSubmenuServerID);
           console.log("Form Button ID:", formButtonID);
 
-          // Show the input field only for the clicked submenu item
-          if (!selectedButton.dataset.clicked) {
-            let inputField = document.querySelector(`input[data-id="${newTimerID}-timersenddata"]`);
-            let sendButton = document.querySelector(`button[data-id="${newTimerID}-send"]`);
-
-            if (!inputField) {
-              // Create input field if it doesn't exist
-              inputField = document.createElement("input");
-              inputField.setAttribute("type", "text");
-              inputField.setAttribute("data-id", `${newTimerID}-12`);
-              inputField.classList.add("datainputtimer");
-              inputField.style.margin = "0px 10px";
-              inputField.style.display = "block";
-              // inputField.style.background = "green";
-
-              // Append input field next to the form button
-              formbtn.parentNode.insertBefore(inputField, formbtn.nextSibling);
-            } else {
-              inputField.style.display = "block";
-              inputField.value = "1:00";
-              // inputField.style.background = "green";
-            }
-
-            if (!sendButton) {
-              // Create send button if it doesn't exist
-              sendButton = document.createElement("button");
-              sendButton.innerText = "Send";
-              sendButton.setAttribute("data-id", `${newTimerID}-send`);
-              sendButton.classList.add("send-btn");
-
-              // Append send button next to the input field
-              inputField.parentNode.insertBefore(sendButton, inputField.nextSibling);
-
-              // Add event listener to send data when button is clicked
-              sendButton.addEventListener("click", function () {
-                const newtimerinputfiled = inputField.value; // Get user input
-
-                // Construct WebSocket data
-                const data = {
-                  cmd: "submenuClick",
-                  msg: {
-                    ELMxID: 0,
-                    timerSubmenuServerID: timerSubmenuServerID,
-                    formButtonID: formButtonID,
-                    newtimerinputfiled: newtimerinputfiled, // Send input field value
-                    timerdropdownID: timerdropdownID,
-                    timerFromNewName: timerNewName,
-                    buttonText: buttonText
-                  }
-                };
-
-                console.log("Sending data:", JSON.stringify(data));
-
-                // Send data via WebSocket
-                socket.send(JSON.stringify(data));
-              });
-            }
-          }
-
-          // Prevent multiple clicks
           if (selectedButton.dataset.clicked) return;
           selectedButton.dataset.clicked = true;
+
+          // Hide all other timer containers except the one for the selected data-timerServerID
+          document.querySelectorAll(".timer-container").forEach(container => {
+            if (container.getAttribute("data-timerServerID") !== timerSubmenuServerID) {
+              container.style.display = "none";
+            }
+          });
+
+          // Find or create the timer container for this specific timerServerID
+          let timerContainer = document.querySelector(`div[data-timerServerID="${timerSubmenuServerID}"]`);
+
+          if (!timerContainer) {
+            timerContainer = document.createElement("div");
+            timerContainer.setAttribute("data-timerServerID", timerSubmenuServerID);
+            timerContainer.classList.add("timer-container");
+            timerContainer.innerHTML = `
+            <div class="scroll-container">
+                <div id="minutes-${timerSubmenuServerID}" class="scroll-box"></div>
+                <div id="seconds-${timerSubmenuServerID}" class="scroll-box"></div>
+                <button class="formbtntimersubmenu">Set Timer</button>
+            </div>
+        `;
+            formbtn.parentNode.insertBefore(timerContainer, formbtn.nextSibling);
+
+            // Populate the scroll boxes
+            populateScrollBox(`minutes-${timerSubmenuServerID}`, 60);
+            populateScrollBox(`seconds-${timerSubmenuServerID}`, 60);
+          } else {
+            // Toggle visibility of the existing timer container
+            timerContainer.style.display = (timerContainer.style.display === "none" || timerContainer.style.display === "") ? "block" : "none";
+          }
+
+          // Set correct send button for this specific timer
+          const sendButton = timerContainer.querySelector(".formbtntimersubmenu");
+          sendButton.onclick = function () {
+            const selectedMinute = document.querySelector(`#minutes-${timerSubmenuServerID} .selected`)?.textContent || "00";
+            const selectedSecond = document.querySelector(`#seconds-${timerSubmenuServerID} .selected`)?.textContent || "00";
+
+            const newtimerinputfiled = `${selectedMinute}:${selectedSecond}`;
+
+            console.log('newtimerinputfiled', newtimerinputfiled);
+            const data = {
+              cmd: "submenuClick",
+              msg: {
+                ELMxID: 0,
+                timerSubmenuServerID: timerSubmenuServerID,
+                formButtonID: formButtonID,
+                newtimerinputfiled: newtimerinputfiled,
+                timerdropdownID: timerdropdownID,
+                timerFromNewName: timerNewName,
+                buttonText: buttonText
+              }
+            };
+
+            console.log("Sending data:", JSON.stringify(data));
+            socket.send(JSON.stringify(data));
+          };
 
           setTimeout(() => {
             delete selectedButton.dataset.clicked;
           }, 500);
         }
 
-
-        // Attach event listeners dynamically for the current dropdown
+        // Ensure each button activates its own timer container
         allButtons.forEach(button => {
           button.addEventListener("click", () => {
             activateButton(button);
             console.log('Sub item clicked');
           });
         });
+
       }
 
       // Initial setup for existing dropdowns
@@ -3371,14 +4260,122 @@
         }
       });
 
-      addTimerBtn.addEventListener("click", addTimer);
+      // addTimerBtn.addEventListener("click", addTimer);
       //resetVotesBtn.addEventListener("click", resetVotes); // Add listener for reset vote button
 
     }); ////end DOMContentLoaded
 
 
 
+
+
+
+
+    // /*scroll effect in form submenu*/
+
+    let selectedMinute = 1;  // Default to 1 minute
+    let selectedSecond = 0;
+    let formSubmenuTimerSet = false;
+    let formSubmenuTimerTime = null;
+
+    function populateScrollBox(id, range) {
+      const box = document.getElementById(id);
+      if (!box) return;
+
+      box.innerHTML = "";  // Clear previous entries
+
+      let defaultSelection = 0;
+      if (id.includes("minutes")) defaultSelection = 1; // Set default to 1 minute
+
+      for (let i = 0; i < range; i++) {
+        let div = document.createElement("div");
+        div.textContent = i.toString().padStart(2, '0');
+        div.classList.add("time-option");
+
+        if (i === defaultSelection) {
+          div.classList.add("selected");  // Default selection
+          selectedMinute = i;
+        }
+
+        div.onclick = function () {
+          selectTime(id, div, i);
+        };
+        box.appendChild(div);
+      }
+
+      // ✅ Scroll to default selection
+      setTimeout(() => {
+        let defaultElement = box.children[defaultSelection];
+        if (defaultElement) {
+          box.scrollTop = defaultElement.offsetTop;
+        }
+      }, 100);
+
+      // ✅ Auto-select when scrolling
+      box.addEventListener("scroll", () => {
+        let items = box.children;
+        let closest = null;
+        let minDiff = Infinity;
+
+        for (let item of items) {
+          let diff = Math.abs(item.offsetTop - box.scrollTop);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closest = item;
+          }
+        }
+
+        if (closest) {
+          let value = parseInt(closest.textContent);
+          selectTime(id, closest, value);
+        }
+      });
+    }
+
+    function selectTime(id, element, value) {
+      document.querySelectorAll(`#${id} div`).forEach(el => el.classList.remove("selected"));
+      element.classList.add("selected");
+
+      if (id.includes("minutes")) selectedMinute = value;
+      if (id.includes("seconds")) selectedSecond = value;
+
+      console.log(`🎯 Selected ${id}: ${value}`);
+    }
+
+    function setFormSubmenuTimer() {
+      formSubmenuTimerTime = new Date();
+      formSubmenuTimerTime.setMinutes(selectedMinute);
+      formSubmenuTimerTime.setSeconds(selectedSecond);
+      formSubmenuTimerTime.setMilliseconds(0);
+      formSubmenuTimerSet = true;
+
+      let timerStatus = `Timer set for ${selectedMinute}:${selectedSecond.toString().padStart(2, '0')}`;
+      document.getElementById("form-submenu-timer-status").textContent = timerStatus;
+      document.getElementById("form-submenu-timer-input").value = timerStatus;
+    }
+
+    // Check the timer every second
+    setInterval(() => {
+      if (formSubmenuTimerSet) {
+        let now = new Date();
+        if (now.getMinutes() === formSubmenuTimerTime.getMinutes() && now.getSeconds() === formSubmenuTimerTime.getSeconds()) {
+          alert("⏳ Timer Completed!");
+          formSubmenuTimerSet = false;
+        }
+      }
+    }, 1000);
+
+    populateScrollBox("minutes", 60);
+    populateScrollBox("seconds", 60);
+
+
+    /*scroll effect in form submenu end*/
+
+
+
+
   </script>
+
 </body>
 
 </html>
