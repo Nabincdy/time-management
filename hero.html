@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Donation System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Time Donation System</h1>
+        <p class="instructions">Enter the amount of time (minutes and seconds) you want to donate and select the recipient.</p>
+
+        <div class="users-container">
+            <!-- User 1 -->
+            <div class="user-card" id="user1">
+                <h2>User 1</h2>
+                <p>Available Time: <span class="time-value" id="user1-time">60:00</span></p>
+                <div class="donation-controls">
+                    <input type="number" id="donate-minutes-user1" min="0" max="60" value="1"> min
+                    <input type="number" id="donate-seconds-user1" min="0" max="59" value="0"> sec
+                    <select id="donate-to-user1"></select>
+                    <button class="donate-btn" data-user="user1">Donate</button>
+                </div>
+            </div>
+
+            <!-- User 2 -->
+            <div class="user-card" id="user2">
+                <h2>User 2</h2>
+                <p>Available Time: <span class="time-value" id="user2-time">45:00</span></p>
+                <div class="donation-controls">
+                    <input type="number" id="donate-minutes-user2" min="0" max="45" value="1"> min
+                    <input type="number" id="donate-seconds-user2" min="0" max="59" value="0"> sec
+                    <select id="donate-to-user2"></select>
+                    <button class="donate-btn" data-user="user2">Donate</button>
+                </div>
+            </div>
+
+            <!-- User 3 -->
+            <div class="user-card" id="user3">
+                <h2>User 3</h2>
+                <p>Available Time: <span class="time-value" id="user3-time">30:00</span></p>
+                <div class="donation-controls">
+                    <input type="number" id="donate-minutes-user3" min="0" max="30" value="1"> min
+                    <input type="number" id="donate-seconds-user3" min="0" max="59" value="0"> sec
+                    <select id="donate-to-user3"></select>
+                    <button class="donate-btn" data-user="user3">Donate</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="transaction-history">
+            <h2>Transaction History</h2>
+            <div class="history-container" id="history-list"></div>
+        </div>
+    </div>
+
+    <script>
+     document.addEventListener("DOMContentLoaded", function () {
+    const usersContainer = document.querySelector(".users-container");
+    const userCards = usersContainer.querySelectorAll(".user-card");
+    const users = {};
+
+    // Extract users from DOM
+    userCards.forEach((card) => {
+        const userId = card.id;
+        const timeText = card.querySelector(".time-value").textContent;
+        const [minutes, seconds] = timeText.split(":").map(Number);
+        users[userId] = {
+            name: `User ${userId.replace("user", "")}`,
+            time: minutes * 60 + seconds
+        };
+    });
+
+    // Populate select dropdowns dynamically
+    userCards.forEach((card) => {
+        const userId = card.id;
+        const select = card.querySelector("select");
+
+        // Clear existing options
+        select.innerHTML = "";
+
+        // Add users to the select dropdown, excluding self
+        Object.keys(users).forEach((id) => {
+            if (id !== userId) {
+                const option = document.createElement("option");
+                option.value = id;
+                option.textContent = users[id].name;
+                select.appendChild(option);
+            }
+        });
+    });
+
+    // Donation handling logic
+    document.querySelectorAll(".donate-btn").forEach((button) => {
+        button.addEventListener("click", function () {
+            const donorId = this.dataset.user;
+            const minutes = parseInt(document.getElementById(`donate-minutes-${donorId}`).value);
+            const seconds = parseInt(document.getElementById(`donate-seconds-${donorId}`).value);
+            const recipientId = document.getElementById(`donate-to-${donorId}`).value;
+
+            const donationAmount = minutes * 60 + seconds;
+
+            if (donationAmount <= 0 || donationAmount > users[donorId].time) {
+                alert("Invalid donation amount!");
+                return;
+            }
+
+            // Process donation
+            users[donorId].time -= donationAmount;
+            users[recipientId].time += donationAmount;
+
+            // Update UI
+            document.getElementById(`${donorId}-time`).textContent = formatTime(users[donorId].time);
+            document.getElementById(`${recipientId}-time`).textContent = formatTime(users[recipientId].time);
+
+            // Add to transaction history
+            addTransaction(donorId, recipientId, donationAmount);
+        });
+    });
+
+    // Format time as MM:SS
+    function formatTime(timeInSeconds) {
+        const minutes = Math.floor(timeInSeconds / 60);
+        const seconds = timeInSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    }
+
+    function addTransaction(donor, recipient, amount) {
+        const historyList = document.getElementById("history-list");
+        const item = document.createElement("div");
+        item.classList.add("transaction-item");
+        item.textContent = `${users[donor].name} donated ${formatTime(amount)} to ${users[recipient].name}`;
+        historyList.prepend(item);
+    }
+});
+
+    </script>
+</body>
+</html>

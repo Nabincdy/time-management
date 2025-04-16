@@ -1,4 +1,3 @@
-
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -117,7 +116,7 @@ function updateTimers() {
     // Update participant timers
     for (const meetingID in globalELMxArray) {
         if (globalELMxArray.hasOwnProperty(meetingID)) {
-            console.log("UpdateTimers globalELMxArray.hasOwnProperty:" + meetingID);  // Will log: Alice, Bob (but not extraProperty)
+            // console.log("UpdateTimers globalELMxArray.hasOwnProperty:" + meetingID);  // Will log: Alice, Bob (but not extraProperty)
 
             currentTime = performance.now(); // Get the current high-resolution time
             elapsedTime = (currentTime - globalELMxArray[meetingID].lastUpdateTime) / 1000; // Time in seconds
@@ -133,7 +132,7 @@ function updateTimers() {
                         timer.remainingTime -= elapsedTime;
                         timer.ascendingTime += elapsedTime;
 
-                        console.log("time decreased UpdateTimers globalELMxArray.timer:" + timerID + "elaspedTime:" + elapsedTime + "remainingTime:" + timer.remainingTime + " " + globalELMxArray[meetingID].timers[timerID].remainingTime);
+                        // console.log("time decreased UpdateTimers globalELMxArray.timer:" + timerID + "elaspedTime:" + elapsedTime + "remainingTime:" + timer.remainingTime + " " + globalELMxArray[meetingID].timers[timerID].remainingTime);
                         if (timer.remainingTime <= 0) {
                             timer.remainingTime = 0; // Ensure time doesn't go negative
                             timer.isRunning = false; // Stop the timer once time is up
@@ -203,6 +202,19 @@ globalELMxArray = {
 
         }, //end flow roles
         "arrayOfAttendanceIDs": {},
+        "userData": {
+            "participant1": { "assignTimerId": "timerId", "paretoCategory": { "aesthetic": 6, "social": 6, "wealth": 4, "body": 5, "culturedness": 8, "IQ": 9, "UQ": 1 } },
+            "participant2": { "aesthetic": 2, "social": 9, "wealth": 5, "body": 3, "culturedness": 7, "IQ": 4, "UQ": 1 },
+
+            "vetoes": {
+                "formVeto": 8,
+                "formTimeVeto": 1,
+                "contentVeto": 0,
+                "contentTimeVeto": 2,
+                "peopleVeto": 1,
+                "peopleTimeVeto": 1
+            },
+        },
         "participants": {
             "NumberOfParticipants": 0,
             "paretoCategories": {
@@ -227,9 +239,12 @@ globalELMxArray = {
         "timers": {
             // "timer1TotalMeetTimer": { "name": "Total Meet Timer", "remainingTime": 59, isRunning: true,}, 
             // "FudgeTimer": { "name": "Fudge Timer", "remainingTime": 9 },
-            // "timerID1": { "name": "Ben", "remainingTime": 10, "personAssignedID": "ID2", "timerIntervalID": null isRunning: true, ascendingTime: 3222 }//NOTE: March 16 2025 timerIntervalID is added to store the LIVE running timers on server when the timer is running. It is set to null. NOTE March 19 2025: we no longer store the timers here but have one big meeting engine the elmxEngine //March 20 2025: ascendingTime includes donated time and will be the total speaking time to be added to users total time speaking to inner gov.
+            // "timerID1": { "name": "Ben", "remainingTime": 10, "personAssignedID": "ID2", "timerIntervalID": null isRunning: true, ascendingTime: 3222, veteos:  "vetoes": { "formTimeVeto": 1,"contentVeto": 0,"contentTimeVeto": 2, "peopleVeto": 1, "peopleTimeVeto": 1formTimeVeto },
+            //      }//NOTE: March 16 2025 timerIntervalID is added to store the LIVE running timers on server when the timer is running. It is set to null. NOTE March 19 2025: we no longer store the timers here but have one big meeting engine the elmxEngine //March 20 2025: ascendingTime includes donated time and will be the total speaking time to be added to users total time speaking to inner gov.
 
         },//end timers
+
+
         "vote": {
             "isVotingHappening": "not yet",
             "totalVoteForm": "not yet",
@@ -247,15 +262,15 @@ globalELMxArray = {
             "individualParticipantVotes": {
                 "participant1": {
 
-                    "vetoes":{ //globalELMxArray[0].votes.individualParticipantVotes.participant1.vetoes.formVeto = current  + 1;
-                        "formVeto": 0, 
+                    "vetoes": {
+                        "formVeto": 0,
                         "formTimeVeto": 1,
                         "contentVeto": 0,
                         "contentTimeVeto": 2,
                         "peopleVeto": 1,
                         "peopleTimeVeto": 1
-                         },
-                         
+                    },
+
                     "participant1CurrentVoting": {
                         "VoteForm": "not yet",
                         "voteFormString": "not yet",
@@ -378,9 +393,15 @@ wss.on("connection", (ws) => {
                     let createTimerIDELMxID = message.msg.ELMxID;
                     let timerIDFromBrowser = message.msg.timerIDFromBrowser;
                     let defaultTimeOfNewlyAddedTimer = message.msg.defaultTime; //is in 5:00 form but server stores as seconds
-                    let defaultName = "Timer Title";
+                    let defaultName = "";
+                    let vetoValue = "";
+                    let oldVetoValue = "";
                     let newTimerID = globalTimerIDs + 1;
+                    let userID = newTimerID; // ✅ Get userID from client
                     globalTimerIDs++;
+                    // globalUserIDs
+
+                    console.log("tinn " + message.msg);
                     console.log("Inside createTimerComponentToBrowser:" + createTimerIDELMxID + " " + newTimerID);
 
                     let [minutes, seconds] = defaultTimeOfNewlyAddedTimer.split(":"); // Split the string at ":"
@@ -393,11 +414,13 @@ wss.on("connection", (ws) => {
                         "timerServerID": newTimerID,
                         "defaultTime": defaultTimeOfNewlyAddedTimer,
                         "personAssignedID": "???",
+                        "ownerID": userID,
                         "name": defaultName,
                         "remainingTime": totalSeconds,
                         "ascendingTime": 0,
-                        "isRunning": false
-
+                        "isRunning": false,
+                        "veto": vetoValue,
+                        "oldVeto": oldVetoValue,
                     }//end timers
 
                     let createUserResponseObject = { "cmd": "returnedFromServerAddTimer", "msg": { "timerServerID": newTimerID, "defaultTime": defaultTimeOfNewlyAddedTimer, "timerBrowserID": timerIDFromBrowser, "allMeetingData": globalELMxArray[createTimerIDELMxID].timers[newTimerID] } };
@@ -455,8 +478,6 @@ wss.on("connection", (ws) => {
 
                     let stopTimer_ELMxID = message.msg.ELMxID;
                     let stopTimer_timerServerID = message.msg.timerServerID;
-
-
 
                     globalELMxArray[stopTimer_ELMxID].timers[stopTimer_timerServerID].isRunning = false;
                     let stopTimer_remainingTime = globalELMxArray[stopTimer_ELMxID].timers[stopTimer_timerServerID].remainingTime;
@@ -588,20 +609,66 @@ wss.on("connection", (ws) => {
 
 
 
-                case 'resetTimerName':
-                    //input {"cmd": "resetTimerName", "msg": {"ELMxID": 0, "timerNewName": name}}
-                    let resetTimerName_meetingID = message.msg.ELMxID
+                // case 'resetTimerName':
+                //     //input {"cmd": "resetTimerName", "msg": {"ELMxID": 0, "timerNewName": name}}
+                //     let resetTimerName_meetingID = message.msg.ELMxID
+                //     let resetTimerName_timerServerID = message.msg.timerServerID;
+                //     //        const parts = resetTimerName_timerServerID.split('-');
+                //     //        const firstPart = parts[0]; 
+                //     //        resetTimerName_timerServerID =firstPart;//this firstPart is the timerServerID        
+                //     //        console.log(firstPart);
+                //     //let resetTimerName_timerNewTitleID = message.msg.timerNewTitleID;
+                //     let timerNewName = message.msg.timerNewName
+                //     //globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID]={};
+                //     //globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].name=""; 
+                //     globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].name = timerNewName;
+                //     let createUserResponseObjectName = { "cmd": "returnedFromServerResetTimerName", "msg": { "ELMxID": resetTimerName_meetingID, "timerServerID": resetTimerName_timerServerID, "timerNewName": timerNewName } };
+                //     let desiredListName = ["particularSome", globalELMxArray[resetTimerName_meetingID].arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, desiredListName, createUserResponseObjectName);
+
+                //     break;
+
+                case "resetTimerName":
+                    // Input: { "cmd": "resetTimerName", "msg": { "ELMxID": 0, "timerServerID": "timerID1", "timerNewName": "Ben" } }
+
+                    let resetTimerName_meetingID = message.msg.ELMxID;
                     let resetTimerName_timerServerID = message.msg.timerServerID;
-                    //        const parts = resetTimerName_timerServerID.split('-');
-                    //        const firstPart = parts[0]; 
-                    //        resetTimerName_timerServerID =firstPart;//this firstPart is the timerServerID        
-                    //        console.log(firstPart);
-                    //let resetTimerName_timerNewTitleID = message.msg.timerNewTitleID;
-                    let timerNewName = message.msg.timerNewName
-                    //globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID]={};
-                    //globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].name=""; 
+                    let timerNewName = message.msg.timerNewName;
+
+                    // Ensure timer object exists before updating
+                    if (!globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID]) {
+                        globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID] = {};
+                    }
+
+                    // ✅ Set the new timer name
                     globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].name = timerNewName;
-                    let createUserResponseObjectName = { "cmd": "returnedFromServerResetTimerName", "msg": { "ELMxID": resetTimerName_meetingID, "timerServerID": resetTimerName_timerServerID, "timerNewName": timerNewName } };
+
+                    // ✅ OPTIONAL: Attach veto data if you want to pre-fill or sync it
+                    let defaultVetoObject = {
+                        formVeto: 0,
+                        formTimeVeto: 0,
+                        contentVeto: 0,
+                        contentTimeVeto: 0,
+                        peopleVeto: 0,
+                        peopleTimeVeto: 0
+                    };
+
+                    let vetoDataFromMeeting = globalELMxArray[resetTimerName_meetingID]?.userData?.vetoes;
+
+                    globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].vetoes =
+                        vetoDataFromMeeting ? { ...defaultVetoObject, ...vetoDataFromMeeting } : defaultVetoObject;
+
+                    // ✅ Broadcast the updated name (and optionally veto info)
+                    let createUserResponseObjectName = {
+                        cmd: "returnedFromServerResetTimerName",
+                        msg: {
+                            ELMxID: resetTimerName_meetingID,
+                            timerServerID: resetTimerName_timerServerID,
+                            timerNewName: timerNewName,
+                            vetoes: globalELMxArray[resetTimerName_meetingID].timers[resetTimerName_timerServerID].vetoes // optional to send veto back
+                        }
+                    };
+
                     let desiredListName = ["particularSome", globalELMxArray[resetTimerName_meetingID].arrayOfAttendanceIDs];
                     sendToWho(wss, ws, desiredListName, createUserResponseObjectName);
 
@@ -609,6 +676,7 @@ wss.on("connection", (ws) => {
 
 
 
+                //working 3
                 case 'resetDefaultTime':
                     // Input: {"cmd": "resetDefaultTime", "msg": {"timerServerID": "1-2", "newDefaultTime": "5:05"}}
                     console.log("Received resetDefaultTime message: ", message);  // Log the incoming message for debugging
@@ -639,6 +707,7 @@ wss.on("connection", (ws) => {
                     // } else {
                     //     console.error(`Timer with ID ${resetDefaultTime_timerServerID} not found in globalELMxArray.`);
                     // }
+
                     break;
 
 
@@ -684,7 +753,25 @@ wss.on("connection", (ws) => {
                     let resetVetoName_meetingID = message.msg.ELMxID;
                     let resetVetoName_vetoNewTitleID = message.msg.vetoNewTitleID;
                     let vetoNewName = message.msg.vetoNewName;
+                    let newTimeVetoID = message.msg.newTimeVetoID;
+                    
 
+                    // let timerId = globalUserIDs;
+
+
+
+                    // let checking = globalELMxArray[resetVetoName_meetingID].userData[resetVetoName_vetoNewTitleID].vetoes = vetoNewName;
+                    // globalELMxArray[resetTimerAsc_ELMxID].timers[resetTimerAsc_timerServerID].ascValue = timerAscValue;
+                    // let checking = JSON.stringify(globalELMxArray[resetVetoName_meetingID].userData.vetoes.formVeto);
+                //    $testing = globalELMxArray[resetVetoName_meetingID].timers[resetVetoName_vetoNewTitleID].veto;
+
+                
+                // let testing = JSON.stringify(globalELMxArray[resetVetoName_meetingID].timers[newTimeVetoID]);
+              globalELMxArray[resetVetoName_meetingID].timers[newTimeVetoID].veto = vetoNewName;
+
+                    // console.log("ramro" + newUserID);
+
+                    // globalELMxArray[ resetVetoName_meetingID].timers[]
                     let createUserResponseObjectVetoName = {
                         "cmd": "returnedFromServerResetVetoName",
                         "msg": {
@@ -698,6 +785,109 @@ wss.on("connection", (ws) => {
                     sendToWho(wss, ws, desiredListVetoName, createUserResponseObjectVetoName);
 
                     break;
+
+
+
+                
+
+
+
+
+                //bestwork
+                // Case: Set Veto User ID (Assuming different functionality, update logic accordingly)
+                case 'setVetoUserId':
+                    // Input: {"cmd": "setVetoUserId", "msg": {"ELMxID": 0, "vetoNewTitleID": 1, "vetoNewName": "teamFreeFlow", "newTimerID": "1"}}
+                    console.log("Mero data", message);
+                    let setVetoUser_meetingID = message.msg.ELMxID;
+                    let setVetoUser_titleID = message.msg.vetoElementID;  // Make sure to use the correct field
+                    let vetoUserName = message.msg.vetoNewName;
+                    let newTimerUserID = message.msg.newTimerID;  // Ensure we're getting newTimerID
+                    globalELMxArray[setVetoUser_meetingID].timers[newTimerUserID].veto = vetoUserName;
+
+                    // Create response object with all the required fields
+                    let createUserResponseObjectSetVetoUser = {
+                        "cmd": "returnedFromServerSetVetoUserId",
+                        "msg": {
+                            "ELMxID": setVetoUser_meetingID,
+                            "newTimerUserID": newTimerUserID, // Add newTimerID here
+                            "vetoElementID": setVetoUser_titleID, // Add vetoElementID here
+                            "vetoNewName": vetoUserName
+                        }
+                    };
+
+                    console.log("createUserResponseObjectSetVetoUser: " + JSON.stringify(createUserResponseObjectSetVetoUser));
+
+                    // List of users to send the response to
+                    let desiredListSetVetoUser = ["particularSome", globalELMxArray[setVetoUser_meetingID].arrayOfAttendanceIDs];
+
+                    // Send response to the relevant users
+                    sendToWho(wss, ws, desiredListSetVetoUser, createUserResponseObjectSetVetoUser);
+
+                    break;
+
+
+
+                // case 'updateMultipleVetoValue':
+                //     console.log("Mero data", message);
+                //     // Extract values from the message
+                //     let updateVeto_meetingID = message.msg.ELMxID;
+                //     let updateVeto_titleID = message.msg.vetoElementID;  // Ensure correct field
+                //     let updateVetoNewName = message.msg.vetoNewName;
+
+                //     // Create response object with the necessary fields
+                //     let createUserResponseObjectUpdateVetoValue = {
+                //         "cmd": "returnedFromServerUpdateMultipleVetoValue",
+                //         "msg": {
+                //             "ELMxID": updateVeto_meetingID,
+                //             "vetoElementID": updateVeto_titleID,
+                //             "vetoNewName": updateVetoNewName
+                //         }
+                //     };
+                //     console.log("createUserResponseObjectUpdateVetoValue: " + JSON.stringify(createUserResponseObjectUpdateVetoValue));
+
+                //     // List of users to send the response to
+                //     let desiredListUpdateVetoValue = ["particularSome", globalELMxArray[updateVeto_meetingID].arrayOfAttendanceIDs];
+
+                //     // Send response to the relevant users
+                //     sendToWho(wss, ws, desiredListUpdateVetoValue, createUserResponseObjectUpdateVetoValue);
+
+                //     break;
+
+
+                case 'updateMultipleVetoValue':
+                    console.log("Mero data", message);
+
+                    let updateVeto_meetingID = message.msg.ELMxID;
+                    let updateVeto_titleID = message.msg.vetoElementID;
+                    let updateVetoNewName = message.msg.vetoNewName;
+                    let vetoMultipleNewTimerId = message.msg.vetoMultipleNewTimerId;
+                    let oldVetoName = message.msg.oldVetoName;
+                    //working 2
+                    globalELMxArray[updateVeto_meetingID].timers[vetoMultipleNewTimerId].veto = updateVetoNewName;
+                    globalELMxArray[updateVeto_meetingID].timers[vetoMultipleNewTimerId].oldVeto = oldVetoName;
+
+
+
+                    // Create response object with the necessary fields
+                    let createUserResponseObjectUpdateVetoValue = {
+                        "cmd": "returnedFromServerUpdateMultipleVetoValue",
+                        "msg": {
+                            "ELMxID": updateVeto_meetingID,
+                            "vetoElementID": updateVeto_titleID,
+                            "vetoNewName": updateVetoNewName,
+                            "oldVetoName": oldVetoName
+                        }
+                    };
+                    console.log("hello everyone : " + JSON.stringify(createUserResponseObjectUpdateVetoValue));
+
+                    // List of users to send the response to
+                    let desiredListUpdateVetoValue = ["particularSome", globalELMxArray[updateVeto_meetingID].arrayOfAttendanceIDs];
+
+                    // Send response to the relevant users (broadcasting to all tabs)
+                    sendToWho(wss, ws, desiredListUpdateVetoValue, createUserResponseObjectUpdateVetoValue);
+
+                    break;
+                    
 
 
                 case 'removeTimer':
@@ -846,6 +1036,59 @@ wss.on("connection", (ws) => {
 
 
 
+          
+
+                case "contentDropdownClick":
+                    console.log("Received contentDropdownClick message:", message);
+
+                    // Use unique variable names to avoid redeclaration errors
+                    const {
+                        selectedContent: selectedContentFromMsg,
+                        timerName: timerNameFromMsg,
+                        timerID: timerIDFromMsg,
+                        topicName: topicNameFromMsg,
+                        topicTime: topicTimeFromMsg
+                    } = message.msg;
+
+                    console.log("Selected Content:", selectedContentFromMsg);
+                    console.log("From Timer Name:", timerNameFromMsg);
+                    console.log("Timer ID:", timerIDFromMsg);
+                    console.log("Topic Name:", topicNameFromMsg);
+                    console.log("Topic Time:", topicTimeFromMsg);
+
+                    // Optional: Use a unique tracking object
+                    if (typeof globalContentClickData === "undefined") {
+                        globalContentClickData = {};
+                    }
+
+                    const contentKey = `${selectedContentFromMsg}_TIMER_${timerIDFromMsg}`;
+                    globalContentClickData[contentKey] = (globalContentClickData[contentKey] || 0) + 1;
+
+                    const contentResponse = {
+                        cmd: "returnedContentDropdownClick",
+                        msg: {
+                            selectedContent: selectedContentFromMsg,
+                            timerName: timerNameFromMsg,
+                            timerID: timerIDFromMsg,
+                            topicName: topicNameFromMsg,
+                            topicTime: topicTimeFromMsg,
+                            count: globalContentClickData[contentKey]
+                        }
+                    };
+
+                    console.log("Broadcasting contentResponse:", JSON.stringify(contentResponse));
+
+                    let recipientContentList = ["particularSome"];
+                    if (globalELMxArray[message.msg.ELMxID]) {
+                        recipientContentList.push(globalELMxArray[message.msg.ELMxID].arrayOfAttendanceIDs);
+                    }
+
+                    sendToWho(wss, ws, recipientContentList, contentResponse);
+                    break;
+
+
+
+
                 case "peopleDropdownClick":
                     console.log("Received peopleDropdownClick message:", message);
 
@@ -934,6 +1177,364 @@ wss.on("connection", (ws) => {
 
 
 
+
+
+                //     case 'donateTime':
+                // console.log("Received donateTime message: ", message);
+
+                // // Rename to avoid block conflicts
+                // const {
+                //     fromUserID,
+                //     toUserID,
+                //     timerName,
+                //     minutes: donateMinutes,
+                //     seconds: donateSeconds,
+                //     totalSeconds: donateTotalSeconds
+                // } = message.msg;
+
+                // // Ensure required fields are present
+                // if (fromUserID == null || !toUserID || !timerName || donateTotalSeconds == null) {
+                //     console.error("Invalid donateTime message: missing required fields.");
+                //     break;
+                // }
+
+                // console.log(`User ${fromUserID} is donating ${donateMinutes}m ${donateSeconds}s (${donateTotalSeconds}s) to user ${toUserID} for timer "${timerName}".`);
+
+                // if (!globalELMxArray) {
+                //     console.error("No active meetings data available.");
+                //     break;
+                // }
+
+                // // Iterate over the meetings and their timers to find matching timers for both the donor and recipient
+                // let donorTimerUpdated = false;
+                // let recipientTimerUpdated = false;
+
+                // // Loop through all active meetings
+                // for (let ELMxID in globalELMxArray) {
+                //     const meeting = globalELMxArray[ELMxID];
+
+                //     // Check if the donor's and recipient's timers exist for this meeting
+                //     for (let timerID in meeting.timers) {
+                //         const timer = meeting.timers[timerID];
+
+                //         // Check if it's the donor's timer
+                //         if (timer.personAssignedID === String(fromUserID)) {
+                //             if (timer.remainingTime >= donateTotalSeconds) {
+                //                 timer.remainingTime -= donateTotalSeconds;  // Subtract donated time from donor's timer
+                //                 donorTimerUpdated = true;
+                //                 console.log(`Donor's timer updated: New remaining time is ${timer.remainingTime}s.`);
+                //             } else {
+                //                 console.error(`Donor's timer does not have enough time to donate.`);
+                //             }
+                //         }
+
+                //         // Check if it's the recipient's timer
+                //         if (timer.personAssignedID === String(toUserID)) {
+                //             timer.remainingTime += donateTotalSeconds;  // Add donated time to recipient's timer
+                //             recipientTimerUpdated = true;
+                //             console.log(`Recipient's timer updated: New remaining time is ${timer.remainingTime}s.`);
+                //         }
+                //     }
+                // }
+
+                // // If both timers were updated, send donation result
+
+                // if (donorTimerUpdated && recipientTimerUpdated) {
+                //     const donationResult = {
+                //         cmd: "donateTimeResult",
+                //         msg: {
+                //             fromUserID,
+                //             toUserID,
+                //             timerName,
+                //             donatedMinutes: donateMinutes,
+                //             donatedSeconds: donateSeconds,
+                //             totalSeconds: donateTotalSeconds,
+                //             donorNewTime: globalELMxArray[fromUserID]?.timers[donorTimerUpdated]?.remainingTime,
+                //             recipientNewTime: globalELMxArray[toUserID]?.timers[recipientTimerUpdated]?.remainingTime
+                //         }
+                //     };
+
+                //     console.log("donationResult", donationResult);
+                //     // Notify the donor and recipient with the updated times
+                //     const donationRecipients = ["particularSome", [String(fromUserID), String(toUserID)]];
+                //     sendToWho(wss, ws, donationRecipients, donationResult);
+                // } else {
+                //     console.error("Failed to update donor or recipient timer.");
+                // }
+
+
+
+                // for (let ELMxID in globalELMxArray) {
+                //     const meeting = globalELMxArray[ELMxID];
+                //     console.log(`🔹 Meeting ELMxID: ${ELMxID}`);
+                //     for (let timerID in meeting.timers) {
+                //         const timer = meeting.timers[timerID];
+                //         console.log(`   - User ${timer.personAssignedID}: ${formatTime(timer.remainingTime)} (${timer.remainingTime}s)`);
+                //     }
+                // }
+                // console.log("\n");
+
+                // break;
+
+
+                // case 'donateTime':
+                //     console.log("Received donateTime message: ", message);
+
+                //     const {
+                //         fromUserID,
+                //         toUserID,
+                //         timerName,
+                //         minutes: donateMinutes,
+                //         seconds: donateSeconds,
+                //         totalSeconds: donateTotalSeconds
+                //     } = message.msg;
+
+                //     // Validate message fields
+                //     if (fromUserID == null || !toUserID || !timerName || donateTotalSeconds == null) {
+                //         console.error("❌ Invalid donateTime message: missing required fields.");
+                //         break;
+                //     }
+
+                //     console.log(`⏳ User ${fromUserID} is donating ${donateMinutes}m ${donateSeconds}s (${donateTotalSeconds}s) to user ${toUserID} for timer "${timerName}".`);
+
+                //     // Ensure active meetings are available
+                //     if (!globalELMxArray) {
+                //         console.error("❌ No active meetings data available.");
+                //         break;
+                //     }
+
+                //     let donorTimer = null;
+                //     let recipientTimer = null;
+
+                //     // Log global meeting data
+                //     console.log("Current globalELMxArray:", JSON.stringify(globalELMxArray, null, 2));
+
+                //     // Iterate through meetings and timers to find the donor and recipient timers
+                //     for (let ELMxID in globalELMxArray) {
+                //         const meeting = globalELMxArray[ELMxID];
+
+                //         // Check all timers in this meeting
+                //         for (let timerID in meeting.timers) {
+                //             const timer = meeting.timers[timerID];
+
+                //             // Debugging log for timer info
+                //             console.log(`   ↪ TimerID ${timerID}: Assigned to ${timer.personAssignedID}, Remaining: ${timer.remainingTime}s`);
+
+                //             // Check if this timer belongs to the donor
+                //             if (String(timer.personAssignedID) === String(fromUserID)) {
+                //                 donorTimer = timer;
+                //             }
+
+                //             // Check if this timer belongs to the recipient
+                //             if (String(timer.personAssignedID) === String(toUserID)) {
+                //                 recipientTimer = timer;
+                //             }
+                //         }
+                //     }
+
+                //     // If either donor or recipient timer is not found, log an error
+                //     if (!donorTimer || !recipientTimer) {
+                //         console.error("❌ Donor or recipient timer not found.");
+                //     } else if (donorTimer.remainingTime < donateTotalSeconds) {
+                //         // If donor doesn't have enough time, log an error
+                //         console.error("❌ Donor does not have enough time to donate.");
+                //     } else {
+                //         // Perform time transfer
+                //         donorTimer.remainingTime -= donateTotalSeconds;
+                //         recipientTimer.remainingTime += donateTotalSeconds;
+
+                //         console.log(`✅ Donor's new time: ${formatTime(donorTimer.remainingTime)} (${donorTimer.remainingTime}s)`);
+                //         console.log(`✅ Recipient's new time: ${formatTime(recipientTimer.remainingTime)} (${recipientTimer.remainingTime}s)`);
+
+                //         // Send the donation result
+                //         const donationResult = {
+                //             cmd: "donateTimeResult",
+                //             msg: {
+                //                 fromUserID,
+                //                 toUserID,
+                //                 timerName,
+                //                 donatedMinutes: donateMinutes,
+                //                 donatedSeconds: donateSeconds,
+                //                 totalSeconds: donateTotalSeconds,
+                //                 donorNewTime: donorTimer.remainingTime,
+                //                 recipientNewTime: recipientTimer.remainingTime
+                //             }
+                //         };
+
+                //         console.log("📤 Sending donation result:", donationResult);
+
+                //         // Send to specified users (donor and recipient)
+                //         const donationRecipients = ["particularSome", [String(fromUserID), String(toUserID)]];
+                //         sendToWho(wss, ws, donationRecipients, donationResult);
+                //     }
+
+                //     // Log the current state of all timers in the meetings
+                //     console.log(`\n🕒 All users' remaining default times:`);
+                //     for (let ELMxID in globalELMxArray) {
+                //         const meeting = globalELMxArray[ELMxID];
+                //         console.log(`🔹 Meeting ELMxID: ${ELMxID}`);
+                //         for (let timerID in meeting.timers) {
+                //             const timer = meeting.timers[timerID];
+                //             const userID = timer.personAssignedID ?? "Unknown";
+                //             console.log(`   - User ${userID}: ${formatTime(timer.remainingTime)} (${timer.remainingTime}s)`);
+                //         }
+                //     }
+                //     console.log("\n");
+
+                //     break;
+
+                //     function formatTime(seconds) {
+                //         let h = Math.floor(seconds / 3600);
+                //         let m = Math.floor((seconds % 3600) / 60);
+                //         let s = seconds % 60;
+                //         return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
+                //     }
+
+
+
+                case 'donateTime':
+                    console.log("📩 Received donateTime message: ", message);
+                    let ELMxID_DonateTimer = message.msg.ELMxID;
+                    // console.log("ELMxID_DonateTimer" + ELMxID_DonateTimer);
+                    const {
+                        // ELMxID_DonateTimer,
+                        fromUserID,
+                        toUserID,
+                        timerName,
+                        minutes: donateMinutes,
+                        seconds: donateSeconds,
+                        totalSeconds: donateTotalSeconds
+                    } = message.msg;
+
+                    if (!fromUserID || !toUserID || !timerName || donateTotalSeconds == null) {
+                        console.error("❌ Invalid donateTime message: missing required fields.");
+                        break;
+                    }
+
+                    console.log(`⏳ User ${fromUserID} is donating ${donateMinutes}m ${donateSeconds}s (${donateTotalSeconds}s) to user ${toUserID} for timer "${timerName}".`);
+
+                    if (!globalELMxArray) {
+                        console.error("❌ No active meetings data available.");
+                        break;
+                    }
+
+                    let donorTimer = null;
+                    let recipientTimer = null;
+
+                    for (let ELMxID in globalELMxArray) {
+                        const meeting = globalELMxArray[ELMxID];
+
+                        for (let timerID in meeting.timers) {
+                            const timer = meeting.timers[timerID];
+
+                            // Debug logging
+                            console.log(`🔍 Checking timer "${timer.name}" with owner ${timer.ownerID}`);
+
+                            // Find donor timer by both name and owner
+                            // if (!donorTimer && String(timer.ownerID) === String(fromUserID) && timer.name === timerName) {
+                            //     donorTimer = timer;
+                            // }
+
+                            if (!donorTimer && String(timer.ownerID) === String(fromUserID)) {
+                                donorTimer = timer;
+                            }
+                            // Find recipient timer - relax condition to match owner only
+                            if (!recipientTimer && String(timer.ownerID) === String(toUserID)) {
+                                recipientTimer = timer;
+                            }
+                        }
+                    }
+
+                    console.log("✅ Found donorTimer: " + JSON.stringify(donorTimer));
+                    console.log("✅ Found recipientTimer: " + JSON.stringify(recipientTimer));
+
+                    if (!donorTimer) {
+                        console.error(`❌ Donor's timer not found for user ${fromUserID}.`);
+                        break;
+                    }
+
+                    if (!recipientTimer) {
+                        console.error(`❌ Recipient's timer not found for user ${toUserID}.`);
+                        break;
+                    }
+
+                    if (donorTimer.remainingTime < donateTotalSeconds) {
+                        console.error("❌ Donor does not have enough time to donate.");
+                        break;
+                    }
+
+
+                    console.log(`🎁 Recipient's timer title: "${recipientTimer.name}"`);
+
+                    // Perform the donation
+                    donorTimer.remainingTime -= donateTotalSeconds;
+                    recipientTimer.remainingTime += donateTotalSeconds;
+
+                    console.log(`✅ Donor's new time: ${formatTime(donorTimer.remainingTime)} (${donorTimer.remainingTime}s)`);
+                    console.log(`✅ Recipient's new time: ${formatTime(recipientTimer.remainingTime)} (${recipientTimer.remainingTime}s)`);
+
+                    const donationResult = {
+                        cmd: "donateTimeResult",
+                        msg: {
+                            ELMxID_DonateTimer: 0,
+                            fromUserID,
+                            toUserID,
+                            timerName,
+                            donatedMinutes: donateMinutes,
+                            donatedSeconds: donateSeconds,
+                            totalSeconds: donateTotalSeconds,
+                            donorNewTime: donorTimer.remainingTime,
+                            recipientNewTime: recipientTimer.remainingTime,
+                            recipientName: recipientTimer.name
+                        }
+                    };
+
+                    console.log("📤 Sending donation result:", donationResult);
+
+                    // const donationRecipients = ["particularSome", [String(fromUserID), String(toUserID)]];
+                    // sendToWho(wss, ws, donationRecipients, donationResult);
+
+
+
+                    // let updateVoteResponse = {
+                    //     cmd: "returnedFromServerUpdateVoteButton",
+                    //     msg: {
+                    //         voteButtonID: voteButtonID,
+                    //         isEnabled: isEnabled,
+                    //         ELMxID: vote_ELMxID
+                    //     }
+                    // };
+
+                    // let targetAudience = ["particularSome", globalELMxArray[vote_ELMxID].arrayOfAttendanceIDs];
+                    // sendToWho(wss, ws, targetAudience, updateVoteResponse);
+                    // const donationRecipients = ["particularSome", [String(fromUserID), String(toUserID)]];
+
+
+                    // console.log("targetDonateAudience"+ targetDonateAudience + "and" + donationResult);
+
+                    // let targetDonateAudience = ["particularSome", [String(fromUserID), String(toUserID)]];
+                    // let targetDonateAudience = ["particularSome", [fromUserID, toUserID]];
+                    let targetDonateAudience = ["particularSome", globalELMxArray[ELMxID_DonateTimer].arrayOfAttendanceIDs];
+
+                    console.log("🎯 Target donation audience:", JSON.stringify(targetDonateAudience));
+                    sendToWho(wss, ws, targetDonateAudience, donationResult);
+
+                    // sendToWho(wss, ws, targetDonateAudience, donationResult);
+
+                    // Print debug list of all timers
+                    console.log(`\n🕒 All users' remaining default times:`);
+                    for (let ELMxID in globalELMxArray) {
+                        const meeting = globalELMxArray[ELMxID];
+                        console.log(`🔹 Meeting ELMxID: ${ELMxID}`);
+                        for (let timerID in meeting.timers) {
+                            const timer = meeting.timers[timerID];
+                            console.log(`   - Timer "${timer.name}" (ID: ${timer.timerServerID}) owned by ${timer.ownerID}: ${formatTime(timer.remainingTime)} (${timer.remainingTime}s)`);
+
+                        }
+                    }
+                    console.log("\n");
+
+                    break;
 
 
                 case 'hardcodeNewTimeIntoTimer':
@@ -1168,6 +1769,10 @@ wss.on("connection", (ws) => {
                     }//end totalVoteSubmitResponseObject 
                     sendToWho(wss, ws, listDesired, messageToBrowser);
                     break;
+
+                // case 'donateTime':
+                //     handleTimeDonation(wss, ws, message);
+                //     break;
             } // End switch
 
 
@@ -1197,6 +1802,14 @@ server.listen(PORT, () => {
 
 // ////////////LIBRARY///////////////
 
+function formatTime(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
+}
+
+
 function createUserTimerIDFunction(wss, ws, message) {
     //input Object Form: {"cmd": "createUserTimerID", "msg": {"ELMxID": 1, "timerIDFromBrowser": 2}}
     //if(gidClients[decoded.acc]!=undefined){delete gidClients[];}
@@ -1208,7 +1821,8 @@ function createUserTimerIDFunction(wss, ws, message) {
     console.log("Login ELMXMEETING ID SHOULD BE for meeting 0: newUserID:" + " " + newUserID + " " + JSON.stringify(globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs));
     globalUserIDsWebsocketObject[newUserID] = ws;
     globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs[newUserID] = newUserID;
-
+    globalELMxArray[createUserTimerIDELMxID].userData[newUserID] = {UserID: newUserID};
+    // console.log("Hero" + JSON.stringify(Heroo));
     //userData updating done
 
     //break reference here so that the high precision on server not lost. We draw lower precision on browser
@@ -1293,6 +1907,42 @@ function sendToWho(wss, ws, listDesired, messageToBrowser, meetingIDIfNeeded) {
             }//end if listDesired[1].hasOwnProperty(key)
 
             break;
+
+
+        // case "particularSome":
+        //     // Define logic for sending to specific clients in a specific meeting ("send to some")
+        //     let userWS = {};  // Initialize an empty object for WebSocket
+        //     let socketID = 0; // Initialize socketID as 0
+
+        //     // Iterate over the desired list of users (listDesired[1])
+        //     for (const key in listDesired[1]) {
+        //         if (listDesired[1].hasOwnProperty(key)) {
+
+        //             // Get the WebSocket for the current user from globalUserIDsWebsocketObject
+        //             userWS = globalUserIDsWebsocketObject[listDesired[1][key]];
+
+        //             // Check if userWS exists and if the WebSocket connection is open
+        //             if (userWS && userWS.readyState === WebSocket.OPEN) {
+        //                 // Proceed to send the message to the WebSocket client
+
+        //                 if (socketID !== -1) {
+        //                     // socketID is valid, proceed with sending the message
+        //                     userWS.send(JSON.stringify(messageToBrowser));
+        //                     console.log("sending particularSOME to: userID " + key + " websocketID " + socketID);
+        //                 } else {
+        //                     // socketID is not valid
+        //                     console.log("WebSocket client not found for userID " + key + ". Removing from list.");
+        //                 }
+
+        //             } else {
+        //                 // If userWS is undefined or WebSocket is not open, log a message
+        //                 console.warn("WebSocket for user " + key + " is not open or not found.");
+        //             }
+        //         }
+        //     }
+        //     break;
+
+
         case "individualOne":
             // Define logic for sending to a single client
             let individualUserWS = ws; //setting this in what appears to be redundent but makes it clear we are in individual and only sending to an individual user
@@ -1319,3 +1969,70 @@ function sendToWho(wss, ws, listDesired, messageToBrowser, meetingIDIfNeeded) {
 }//end sendToWho
 //   });
 //}
+
+function handleTimeDonation(wss, ws, message) {
+    console.log("Received donation request:", message);
+    const { fromUserID, toUserID, minutes, seconds } = message.msg;
+    const meetingID = message.msg.meetingID || "0"; // Default to meeting 0 if not specified
+
+    console.log(`Processing donation: fromUserID=${fromUserID}, toUserID=${toUserID}, minutes=${minutes}, seconds=${seconds}`);
+
+    // Convert donation time to seconds
+    const donationTime = (parseInt(minutes) * 60) + parseInt(seconds);
+    console.log(`Total donation time in seconds: ${donationTime}`);
+
+    // Check if both users exist in the meeting
+    if (globalELMxArray[meetingID] &&
+        globalELMxArray[meetingID].timers[fromUserID] &&
+        globalELMxArray[meetingID].timers[toUserID]) {
+
+        console.log(`Donor's current time: ${globalELMxArray[meetingID].timers[fromUserID].remainingTime}`);
+        console.log(`Recipient's current time: ${globalELMxArray[meetingID].timers[toUserID].remainingTime}`);
+
+        // Check if donor has enough time
+        if (globalELMxArray[meetingID].timers[fromUserID].remainingTime >= donationTime) {
+            // Subtract time from donor
+            globalELMxArray[meetingID].timers[fromUserID].remainingTime -= donationTime;
+
+            // Add time to recipient
+            globalELMxArray[meetingID].timers[toUserID].remainingTime += donationTime;
+
+            console.log(`After donation - Donor's new time: ${globalELMxArray[meetingID].timers[fromUserID].remainingTime}`);
+            console.log(`After donation - Recipient's new time: ${globalELMxArray[meetingID].timers[toUserID].remainingTime}`);
+
+            // Create response object
+            const response = {
+                cmd: "timeDonationUpdate",
+                msg: {
+                    fromUserID,
+                    toUserID,
+                    donationTime,
+                    remainingTime: {
+                        [fromUserID]: globalELMxArray[meetingID].timers[fromUserID].remainingTime,
+                        [toUserID]: globalELMxArray[meetingID].timers[toUserID].remainingTime
+                    }
+                }
+            };
+
+            console.log("Sending donation update to clients:", response);
+
+            // Broadcast update to all clients
+            sendToWho(wss, ws, "all", response, meetingID);
+        } else {
+            console.log("Donation failed: Insufficient time available");
+            // Send error message if donor doesn't have enough time
+            const errorResponse = {
+                cmd: "timeDonationError",
+                msg: {
+                    error: "Insufficient time available for donation"
+                }
+            };
+            ws.send(JSON.stringify(errorResponse));
+        }
+    } else {
+        console.log("Donation failed: One or both users not found in meeting");
+        console.log("Meeting exists:", !!globalELMxArray[meetingID]);
+        console.log("Donor exists:", !!globalELMxArray[meetingID]?.timers[fromUserID]);
+        console.log("Recipient exists:", !!globalELMxArray[meetingID]?.timers[toUserID]);
+    }
+}
