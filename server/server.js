@@ -1405,13 +1405,20 @@ wss.on("connection", (ws) => {
                         timerName,
                         minutes: donateMinutes,
                         seconds: donateSeconds,
-                        totalSeconds: donateTotalSeconds
+                        totalSeconds: donateTotalSeconds,
+                        approvedByID = null,
+                        approvedByName = null
                     } = message.msg;
 
                     // if (!fromUserID || !toUserID || !timerName || donateTotalSeconds == null) {
                     //     console.error("❌ Invalid donateTime message: missing required fields.");
                     //     break;
                     // }
+
+                    if (approvedByID && approvedByName) {
+                        console.log(`✅ Donation approved by User ${approvedByID} (${approvedByName})`);
+                    }
+                    
 
                     console.log(`⏳ User ${fromUserID} is donating ${donateMinutes}m ${donateSeconds}s (${donateTotalSeconds}s) to user ${toUserID} for timer "${timerName}".`);
 
@@ -1497,36 +1504,16 @@ wss.on("connection", (ws) => {
                             totalSeconds: donateTotalSeconds,
                             donorNewTime: donorTimer.remainingTime,
                             recipientNewTime: recipientTimer.remainingTime,
-                            recipientName: recipientTimer.name
+                            recipientName: recipientTimer.name,
+                            approvedByID,
+                            approvedByName
                         }
                     };
 
 
                     console.log("📤 Sending donation result:", donationResult);
 
-                    // const donationRecipients = ["particularSome", [String(fromUserID), String(toUserID)]];
-                    // sendToWho(wss, ws, donationRecipients, donationResult);
-
-
-
-                    // let updateVoteResponse = {
-                    //     cmd: "returnedFromServerUpdateVoteButton",
-                    //     msg: {
-                    //         voteButtonID: voteButtonID,
-                    //         isEnabled: isEnabled,
-                    //         ELMxID: vote_ELMxID
-                    //     }
-                    // };
-
-                    // let targetAudience = ["particularSome", globalELMxArray[vote_ELMxID].arrayOfAttendanceIDs];
-                    // sendToWho(wss, ws, targetAudience, updateVoteResponse);
-                    // const donationRecipients = ["particularSome", [String(fromUserID), String(toUserID)]];
-
-
-                    // console.log("targetDonateAudience"+ targetDonateAudience + "and" + donationResult);
-
-                    // let targetDonateAudience = ["particularSome", [String(fromUserID), String(toUserID)]];
-                    // let targetDonateAudience = ["particularSome", [fromUserID, toUserID]];
+                    
                     let targetDonateAudience = ["particularSome", globalELMxArray[ELMxID_DonateTimer].arrayOfAttendanceIDs];
 
                     console.log("🎯 Target donation audience:", JSON.stringify(targetDonateAudience));

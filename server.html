@@ -896,6 +896,9 @@
 
 
 
+
+
+
     <div id="numberCitizenTimers">Number Citizen Timers: 0</div>
 
     <button id="resetVotesBtn" title="Reset Votes">Reset Votes</button>
@@ -968,6 +971,11 @@
     <div id="donationHistoryContainer">
       <h3>🕒 Donation History</h3>
       <ul id="donationConsoleOutput"></ul>
+    </div>
+
+    <div id="unapprovedDonationList">
+      <h3>Pending Donation Approvals</h3>
+      <div id="unapprovedItems"></div>
     </div>
 
 
@@ -2018,6 +2026,63 @@
         //   break;
 
 
+        // case "donateTimeResult":
+        //   const {
+        //     fromUserID,
+        //     toUserID,
+        //     timerName,
+        //     donatedMinutes,
+        //     donatedSeconds,
+        //     totalSeconds,
+        //     donorNewTime,
+        //     recipientNewTime,
+        //     recipientName,
+        //     donorName
+        //   } = data.msg;
+
+        //   // ⛔ Prevent self-donation
+        //   if (fromUserID === toUserID) {
+        //     const errorMsg = `❌ Invalid donation: You cannot donate time to yourself (${donorName || fromUserID}).`;
+        //     console.warn(errorMsg);
+        //     displayDonationMessageOnHTML(errorMsg, true);
+        //     break;
+        //   }
+
+        //   // ✅ Initialize donation tracking
+        //   if (!donationTracker[fromUserID]) {
+        //     donationTracker[fromUserID] = {};
+        //   }
+
+        //   if (!donationTracker[fromUserID][toUserID]) {
+        //     donationTracker[fromUserID][toUserID] = 0;
+        //   }
+
+        //   // Increment the count
+        //   donationTracker[fromUserID][toUserID] += 1;
+        //   const donationCount = donationTracker[fromUserID][toUserID];
+        //   const isRepeated = donationCount > 1;
+
+        //   // Optional warning for repeated donations
+        //   if (isRepeated) {
+        //     const repeatMsg = `⚠️ You have donated to ${recipientName || toUserID} ${donationCount} times!`;
+        //     console.warn(repeatMsg);
+        //     displayDonationMessageOnHTML(repeatMsg, false, true); // Red background
+        //   }
+
+        //   // Build main donation message (skip "Donated 1 time")
+        //   let donationMessage = `${timerName} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
+        //   if (donationCount > 1) {
+        //     donationMessage += ` (Donated ${donationCount} times)`;
+        //   }
+
+        //   console.log(donationMessage);
+        //   displayDonationMessageOnHTML(donationMessage, false, isRepeated);
+
+        //   updateTimerDisplay(fromUserID, donorNewTime);
+        //   updateTimerDisplay(toUserID, recipientNewTime);
+        //   break;
+
+
         case "donateTimeResult":
   const {
     fromUserID,
@@ -2029,7 +2094,9 @@
     donorNewTime,
     recipientNewTime,
     recipientName,
-    donorName
+    donorName,
+    approvedByID,
+    approvedByName
   } = data.msg;
 
   // ⛔ Prevent self-donation
@@ -2061,19 +2128,27 @@
     displayDonationMessageOnHTML(repeatMsg, false, true); // Red background
   }
 
-  // Build main donation message (skip "Donated 1 time")
+  // 🧾 Build donation message
   let donationMessage = `${timerName} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
   if (donationCount > 1) {
     donationMessage += ` (Donated ${donationCount} times)`;
   }
 
+  // ✅ If there's an approver, append their info
+  if (approvedByID && approvedByName) {
+    donationMessage += ` ✅ Approved by ${approvedByName}`;
+  }
+
   console.log(donationMessage);
   displayDonationMessageOnHTML(donationMessage, false, isRepeated);
 
+  // ⏱️ Update timers
   updateTimerDisplay(fromUserID, donorNewTime);
   updateTimerDisplay(toUserID, recipientNewTime);
+
   break;
 
+  
 
 
 
@@ -4355,6 +4430,8 @@
 
       let clickCount = 0;
       let userNames = {}; // Store usernames dynamically
+      let donationCounts = {}; // Tracks how many times each user has donated to another
+
 
       function updateUsernames() {
         document.querySelectorAll(`[data-id$="-1"]`).forEach(input => {
@@ -4363,21 +4440,17 @@
         });
       }
 
-      // Function to generate user options excluding the current user
-      function getUserOptions(currentUserID) {
+      function getUserOptions(currentUserID, excludeIDs = []) {
         updateUsernames();
         let options = "";
-
         Object.entries(userNames).forEach(([userID, userName]) => {
-          // if (userID !== currentUserID) {
-          options += `<option value="${userID}">${userName}</option>`;
-          // }
+          if (userID !== currentUserID && !excludeIDs.includes(userID)) {
+            options += `<option value="${userID}">${userName}</option>`;
+          }
         });
-
         return options;
       }
 
-      // Function to update all donation dropdowns
       function updateUserDropdowns() {
         document.querySelectorAll(".donation-controls select").forEach(selectElement => {
           let currentUserID = selectElement.closest(".user-card")?.getAttribute("data-user-id");
@@ -4385,8 +4458,6 @@
         });
       }
 
-
-      // Auto-update usernames when input fields change
       document.addEventListener("input", function (event) {
         if (event.target.matches(`[data-id$="-1"]`)) {
           updateUsernames();
@@ -4394,18 +4465,15 @@
         }
       });
 
-      // Observe changes in the number of citizens
       const citizenCountElement = document.getElementById("numberCitizenTimers");
       if (typeof window.citizenObserver === "undefined" && citizenCountElement) {
         window.citizenObserver = new MutationObserver(() => {
           updateUserDropdowns();
         });
-
         window.citizenObserver.observe(citizenCountElement, { childList: true, subtree: true });
       }
 
-      // Helper to attach Donate button logic
-      function attachDonateButton(cardElement, userID, timerName) {
+      function attachDonateButton(cardElement, fromUserID, timerName) {
         const donateBtn = cardElement.querySelector(".donate-btn");
         donateBtn?.addEventListener("click", () => {
           const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
@@ -4414,35 +4482,104 @@
 
           const donateMinutes = parseInt(minutesInput?.value || "0");
           const donateSeconds = parseInt(secondsInput?.value || "0");
-          // const recipientID = recipientSelect?.value;
-          const recipientID = parseInt(recipientSelect?.value);
-
+          const toUserID = parseInt(recipientSelect?.value);
           const totalSeconds = donateMinutes * 60 + donateSeconds;
 
-          if (!recipientID || totalSeconds <= 0) {
+          if (!toUserID || totalSeconds <= 0) {
             alert("Please select a recipient and enter valid time to donate.");
             return;
           }
 
+          const donationKey = `${fromUserID}_${toUserID}`;
+          donationCounts[donationKey] = (donationCounts[donationKey] || 0) + 1;
+
           const donationData = {
-            cmd: "donateTime",
-            msg: {
-              ELMxID: 0,
-              fromUserID: userID,
-              toUserID: recipientID,
-              timerName: timerName,
-              minutes: donateMinutes,
-              seconds: donateSeconds,
-              totalSeconds: totalSeconds
-            }
+            fromUserID,
+            toUserID,
+            timerName,
+            minutes: donateMinutes,
+            seconds: donateSeconds,
+            totalSeconds
           };
 
-          socket.send(JSON.stringify(donationData));
-          console.log("Donation sent via WebSocket:", donationData);
+          if (donationCounts[donationKey] > 2) {
+            alert("You have already donated 2 times. Approval required from another user.");
+            showPendingApproval(donationData);
+          } else {
+            sendDonation(donationData);
+          }
         });
       }
 
+      // function sendDonation(data) {
+      //   const payload = {
+      //     cmd: "donateTime",
+      //     msg: {
+      //       ELMxID: 0,
+      //       fromUserID: data.fromUserID,
+      //       toUserID: data.toUserID,
+      //       timerName: data.timerName,
+      //       minutes: data.minutes,
+      //       seconds: data.seconds,
+      //       totalSeconds: data.totalSeconds
+      //     }
+      //   };
 
+      //   socket.send(JSON.stringify(payload));
+      //   console.log("Donation sent via WebSocket:", payload);
+      // }
+
+      function sendDonation(data, approverID = null) {
+        const payload = {
+          cmd: "donateTime",
+          msg: {
+            ELMxID: 0,
+            fromUserID: data.fromUserID,
+            toUserID: data.toUserID,
+            timerName: data.timerName,
+            minutes: data.minutes,
+            seconds: data.seconds,
+            totalSeconds: data.totalSeconds
+          }
+        };
+
+        if (approverID) {
+          payload.msg.approvedByID = approverID;
+          payload.msg.approvedByName = userNames[approverID] || `User ${approverID}`;
+        }
+
+        socket.send(JSON.stringify(payload));
+        console.log("Donation sent via WebSocket:", payload);
+      }
+
+
+      function showPendingApproval(data) {
+        const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
+
+        const container = document.createElement("div");
+        container.innerHTML = `
+    <div class="pending-approval">
+      <p><strong>${userNames[data.fromUserID]} ➜ ${userNames[data.toUserID]}</strong> (${data.minutes} min ${data.seconds} sec)</p>
+      <select class="approver-dropdown">${approverOptions}</select>
+      <button class="approve-btn">Approve</button>
+    </div>
+  `;
+
+        container.querySelector(".approve-btn").addEventListener("click", () => {
+          const approverID = container.querySelector(".approver-dropdown").value;
+          if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
+            alert("Invalid approver.");
+            return;
+          }
+
+          sendDonation(data, parseInt(approverID)); // ✅ Fixed here
+          container.remove();
+        });
+
+
+
+        document.getElementById("unapprovedItems").appendChild(container);
+      }
 
       document.querySelectorAll(`[data-id="${newTimerID}-13"]`).forEach(button => {
         button.addEventListener("click", function () {
@@ -4455,17 +4592,13 @@
           let [minutes, seconds] = timerValue.split(":").map(Number);
           minutes = isNaN(minutes) ? 0 : minutes;
           seconds = isNaN(seconds) ? 0 : seconds;
-          const formattedTime = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
 
           let existingCard = this.nextElementSibling;
 
-          // TOGGLE: If card exists and has .user-card, remove it
           if (existingCard && existingCard.classList.contains("user-card")) {
-            existingCard.remove();  // Hides the user card
+            existingCard.remove();
           } else {
-            // Otherwise, create and insert the user card
             let userOptions = getUserOptions(currentUserID);
-
             let userCardHTML = `
         <div class="user-card" data-user-id="${currentUserID}">
           <div class="donation-controls">
@@ -4481,13 +4614,12 @@
             wrapper.innerHTML = userCardHTML;
             let cardElement = wrapper.firstElementChild;
 
-            this.after(cardElement); // Insert after button
-
-            // You can add or show the formatted time here if needed
+            this.after(cardElement);
             attachDonateButton(cardElement, currentUserID, timerTitle);
           }
         });
       });
+
 
 
       // Periodic dropdown updates
