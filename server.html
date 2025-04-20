@@ -1323,6 +1323,7 @@
   <script>
     // const socket = new WebSocket("ws://69.197.142.130:8084");
     const socket = new WebSocket("http://localhost:8084/");
+    const donationTracker = {};
 
     socket.onopen = function () {
       console.log("Connected to   WebSocket server");
@@ -1384,49 +1385,49 @@
         //   break;
 
         case "returnNewUserIDWithScreenCatchUp":
-  let allELMxData = data.msg.allMeetingData; // for this meeting, currently hardcoded at ELM "0"
-  let allTimersData = allELMxData.timers;
+          let allELMxData = data.msg.allMeetingData; // for this meeting, currently hardcoded at ELM "0"
+          let allTimersData = allELMxData.timers;
 
-  console.log("In browser returnNewUserIDWithScreenCatchUp:" + JSON.stringify(allTimersData));
+          console.log("In browser returnNewUserIDWithScreenCatchUp:" + JSON.stringify(allTimersData));
 
-  for (let key in allTimersData) {
-    if (allTimersData.hasOwnProperty(key)) {
-      // Wait for DOMContentLoaded before running DOM-dependent code
-      let singleTimerData = allTimersData[key];
-      numberCitizenTimers++; // Update total number for VoteReset and color
+          for (let key in allTimersData) {
+            if (allTimersData.hasOwnProperty(key)) {
+              // Wait for DOMContentLoaded before running DOM-dependent code
+              let singleTimerData = allTimersData[key];
+              numberCitizenTimers++; // Update total number for VoteReset and color
 
-      const browserIndTimerDefault = singleTimerData.remainingTime;
-      const serverTimerID = singleTimerData.timerServerID;
+              const browserIndTimerDefault = singleTimerData.remainingTime;
+              const serverTimerID = singleTimerData.timerServerID;
 
-      console.log("MAIN SWITCH:createTimerComponentToBrowser browserIndTimerDefault:", browserIndTimerDefault);
+              console.log("MAIN SWITCH:createTimerComponentToBrowser browserIndTimerDefault:", browserIndTimerDefault);
 
-      const timerContainer = document.getElementById("timerList");
-      const timerComponent = createTimerComponent(singleTimerData, timerContainer); // has no socket.send in it
-      setupTimerControls(timerComponent, browserIndTimerDefault);
+              const timerContainer = document.getElementById("timerList");
+              const timerComponent = createTimerComponent(singleTimerData, timerContainer); // has no socket.send in it
+              setupTimerControls(timerComponent, browserIndTimerDefault);
 
-      document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
+              document.getElementById("numberCitizenTimers").textContent = `Number Citizen Timers: ${numberCitizenTimers}`;
 
-      console.log("key:", key, "singleTimerData:", JSON.stringify(singleTimerData));
+              console.log("key:", key, "singleTimerData:", JSON.stringify(singleTimerData));
 
-      // ✅ Restore Veto Input Field and Update Click Count Map
-      const vetoValue = singleTimerData.veto; // e.g., "f-2"
-      const inputField = document.querySelector(`[data-id="${key}-4"]`);
+              // ✅ Restore Veto Input Field and Update Click Count Map
+              const vetoValue = singleTimerData.veto; // e.g., "f-2"
+              const inputField = document.querySelector(`[data-id="${key}-4"]`);
 
-      if (inputField) {
-        inputField.value = vetoValue;
+              if (inputField) {
+                inputField.value = vetoValue;
 
-        if (vetoValue && vetoValue.startsWith("f-")) {
-          const count = parseInt(vetoValue.split("-")[1], 10);
-          vetoClickCountMap[key] = count;
-        } else {
-          vetoClickCountMap[key] = 0;
-        }
+                if (vetoValue && vetoValue.startsWith("f-")) {
+                  const count = parseInt(vetoValue.split("-")[1], 10);
+                  vetoClickCountMap[key] = count;
+                } else {
+                  vetoClickCountMap[key] = 0;
+                }
 
-        console.log(`Restored vetoClickCountMap[${key}] = ${vetoClickCountMap[key]}`);
-      }
-    }
-  }
-  break;
+                console.log(`Restored vetoClickCountMap[${key}] = ${vetoClickCountMap[key]}`);
+              }
+            }
+          }
+          break;
 
 
         case "returnedFromServerAddTimer": //this one is from server for the non Optimistic UI draw but the one from the server
@@ -1961,37 +1962,117 @@
 
 
 
+        // case "donateTimeResult":
+        //   const {
+        //     fromUserID,
+        //     toUserID,
+        //     timerName,
+        //     donatedMinutes,
+        //     donatedSeconds,
+        //     totalSeconds,
+        //     donorNewTime,
+        //     recipientNewTime,
+        //     recipientName,
+        //     donorName
+        //   } = data.msg;
+
+        //   // ⛔ Check for self-donation
+        //   if (fromUserID === toUserID) {
+        //     const errorMsg = `❌ Invalid donation: You cannot donate time to yourself (${donorName || fromUserID}).`;
+        //     console.warn(errorMsg);
+        //     displayDonationMessageOnHTML(errorMsg, true); // Show in HTML
+        //     break;
+        //   }
+
+
+
+
+        //   // ✅ Initialize tracking
+        //   if (!donationTracker[fromUserID]) {
+        //     donationTracker[fromUserID] = new Set();
+        //   }
+
+        //   const hasDonatedBefore = donationTracker[fromUserID].has(toUserID);
+
+        //   if (hasDonatedBefore) {
+        //     const repeatMsg = `⚠️ You are donating time to ${recipientName || toUserID} again!`;
+        //     console.warn(repeatMsg);
+        //     displayDonationMessageOnHTML(repeatMsg, false, true); // Red background
+        //   } else {
+        //     donationTracker[fromUserID].add(toUserID);
+        //   }
+
+        //   const donationMessage = `${timerName} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
+        //   console.log(donationMessage);
+        //   displayDonationMessageOnHTML(donationMessage, false, hasDonatedBefore);
+
+
+
+
+        //   // const donationMessage = `${timerName} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
+        //   // console.log(donationMessage);
+        //   // displayDonationMessageOnHTML(donationMessage);
+
+        //   updateTimerDisplay(fromUserID, donorNewTime);
+        //   updateTimerDisplay(toUserID, recipientNewTime);
+        //   break;
+
+
         case "donateTimeResult":
-          const {
-            fromUserID,
-            toUserID,
-            timerName,
-            donatedMinutes,
-            donatedSeconds,
-            totalSeconds,
-            donorNewTime,
-            recipientNewTime,
-            recipientName,
-            donorName
-          } = data.msg;
+  const {
+    fromUserID,
+    toUserID,
+    timerName,
+    donatedMinutes,
+    donatedSeconds,
+    totalSeconds,
+    donorNewTime,
+    recipientNewTime,
+    recipientName,
+    donorName
+  } = data.msg;
 
-          // ⛔ Check for self-donation
-          if (fromUserID === toUserID) {
-            const errorMsg = `❌ Invalid donation: You cannot donate time to yourself (${donorName || fromUserID}).`;
-            console.warn(errorMsg);
-            displayDonationMessageOnHTML(errorMsg, true); // Show in HTML
-            break;
-          }
+  // ⛔ Prevent self-donation
+  if (fromUserID === toUserID) {
+    const errorMsg = `❌ Invalid donation: You cannot donate time to yourself (${donorName || fromUserID}).`;
+    console.warn(errorMsg);
+    displayDonationMessageOnHTML(errorMsg, true);
+    break;
+  }
 
-          const donationMessage = `${timerName} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
-          console.log(donationMessage);
-          displayDonationMessageOnHTML(donationMessage);
+  // ✅ Initialize donation tracking
+  if (!donationTracker[fromUserID]) {
+    donationTracker[fromUserID] = {};
+  }
 
-          updateTimerDisplay(fromUserID, donorNewTime);
-          updateTimerDisplay(toUserID, recipientNewTime);
-          break;
+  if (!donationTracker[fromUserID][toUserID]) {
+    donationTracker[fromUserID][toUserID] = 0;
+  }
 
+  // Increment the count
+  donationTracker[fromUserID][toUserID] += 1;
+  const donationCount = donationTracker[fromUserID][toUserID];
+  const isRepeated = donationCount > 1;
 
+  // Optional warning for repeated donations
+  if (isRepeated) {
+    const repeatMsg = `⚠️ You have donated to ${recipientName || toUserID} ${donationCount} times!`;
+    console.warn(repeatMsg);
+    displayDonationMessageOnHTML(repeatMsg, false, true); // Red background
+  }
+
+  // Build main donation message (skip "Donated 1 time")
+  let donationMessage = `${timerName} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
+  if (donationCount > 1) {
+    donationMessage += ` (Donated ${donationCount} times)`;
+  }
+
+  console.log(donationMessage);
+  displayDonationMessageOnHTML(donationMessage, false, isRepeated);
+
+  updateTimerDisplay(fromUserID, donorNewTime);
+  updateTimerDisplay(toUserID, recipientNewTime);
+  break;
 
 
 
@@ -2378,101 +2459,219 @@
 
     //working code
 
+    // let vetoClickCountMap = {}; // Store click count for each timerID
+
+    // document.getElementById('resetVotesBtn').addEventListener('click', sendTimerUpdateFromButton);
+
+    // function sendTimerUpdateFromButton() {
+    //   console.log("Sending veto name updates...");
+
+    //   const vetoInputs = document.querySelectorAll('[data-id$="-4"]');
+    //   const oldVetoMap = {}; // { newTimerID: oldVetoValue }
+
+    //   // STEP 1: Capture old veto values
+    //   vetoInputs.forEach(input => {
+    //     const dataId = input.getAttribute('data-id'); // e.g., "3-4"
+    //     const newTimerID = dataId.split('-')[0];
+    //     const oldVetoValue = input.value;
+    //     oldVetoMap[newTimerID] = oldVetoValue;
+    //     console.log(`Existing -> newTimerID: ${newTimerID}, Old Veto Value: ${oldVetoValue}`);
+    //   });
+
+    //   // STEP 2: Determine highest voted option
+    //   let highestVoteCount = 0;
+    //   let highestVotedName = "";
+    //   for (let [key, count] of Object.entries(clickCountsMap)) {
+    //     if (count > highestVoteCount) {
+    //       highestVoteCount = count;
+    //       highestVotedName = key;
+    //     }
+    //   }
+
+    //   if (!highestVotedName) {
+    //     alert("No votes to select for veto.");
+    //     return;
+    //   }
+
+    //   const selectedVeto = document.querySelector(`input[name="vetoSelection"][value="${highestVotedName}"]`);
+    //   if (!selectedVeto) {
+    //     alert("Selected veto option not found.");
+    //     return;
+    //   }
+
+    //   const vetoValue = selectedVeto.value;
+    //   console.log("Selected veto value:", vetoValue);
+
+    //   // STEP 3: Log vote breakdown
+    //   for (let [key, count] of Object.entries(clickCountsMap)) {
+    //     if (count > 0) {
+    //       const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+    //       const manageValueForKey = manageValuesMap[key] || "N/A";
+    //       const newTimerInputs = Object.values(newtimerinputfiledMap[key] || {}).join(", ") || "No input provided";
+
+    //       console.log(`Votes Data  : (${voters}) voted for (${key}) For: (${newTimerInputs}) min. Total Votes: ${count}`);
+    //     }
+    //   }
+
+    //   // STEP 4: Apply new veto values and send to server
+    //   vetoInputs.forEach(input => {
+    //     const vetoElementID = input.getAttribute('data-id');
+    //     const newTimerID = vetoElementID.split('-')[0];
+    //     const oldVetoValue = oldVetoMap[newTimerID];
+
+    //     console.log("newTimerID from", newTimerID);
+
+    //     // Init click count for this timer if missing
+    //     if (!vetoClickCountMap[newTimerID]) {
+    //       vetoClickCountMap[newTimerID] = 0;
+    //     }
+
+    //     let vetoMessage;
+    //     if (oldVetoValue === vetoValue) {
+    //       vetoMessage = `f-${vetoClickCountMap[newTimerID]}`;
+    //       console.log(`Repeated sentence for newTimerID: ${newTimerID}. Passing previous value: ${vetoMessage}`);
+    //     } else {
+    //       vetoClickCountMap[newTimerID] += 1;
+    //       vetoMessage = `f-${vetoClickCountMap[newTimerID]}`;
+    //     }
+
+    //     input.value = vetoMessage;
+
+    //     const responseObject = {
+    //       cmd: "updateMultipleVetoValue",
+    //       msg: {
+    //         ELMxID: 0,
+    //         vetoMultipleNewTimerId: newTimerID,
+    //         vetoElementID: vetoElementID,
+    //         vetoNewName: vetoMessage,
+    //         oldVetoName: oldVetoValue // ✅ Send old veto value
+    //       }
+    //     };
+
+    //     console.log("Sending old veto:", responseObject);
+    //     socket.send(JSON.stringify(responseObject));
+    //   });
+
+    //   console.log("✅ Veto value update process complete.");
+    // }
+
+
     let vetoClickCountMap = {}; // Store click count for each timerID
 
-document.getElementById('resetVotesBtn').addEventListener('click', sendTimerUpdateFromButton);
+    document.getElementById('resetVotesBtn').addEventListener('click', sendTimerUpdateFromButton);
 
-function sendTimerUpdateFromButton() {
-  console.log("Sending veto name updates...");
+    function sendTimerUpdateFromButton() {
+      console.log("Sending veto name updates...");
 
-  const vetoInputs = document.querySelectorAll('[data-id$="-4"]');
-  const oldVetoMap = {}; // { newTimerID: oldVetoValue }
+      const vetoInputs = document.querySelectorAll('[data-id$="-4"]');
+      const oldVetoMap = {}; // { newTimerID: oldVetoValue }
 
-  // STEP 1: Capture old veto values
-  vetoInputs.forEach(input => {
-    const dataId = input.getAttribute('data-id'); // e.g., "3-4"
-    const newTimerID = dataId.split('-')[0];
-    const oldVetoValue = input.value;
-    oldVetoMap[newTimerID] = oldVetoValue;
-    console.log(`Existing -> newTimerID: ${newTimerID}, Old Veto Value: ${oldVetoValue}`);
-  });
+      // STEP 1: Capture old veto values
+      vetoInputs.forEach(input => {
+        const dataId = input.getAttribute('data-id'); // e.g., "3-4"
+        const newTimerID = dataId.split('-')[0];
+        const oldVetoValue = input.value;
+        oldVetoMap[newTimerID] = oldVetoValue;
+        console.log(`Existing -> newTimerID: ${newTimerID}, Old Veto Value: ${oldVetoValue}`);
+      });
 
-  // STEP 2: Determine highest voted option
-  let highestVoteCount = 0;
-  let highestVotedName = "";
-  for (let [key, count] of Object.entries(clickCountsMap)) {
-    if (count > highestVoteCount) {
-      highestVoteCount = count;
-      highestVotedName = key;
-    }
-  }
-
-  if (!highestVotedName) {
-    alert("No votes to select for veto.");
-    return;
-  }
-
-  const selectedVeto = document.querySelector(`input[name="vetoSelection"][value="${highestVotedName}"]`);
-  if (!selectedVeto) {
-    alert("Selected veto option not found.");
-    return;
-  }
-
-  const vetoValue = selectedVeto.value;
-  console.log("Selected veto value:", vetoValue);
-
-  // STEP 3: Log vote breakdown
-  for (let [key, count] of Object.entries(clickCountsMap)) {
-    if (count > 0) {
-      const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
-      const manageValueForKey = manageValuesMap[key] || "N/A";
-      const newTimerInputs = Object.values(newtimerinputfiledMap[key] || {}).join(", ") || "No input provided";
-
-      console.log(`Votes Data  : (${voters}) voted for (${key}) For: (${newTimerInputs}) min. Total Votes: ${count}`);
-    }
-  }
-
-  // STEP 4: Apply new veto values and send to server
-  vetoInputs.forEach(input => {
-    const vetoElementID = input.getAttribute('data-id');
-    const newTimerID = vetoElementID.split('-')[0];
-    const oldVetoValue = oldVetoMap[newTimerID];
-
-    console.log("newTimerID from", newTimerID);
-
-    // Init click count for this timer if missing
-    if (!vetoClickCountMap[newTimerID]) {
-      vetoClickCountMap[newTimerID] = 0;
-    }
-
-    let vetoMessage;
-    if (oldVetoValue === vetoValue) {
-      vetoMessage = `f-${vetoClickCountMap[newTimerID]}`;
-      console.log(`Repeated sentence for newTimerID: ${newTimerID}. Passing previous value: ${vetoMessage}`);
-    } else {
-      vetoClickCountMap[newTimerID] += 1;
-      vetoMessage = `f-${vetoClickCountMap[newTimerID]}`;
-    }
-
-    input.value = vetoMessage;
-
-    const responseObject = {
-      cmd: "updateMultipleVetoValue",
-      msg: {
-        ELMxID: 0,
-        vetoMultipleNewTimerId: newTimerID,
-        vetoElementID: vetoElementID,
-        vetoNewName: vetoMessage,
-        oldVetoName: oldVetoValue // ✅ Send old veto value
+      // STEP 2: Determine highest voted option
+      let highestVoteCount = 0;
+      let highestVotedName = "";
+      for (let [key, count] of Object.entries(clickCountsMap)) {
+        if (count > highestVoteCount) {
+          highestVoteCount = count;
+          highestVotedName = key;
+        }
       }
-    };
 
-    console.log("Sending old veto:", responseObject);
-    socket.send(JSON.stringify(responseObject));
-  });
+      if (!highestVotedName) {
+        alert("No votes to select for veto.");
+        return;
+      }
 
-  console.log("✅ Veto value update process complete.");
-}
+      const selectedVeto = document.querySelector(`input[name="vetoSelection"][value="${highestVotedName}"]`);
+      if (!selectedVeto) {
+        alert("Selected veto option not found.");
+        return;
+      }
+
+      const vetoValue = selectedVeto.value;
+      console.log("Selected veto value:", vetoValue);
+
+      // STEP 3: Log vote breakdown
+      for (let [key, count] of Object.entries(clickCountsMap)) {
+        if (count > 0) {
+          const voters = voterMap[key] ? voterMap[key].join(", ") : "Unknown";
+          const manageValueForKey = manageValuesMap[key] || "N/A";
+          const newTimerInputs = Object.values(newtimerinputfiledMap[key] || {}).join(", ") || "No input provided";
+
+          console.log(`Votes Data  : (${voters}) voted for (${key}) For: (${newTimerInputs}) min. Total Votes: ${count}`);
+        }
+      }
+
+      // STEP 4: Apply new veto values and send to server
+      vetoInputs.forEach(input => {
+        const vetoElementID = input.getAttribute('data-id');
+        const newTimerID = vetoElementID.split('-')[0];
+        const oldVetoValue = oldVetoMap[newTimerID];
+
+        console.log("newTimerID from", newTimerID);
+
+        // If old value is null or empty, skip assigning f-1 etc.
+        if (oldVetoValue === null || oldVetoValue === "") {
+          input.value = ""; // Leave it blank/null
+          console.log(`Skipping veto update for newTimerID: ${newTimerID} since oldVetoValue is null/empty`);
+
+          const responseObject = {
+            cmd: "updateMultipleVetoValue",
+            msg: {
+              ELMxID: 0,
+              vetoMultipleNewTimerId: newTimerID,
+              vetoElementID: vetoElementID,
+              vetoNewName: null,
+              oldVetoName: oldVetoValue
+            }
+          };
+
+          socket.send(JSON.stringify(responseObject));
+          return;
+        }
+
+        // Init click count for this timer if missing
+        if (!vetoClickCountMap[newTimerID]) {
+          vetoClickCountMap[newTimerID] = 0;
+        }
+
+        let vetoMessage;
+        if (oldVetoValue === vetoValue) {
+          vetoMessage = `f-${vetoClickCountMap[newTimerID]}`;
+          console.log(`Repeated sentence for newTimerID: ${newTimerID}. Passing previous value: ${vetoMessage}`);
+        } else {
+          vetoClickCountMap[newTimerID] += 1;
+          vetoMessage = `f-${vetoClickCountMap[newTimerID]}`;
+        }
+
+        input.value = vetoMessage;
+
+        const responseObject = {
+          cmd: "updateMultipleVetoValue",
+          msg: {
+            ELMxID: 0,
+            vetoMultipleNewTimerId: newTimerID,
+            vetoElementID: vetoElementID,
+            vetoNewName: vetoMessage,
+            oldVetoName: oldVetoValue
+          }
+        };
+
+        console.log("Sending updated veto:", responseObject);
+        socket.send(JSON.stringify(responseObject));
+      });
+
+      console.log("✅ Veto value update process complete.");
+    }
+
 
 
 

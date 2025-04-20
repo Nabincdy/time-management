@@ -1,125 +1,51 @@
-<script>
-    let clickCount = 0;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Switch with Array</title>
+</head>
+<body>
 
-// Select all donate buttons
-document.querySelectorAll(`[data-id="${newTimerID}-13"]`).forEach(button => {
-  button.addEventListener("click", function () {
-    clickCount++;
+  <h2>Select a fruit:</h2>
+  <select id="fruit-select">
+    <option value="">--Choose--</option>
+    <option value="orange">Orange</option>
+    <option value="lemon">Lemon</option>
+    <option value="strawberry">Strawberry</option>
+    <option value="blueberry">Blueberry</option>
+    <option value="banana">Banana</option>
+  </select>
 
-    // Get the default timer value from the input element with the data-id
-    const defaultTimeInput = document.querySelector(`[data-id="${newTimerID}-2"]`);
-    const timerValue = defaultTimeInput ? defaultTimeInput.value : "00:00"; // Default value in case it's not found
+  <p id="result"></p>
 
-    // Parse the timer value
-    let [minutes, seconds] = timerValue.split(":").map(Number);
+  <script>
+    const fruitSelect = document.getElementById("fruit-select");
+    const result = document.getElementById("result");
 
-    // Check if the user card already exists
-    let existingCard = this.nextElementSibling;
+    fruitSelect.addEventListener("change", () => {
+      const fruit = fruitSelect.value;
 
-    if (existingCard && existingCard.classList.contains("user-card")) {
-      // If it exists, just update the available time
-      let timeDisplay = existingCard.querySelector(".time-value");
-      if (timeDisplay) {
-        timeDisplay.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+      const citrusFruits = ["orange", "lemon"];
+      const berries = ["strawberry", "blueberry"];
+
+      switch (true) {
+        case citrusFruits.includes(fruit):
+          result.textContent = `${fruit} is a citrus fruit 🍊`;
+          break;
+
+        case berries.includes(fruit):
+          result.textContent = `${fruit} is a berry 🫐`;
+          break;
+
+        case fruit === "banana":
+          result.textContent = `Banana is not a citrus or berry 🍌`;
+          break;
+
+        default:
+          result.textContent = "Please select a fruit.";
       }
-    } else {
-      // If it doesn't exist, create and insert the user card
-      let userCardHTML = `
-  <div class="user-card" id="user1">
-    <div class="user-info">
-      <div class="time-display">
-        <span class="time-label">Available Time:</span>
-        <span class="time-value" id="user1-time">${minutes}:${seconds < 10 ? '0' + seconds : seconds}</span>
-      </div>
-    </div>
-  </div>
-`;
-      let wrapper = document.createElement("div");
-      wrapper.innerHTML = userCardHTML;
-      this.after(wrapper.firstElementChild);
-    }
-  });
-});
+    });
+  </script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  document.querySelectorAll(`[data-id$="-13"]`).forEach(button => {
-        button.addEventListener("click", function () {
-          clickCount++;
-
-          // Get the dynamic timer title
-          const timerTitleInput = document.querySelector(`[data-id="${newTimerID}-1"]`);
-          const timerTitle = timerTitleInput ? timerTitleInput.value.trim() : "Untitled Timer";
-
-          // Get the current user ID
-          const currentUserID = newTimerID;
-          const defaultTimeInput = document.querySelector(`[data-id="${newTimerID}-2"]`);
-          const timerValue = defaultTimeInput ? defaultTimeInput.value : "00:00"; // Default value in case it's not found
-
-          // Parse the timer value
-          let [minutes, seconds] = timerValue.split(":").map(Number);
-
-          // Check if the user card already exists
-          let existingCard = this.nextElementSibling;
-
-          if (existingCard && existingCard.classList.contains("user-card")) {
-            // Update available time
-
-            let timeDisplay = existingCard.querySelector(`[data-id="${newTimerID}-2"]`);
-            if (timeDisplay) {
-              timeDisplay.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-
-            }
-          } else {
-            // Generate dynamic user options excluding the current user
-            let userOptions = getUserOptions(currentUserID);
-
-            // Create user card with dynamic timer value
-            let userCardHTML = `
-        <div class="user-card" data-user-id="${currentUserID}">
-          <div class="user-info">
-            <div class="time-display">
-              <span class="time-label">Available Time:</span>
-              <span class="time-value">${minutes}:${seconds < 10 ? '0' + seconds : seconds}</span>
-            </div>
-            <div class="timer-name">
-              <strong>Timer Name:</strong> ${timerTitle}
-            </div>
-          </div>
-          <div class="donation-controls">
-            <input type="number" min="0" max="60" value="1"> min
-            <input type="number" min="0" max="59" value="0"> sec
-            <select>
-              ${userOptions}
-            </select>
-            <button class="donate-btn">Donate</button>
-          </div>
-        </div>
-      `;
-
-            let wrapper = document.createElement("div");
-            wrapper.innerHTML = userCardHTML;
-            this.after(wrapper.firstElementChild);
-          }
-        });
-      });
-
-</script>
+</body>
+</html>

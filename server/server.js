@@ -294,6 +294,8 @@ globalELMxArray = {
                 },//end participant1
             },//end individualParticipantVotes
         },//end voting
+        "donateHistory": "History No Data Found",
+
     } //end ELMxID 1
 };//end globalELMxArray
 
@@ -754,7 +756,7 @@ wss.on("connection", (ws) => {
                     let resetVetoName_vetoNewTitleID = message.msg.vetoNewTitleID;
                     let vetoNewName = message.msg.vetoNewName;
                     let newTimeVetoID = message.msg.newTimeVetoID;
-                    
+
 
                     // let timerId = globalUserIDs;
 
@@ -763,11 +765,11 @@ wss.on("connection", (ws) => {
                     // let checking = globalELMxArray[resetVetoName_meetingID].userData[resetVetoName_vetoNewTitleID].vetoes = vetoNewName;
                     // globalELMxArray[resetTimerAsc_ELMxID].timers[resetTimerAsc_timerServerID].ascValue = timerAscValue;
                     // let checking = JSON.stringify(globalELMxArray[resetVetoName_meetingID].userData.vetoes.formVeto);
-                //    $testing = globalELMxArray[resetVetoName_meetingID].timers[resetVetoName_vetoNewTitleID].veto;
+                    //    $testing = globalELMxArray[resetVetoName_meetingID].timers[resetVetoName_vetoNewTitleID].veto;
 
-                
-                // let testing = JSON.stringify(globalELMxArray[resetVetoName_meetingID].timers[newTimeVetoID]);
-              globalELMxArray[resetVetoName_meetingID].timers[newTimeVetoID].veto = vetoNewName;
+
+                    // let testing = JSON.stringify(globalELMxArray[resetVetoName_meetingID].timers[newTimeVetoID]);
+                    globalELMxArray[resetVetoName_meetingID].timers[newTimeVetoID].veto = vetoNewName;
 
                     // console.log("ramro" + newUserID);
 
@@ -788,7 +790,7 @@ wss.on("connection", (ws) => {
 
 
 
-                
+
 
 
 
@@ -887,7 +889,7 @@ wss.on("connection", (ws) => {
                     sendToWho(wss, ws, desiredListUpdateVetoValue, createUserResponseObjectUpdateVetoValue);
 
                     break;
-                    
+
 
 
                 case 'removeTimer':
@@ -1036,7 +1038,7 @@ wss.on("connection", (ws) => {
 
 
 
-          
+
 
                 case "contentDropdownClick":
                     console.log("Received contentDropdownClick message:", message);
@@ -1406,10 +1408,10 @@ wss.on("connection", (ws) => {
                         totalSeconds: donateTotalSeconds
                     } = message.msg;
 
-                    if (!fromUserID || !toUserID || !timerName || donateTotalSeconds == null) {
-                        console.error("❌ Invalid donateTime message: missing required fields.");
-                        break;
-                    }
+                    // if (!fromUserID || !toUserID || !timerName || donateTotalSeconds == null) {
+                    //     console.error("❌ Invalid donateTime message: missing required fields.");
+                    //     break;
+                    // }
 
                     console.log(`⏳ User ${fromUserID} is donating ${donateMinutes}m ${donateSeconds}s (${donateTotalSeconds}s) to user ${toUserID} for timer "${timerName}".`);
 
@@ -1473,6 +1475,16 @@ wss.on("connection", (ws) => {
                     console.log(`✅ Donor's new time: ${formatTime(donorTimer.remainingTime)} (${donorTimer.remainingTime}s)`);
                     console.log(`✅ Recipient's new time: ${formatTime(recipientTimer.remainingTime)} (${recipientTimer.remainingTime}s)`);
 
+
+
+                    // globalELMxArray[resetVetoName_meetingID].timers[newTimeVetoID].veto = vetoNewName;
+
+                    const recipientName = recipientTimer.name || "";
+
+                    const donationMessage = `${timerName} Donated ${donateMinutes}m ${donateSeconds}s to ${recipientName || toUserID}`;
+
+                    globalELMxArray[ELMxID_DonateTimer].donateHistory = donationMessage;
+
                     const donationResult = {
                         cmd: "donateTimeResult",
                         msg: {
@@ -1488,6 +1500,7 @@ wss.on("connection", (ws) => {
                             recipientName: recipientTimer.name
                         }
                     };
+
 
                     console.log("📤 Sending donation result:", donationResult);
 
@@ -1821,7 +1834,7 @@ function createUserTimerIDFunction(wss, ws, message) {
     console.log("Login ELMXMEETING ID SHOULD BE for meeting 0: newUserID:" + " " + newUserID + " " + JSON.stringify(globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs));
     globalUserIDsWebsocketObject[newUserID] = ws;
     globalELMxArray[createUserTimerIDELMxID].arrayOfAttendanceIDs[newUserID] = newUserID;
-    globalELMxArray[createUserTimerIDELMxID].userData[newUserID] = {UserID: newUserID};
+    globalELMxArray[createUserTimerIDELMxID].userData[newUserID] = { UserID: newUserID };
     // console.log("Hero" + JSON.stringify(Heroo));
     //userData updating done
 
