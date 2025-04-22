@@ -1370,6 +1370,8 @@
 
 
     function showPendingApproval(data) {
+
+      console.log("show pending approval check data ", data);
       const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
 
       const fromName = getUsernameByID(data.fromUserID);
@@ -1683,7 +1685,7 @@
 
   break;
 
-  
+
 
 
         case "returnShowApproval":
