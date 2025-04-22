@@ -1444,13 +1444,35 @@ wss.on("connection", (ws) => {
                         }
                     };
 
-                    console.log("Testing send showApprovalResponse" , showApprovalResponse);
+                    console.log("Testing send showApprovalResponse", showApprovalResponse);
                     const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
                     sendToWho(wss, ws, recipients, showApprovalResponse);
 
                     break;
 
-                
+
+
+                    case "sendingremoveApprovalUI":
+                        console.log("📩 Received removeshowApproval message: ", message);
+                        const unapprovalMsg = message.msg;
+                        const {
+                            ELMxID_unApproval = 0,
+                        } = unapprovalMsg;
+
+                        const showunApprovalResponse = {
+                            cmd: "returnRemoveApproval",
+                            msg: {
+                                ELMxID_unApproval,
+                            }
+                        };
+                        console.log("Testing send showunApprovalResponse", showunApprovalResponse);
+                        const unrecipients = ["particularSome", globalELMxArray[ELMxID_unApproval]?.arrayOfAttendanceIDs];
+                        sendToWho(wss, ws, unrecipients, showunApprovalResponse);
+    
+                        break;
+                      
+
+
 
 
 

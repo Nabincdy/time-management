@@ -1342,58 +1342,6 @@
 
 
 
-    // Declare global variables first
-    // let userNames = {};
-    // let donationCounts = {};
-
-    // // Define your functions next
-    // function updateUsernames() {
-    //   document.querySelectorAll(`[data-id$="-1"]`).forEach(input => {
-    //     let timerID = input.getAttribute("data-id").split("-")[0];
-    //     userNames[timerID] = input.value.trim() || `User ${timerID}`;
-    //     console.log(`Updated userNames[${timerID}] =`, userNames[timerID]);
-    //   });
-    // }
-
-    // function getUserOptions(currentUserID, excludeIDs = []) {
-    //   updateUsernames();
-    //   let options = "";
-    //   Object.entries(userNames).forEach(([userID, userName]) => {
-    //     if (userID !== currentUserID && !excludeIDs.includes(userID)) {
-    //       options += `<option value="${userID}">${userName}</option>`;
-    //     }
-    //   });
-    //   return options;
-    // }
-
-    // function showPendingApproval(data) {
-    //   const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
-
-    //   const container = document.createElement("div");
-    //   container.innerHTML = `
-    //     <div class="pending-approval">
-    //       <p><strong>${userNames[data.fromUserID]} ➜ ${userNames[data.toUserID]}</strong> (${data.minutes} min ${data.seconds} sec)</p>
-    //       <select class="approver-dropdown">${approverOptions}</select>
-    //       <button class="approve-btn">Approve</button>
-    //     </div>
-    //   `;
-
-    //   container.querySelector(".approve-btn").addEventListener("click", () => {
-    //     const approverID = container.querySelector(".approver-dropdown").value;
-    //     if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-    //       alert("Invalid approver.");
-    //       return;
-    //     }
-
-    //     sendDonation(data, parseInt(approverID));
-    //     container.remove();
-    //   });
-
-    //   document.getElementById("unapprovedItems").appendChild(container);
-    // }
-
-
-
 
 
     // Global donation tracking
@@ -1419,46 +1367,18 @@
       return options;
     }
 
-  //   function showPendingApproval(data) {
-  //     const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
-
-  //     const fromName = getUsernameByID(data.fromUserID);
-  //     const toName = getUsernameByID(data.toUserID);
-
-  //     const container = document.createElement("div");
-  //     container.innerHTML = `
-  //   <div class="pending-approval">
-  //     <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
-  //     <select class="approver-dropdown">${approverOptions}</select>
-  //     <button class="approve-btn">Approve</button>
-  //   </div>
-  // `;
-
-  //     container.querySelector(".approve-btn").addEventListener("click", () => {
-  //       const approverID = container.querySelector(".approver-dropdown").value;
-  //       if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-  //         alert("Invalid approver.");
-  //         return;
-  //       }
-
-  //       sendDonation(data, parseInt(approverID));
-  //       container.remove();
-  //     });
-
-  //     document.getElementById("unapprovedItems").appendChild(container);
-  //   }
 
 
-  function showPendingApproval(data) {
-  const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
+    function showPendingApproval(data) {
+      const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
 
-  const fromName = getUsernameByID(data.fromUserID);
-  const toName = getUsernameByID(data.toUserID);
+      const fromName = getUsernameByID(data.fromUserID);
+      const toName = getUsernameByID(data.toUserID);
 
-  const container = document.createElement("div");
-  container.id = `approval-${data.ELMxID}`; // ✅ Unique ID using ELMxID
+      const container = document.createElement("div");
+      container.id = `approval-${data.ELMxID}`; // ✅ Unique ID using ELMxID
 
-  container.innerHTML = `
+      container.innerHTML = `
     <div class="pending-approval">
       <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
       <select class="approver-dropdown">${approverOptions}</select>
@@ -1466,27 +1386,27 @@
     </div>
   `;
 
-  container.querySelector(".approve-btn").addEventListener("click", () => {
-    const approverID = container.querySelector(".approver-dropdown").value;
-    if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-      alert("Invalid approver.");
-      return;
+      container.querySelector(".approve-btn").addEventListener("click", () => {
+        const approverID = container.querySelector(".approver-dropdown").value;
+        if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
+          alert("Invalid approver.");
+          return;
+        }
+
+        sendDonation(data, parseInt(approverID));
+
+        // ✅ Remove from this browser
+        container.remove();
+
+        // ✅ Notify all other browsers to remove it too
+        socket.send(JSON.stringify({
+          cmd: "sendingremoveApprovalUI",
+          msg: { ELMxID: data.ELMxID }
+        }));
+      });
+
+      document.getElementById("unapprovedItems").appendChild(container);
     }
-
-    sendDonation(data, parseInt(approverID));
-
-    // ✅ Remove from this browser
-    container.remove();
-
-    // ✅ Notify all other browsers to remove it too
-    socket.send(JSON.stringify({
-      cmd: "removeApprovalUI",
-      msg: { ELMxID: data.ELMxID }
-    }));
-  });
-
-  document.getElementById("unapprovedItems").appendChild(container);
-}
 
 
 
@@ -1735,6 +1655,35 @@
 
 
 
+
+        // case "removeApprovalUI":
+
+        //   console.log("hello testing for ui removal", data);
+        //   const element = document.getElementById(`approval-${data.msg.ELMxID}`);
+        //   if (element) element.remove();
+        //   break;
+
+
+        case "returnRemoveApproval":
+  console.log("📩 Received returnRemoveApproval message:", data);
+
+  if (data.msg && typeof data.msg.ELMxID_unApproval !== "undefined") {
+    const removeID = data.msg.ELMxID_unApproval;
+    const element = document.getElementById(`approval-${removeID}`);
+    
+    if (element) {
+      element.remove();
+      console.log(`✅ Removed approval UI for ELMxID: ${removeID}`);
+    } else {
+      console.warn(`⚠️ No element found with ID approval-${removeID}`);
+    }
+  } else {
+    console.warn("❌ Missing or invalid ELMxID_unApproval in returnRemoveApproval:", data);
+  }
+
+  break;
+
+  
 
 
         case "returnShowApproval":
@@ -3983,97 +3932,6 @@
     //////////////////////Next Function
 
 
-    // function openContentForm(contentType, timerComponent, assignedCategories, timerName) {
-    //   const existingForm = document.getElementById("contentForm");
-    //   if (existingForm) {
-    //     existingForm.remove();
-    //   }
-
-    //   const formHTML = `
-    //     <div id="contentForm">
-    //             <div><strong>Added By :</strong> ${timerName}</div>
-    //       <input type="text" id="topicName" placeholder="${contentType} Selected is"/>
-    //       <input type="text" id="topicTime" value="2:00" placeholder="Enter Time (e.g., 2 min)"/>
-    //       <button id="submitContentBtn">Submit</button>
-    //     </div>
-    //   `;
-
-    //   const contentForm = document.createElement("div");
-    //   contentForm.innerHTML = formHTML;
-    //   document.body.appendChild(contentForm);
-
-    //   const submitContentBtn = contentForm.querySelector("#submitContentBtn");
-    //   submitContentBtn.addEventListener("click", () => {
-    //     const topicName = document.getElementById("topicName").value;
-    //     const topicTime = document.getElementById("topicTime").value;
-
-    //     if (topicName && topicTime) {
-    //       addContentSection(contentType, topicName, topicTime, timerName);
-    //       assignedCategories.add(contentType);
-    //       counters[contentType]++;
-    //       updateCounterDisplay();
-    //       contentForm.remove();
-    //     }
-    //   });
-    // }
-
-
-
-
-    //   function openContentForm(contentType, timerComponent, assignedCategories, timerName) {
-    //     // Remove existing form if any
-    //     const existingForm = document.getElementById("contentForm");
-    //     if (existingForm) {
-    //       existingForm.remove();
-    //     }
-
-    //     // Create the form HTML
-    //     const formHTML = `
-    //   <div id="contentForm">
-    //     <div><strong>Added By :</strong> ${timerName}</div>
-    //     <input type="text" id="topicName" placeholder="${contentType} Selected is"/>
-    //     <input type="text" id="topicTime" value="2:00" placeholder="Enter Time (e.g., 2 min)"/>
-    //     <button id="submitContentBtn">Submit</button>
-    //   </div>
-    // `;
-
-    //     const contentForm = document.createElement("div");
-    //     contentForm.innerHTML = formHTML;
-    //     document.body.appendChild(contentForm);
-
-    //     const submitContentBtn = contentForm.querySelector("#submitContentBtn");
-    //     submitContentBtn.addEventListener("click", () => {
-    //       const topicName = document.getElementById("topicName").value;
-    //       const topicTime = document.getElementById("topicTime").value;
-
-    //       if (topicName && topicTime) {
-    //         addContentSection(contentType, topicName, topicTime, timerName);
-    //         assignedCategories.add(contentType);
-    //         counters[contentType]++;
-    //         updateCounterDisplay();
-    //         contentForm.remove();
-    //       }
-    //     });
-
-    //     // 🔁 SEND WebSocket Message for content selection
-    //     const contentBtn = timerComponent.querySelector(".content-btn");
-    //     const timerID = contentBtn?.getAttribute("data-id") || ""; // Make sure your contentBtn has a unique data-id
-
-    //     const contentData = {
-    //       cmd: "contentDropdownClick",
-    //       msg: {
-    //         selectedContent: contentType,
-    //         timerName: timerName,
-    //         timerID: timerID,
-    //       }
-    //     };
-
-    //     socket.send(JSON.stringify(contentData));
-
-    //     console.log("content data " + JSON.stringify(contentData));
-    //   }
-
-
 
     //working 2
     function openContentForm(contentType, timerComponent, assignedCategories, timerName) {
@@ -4728,9 +4586,8 @@
           };
 
           if (donationCounts[donationKey] > 1) {
-            alert("You have already donated 2 times. Approval required from another user.");
+            alert("You have already donated 1 times. Approval required from another user.");
             console.log("donationData", donationData);
-            showPendingApproval(donationData);
             socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
 
           } else {
@@ -4809,30 +4666,6 @@
 
 
 
-      function showPendingApproval(data) {
-        const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
-
-        const container = document.createElement("div");
-        container.innerHTML = `
-                <div class="pending-approval">
-                  <p><strong>${userNames[data.fromUserID]} ➜ ${userNames[data.toUserID]}</strong> (${data.minutes} min ${data.seconds} sec)</p>
-                    <select class="approver-dropdown">${approverOptions}</select>
-                      <button class="approve-btn">Approve</button>
-                  </div>
-                 `;
-
-        container.querySelector(".approve-btn").addEventListener("click", () => {
-          const approverID = container.querySelector(".approver-dropdown").value;
-          if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-            alert("Invalid approver.");
-            return;
-          }
-
-          sendDonation(data, parseInt(approverID)); // ✅ Fixed here
-          container.remove();
-        });
-        document.getElementById("unapprovedItems").appendChild(container);
-      }
 
 
       function setupDropdown(dropdownMenu) {
