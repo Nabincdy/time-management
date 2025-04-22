@@ -1393,6 +1393,67 @@ wss.on("connection", (ws) => {
                 //     }
 
 
+                // case 'showApproval':
+                //     console.log("📩 Received show approval message: ", message);
+                // break;
+
+                case 'showApproval':
+                    console.log("📩 Received showApproval message: ", message);
+
+                    // let ELMxID_Approval = message.msg.ELMxID;
+                    // let fromUserID_Approval = message.msg.fromUserID;
+                    // let toUserID_Approval = message.msg.toUserID;
+                    // let timerName_Approval = message.msg.timerName;
+                    // let minutes_Approval = message.msg.minutes;
+                    // let seconds_Approval = message.msg.seconds;
+                    // let totalSeconds_Approval = message.msg.totalSeconds;
+
+
+                    const approvalMsg = message.msg;
+                    const {
+                        ELMxID_Approval = 0,
+                        fromUserID_Approval = message.msg.fromUserID,
+                        toUserID_Approval = message.msg.toUserID,
+                        timerName_Approval = message.msg.timerName,
+                        minutes_Approval = message.msg.minutes,
+                        seconds_Approval = message.msg.seconds,
+                        totalSeconds_Approval = message.msg.totalSeconds
+                    } = approvalMsg;
+
+
+
+                    // if (!toUserID_Approval || !timerName_Approval) {
+                    //     console.error("❌ Missing required fields in showApproval:", approvalMsg);
+                    //     break;
+                    // }
+
+                    // if (!fromUserID_Approval) {
+                    //     console.warn("⚠️ fromUserID_Approval is missing in showApproval. Proceeding anyway.");
+                    // }
+
+                    const showApprovalResponse = {
+                        cmd: "returnShowApproval",
+                        msg: {
+                            ELMxID_Approval,
+                            fromUserID_Approval,
+                            toUserID_Approval,
+                            timerName_Approval,
+                            minutes_Approval,
+                            seconds_Approval,
+                            totalSeconds_Approval
+                        }
+                    };
+
+                    console.log("Testing send showApprovalResponse" , showApprovalResponse);
+                    const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
+                    sendToWho(wss, ws, recipients, showApprovalResponse);
+
+                    break;
+
+                
+
+
+
 
                 case 'donateTime':
                     console.log("📩 Received donateTime message: ", message);
@@ -1418,7 +1479,7 @@ wss.on("connection", (ws) => {
                     if (approvedByID && approvedByName) {
                         console.log(`✅ Donation approved by User ${approvedByID} (${approvedByName})`);
                     }
-                    
+
 
                     console.log(`⏳ User ${fromUserID} is donating ${donateMinutes}m ${donateSeconds}s (${donateTotalSeconds}s) to user ${toUserID} for timer "${timerName}".`);
 
@@ -1513,7 +1574,7 @@ wss.on("connection", (ws) => {
 
                     console.log("📤 Sending donation result:", donationResult);
 
-                    
+
                     let targetDonateAudience = ["particularSome", globalELMxArray[ELMxID_DonateTimer].arrayOfAttendanceIDs];
 
                     console.log("🎯 Target donation audience:", JSON.stringify(targetDonateAudience));
