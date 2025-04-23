@@ -237,9 +237,20 @@
       padding: 10px;
     }
 
+    /* .show-dropdown {
+      display: flex;
+    } */
+    /*changes 1*/
     .show-dropdown {
       display: flex;
+      opacity: 1;
+      left: 55%;
+      gap:5px;
+      margin-top: 10px;
+      transform: scale(1);
     }
+
+
 
     .dropdown-item {
       padding: 5px 10px;
@@ -601,20 +612,28 @@
       transform: translateY(-2px);
     }
 
+    /* .donate-btn:active {
+      background-color: #e0137d;
+      box-shadow: 0 3px 8px rgba(224, 19, 125, 0.2);
+      transform: translateY(0);
+    } */
+
+    /* changes 2 */
     .donate-btn:active {
       background-color: #e0137d;
       box-shadow: 0 3px 8px rgba(224, 19, 125, 0.2);
       transform: translateY(0);
+      width: 50%;
     }
+
 
 
     /*scroll effect in form submenu */
 
-    .scroll-container {
+    /* .scroll-container {
       display: flex;
       justify-content: center;
       gap: 0px;
-      /* margin: 20px 0; */
       position: relative;
     }
 
@@ -636,14 +655,63 @@
       transition: all 0.2s;
     }
 
-    /* Apply new height when scrolling */
     .scroll-box.scrolling {
       height: 300px;
     }
 
     .scroll-box::-webkit-scrollbar {
       display: none;
+    } */
+
+
+    .scroll-wrapper {
+      position: relative;
+      display: inline-block;
     }
+
+    /* Timer scroll container floats like a dropdown */
+    .scroll-container {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Make scroll boxes easier to drag and scroll */
+    .scroll-box {
+      width: 60px;
+      height: 200px;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      border: 1px solid #ddd;
+      background-color: #f9f9f9;
+      text-align: center;
+      font-size: 14px;
+      user-select: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .scroll-box div {
+      padding: 16px 0;
+      scroll-snap-align: center;
+      cursor: pointer;
+    }
+
+    .scroll-box::-webkit-scrollbar {
+      width: 0;
+    }
+
+    .time-option {
+      font-size: 14px;
+    }
+    
 
     .selected {
       font-size: 18px;
@@ -4728,10 +4796,13 @@
             timerContainer.setAttribute("data-timerServerID", timerSubmenuServerID);
             timerContainer.classList.add("timer-container");
             timerContainer.innerHTML = `
-            <div class="scroll-container">
+            <div class = "scroll-wrapper">
+            <div class="scroll-container" id="scrollArea-${timerSubmenuServerID}">
                 <div id="minutes-${timerSubmenuServerID}" class="scroll-box"></div>
                 <div id="seconds-${timerSubmenuServerID}" class="scroll-box"></div>
-                <button class="formbtntimersubmenu">Set Timer</button>
+                </div>
+                <button id="setTimerBtn-${timerSubmenuServerID}"  class="formbtntimersubmenu">Set Timer</button>
+                
             </div>
         `;
             formbtn.parentNode.insertBefore(timerContainer, formbtn.nextSibling);
@@ -4739,9 +4810,19 @@
             // Populate the scroll boxes
             populateScrollBox(`minutes-${timerSubmenuServerID}`, 60);
             populateScrollBox(`seconds-${timerSubmenuServerID}`, 60);
+
+            const setBtn = timerContainer.querySelector(`#setTimerBtn-${timerSubmenuServerID}`);
+            const scrollWrapper = timerContainer.querySelector(".scroll-wrapper");
+
+            setBtn.addEventListener("click", () => {
+              scrollWrapper.style.display = "none"; // Completely hides the timer selector UI
+            });
+
           } else {
             // Toggle visibility of the existing timer container
             timerContainer.style.display = (timerContainer.style.display === "none" || timerContainer.style.display === "") ? "block" : "none";
+            const scrollWrapper = timerContainer.querySelector(".scroll-wrapper");
+            scrollWrapper.style.display = "block";
           }
 
           // Set correct send button for this specific timer
