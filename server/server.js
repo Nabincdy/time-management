@@ -295,6 +295,10 @@ globalELMxArray = {
             },//end individualParticipantVotes
         },//end voting
         "donateHistory": "History No Data Found",
+        "approvedDonations": {
+            // Example:
+            // "fromUserID_toUserID_totalSeconds": true
+        }
 
     } //end ELMxID 1
 };//end globalELMxArray
@@ -340,6 +344,25 @@ wss.on("connection", (ws) => {
                 seen.add(value);
             }
             return value;
+        });
+    }
+
+    function saveDonationHistoryToFile() {
+        const dataToSave = {};
+
+        for (const ELMxID in globalELMxArray) {
+            const meeting = globalELMxArray[ELMxID];
+            if (meeting.donateHistory) {
+                dataToSave[ELMxID] = meeting.donateHistory;
+            }
+        }
+
+        fs.writeFile(DONATION_HISTORY_FILE, JSON.stringify(dataToSave, null, 2), err => {
+            if (err) {
+                console.error("Failed to save donation history:", err);
+            } else {
+                console.log("✅ Donation history saved successfully.");
+            }
         });
     }
 
@@ -1177,237 +1200,101 @@ wss.on("connection", (ws) => {
                     sendToWho(wss, ws, targetAudience, updateVoteResponse);
                     break;
 
+                // case 'showApproval':
+                //     console.log("📩 Received showApproval message: ", message);
 
 
+                //     const approvalMsg = message.msg;
+                //     const {
+                //         ELMxID_Approval = 0,
+                //         fromUserID_Approval = message.msg.fromUserID,
+                //         toUserID_Approval = message.msg.toUserID,
+                //         timerName_Approval = message.msg.timerName,
+                //         minutes_Approval = message.msg.minutes,
+                //         seconds_Approval = message.msg.seconds,
+                //         totalSeconds_Approval = message.msg.totalSeconds
+                //     } = approvalMsg;
 
 
-                //     case 'donateTime':
-                // console.log("Received donateTime message: ", message);
-
-                // // Rename to avoid block conflicts
-                // const {
-                //     fromUserID,
-                //     toUserID,
-                //     timerName,
-                //     minutes: donateMinutes,
-                //     seconds: donateSeconds,
-                //     totalSeconds: donateTotalSeconds
-                // } = message.msg;
-
-                // // Ensure required fields are present
-                // if (fromUserID == null || !toUserID || !timerName || donateTotalSeconds == null) {
-                //     console.error("Invalid donateTime message: missing required fields.");
-                //     break;
-                // }
-
-                // console.log(`User ${fromUserID} is donating ${donateMinutes}m ${donateSeconds}s (${donateTotalSeconds}s) to user ${toUserID} for timer "${timerName}".`);
-
-                // if (!globalELMxArray) {
-                //     console.error("No active meetings data available.");
-                //     break;
-                // }
-
-                // // Iterate over the meetings and their timers to find matching timers for both the donor and recipient
-                // let donorTimerUpdated = false;
-                // let recipientTimerUpdated = false;
-
-                // // Loop through all active meetings
-                // for (let ELMxID in globalELMxArray) {
-                //     const meeting = globalELMxArray[ELMxID];
-
-                //     // Check if the donor's and recipient's timers exist for this meeting
-                //     for (let timerID in meeting.timers) {
-                //         const timer = meeting.timers[timerID];
-
-                //         // Check if it's the donor's timer
-                //         if (timer.personAssignedID === String(fromUserID)) {
-                //             if (timer.remainingTime >= donateTotalSeconds) {
-                //                 timer.remainingTime -= donateTotalSeconds;  // Subtract donated time from donor's timer
-                //                 donorTimerUpdated = true;
-                //                 console.log(`Donor's timer updated: New remaining time is ${timer.remainingTime}s.`);
-                //             } else {
-                //                 console.error(`Donor's timer does not have enough time to donate.`);
-                //             }
-                //         }
-
-                //         // Check if it's the recipient's timer
-                //         if (timer.personAssignedID === String(toUserID)) {
-                //             timer.remainingTime += donateTotalSeconds;  // Add donated time to recipient's timer
-                //             recipientTimerUpdated = true;
-                //             console.log(`Recipient's timer updated: New remaining time is ${timer.remainingTime}s.`);
-                //         }
-                //     }
-                // }
-
-                // // If both timers were updated, send donation result
-
-                // if (donorTimerUpdated && recipientTimerUpdated) {
-                //     const donationResult = {
-                //         cmd: "donateTimeResult",
+                //     const showApprovalResponse = {
+                //         cmd: "returnShowApproval",
                 //         msg: {
-                //             fromUserID,
-                //             toUserID,
-                //             timerName,
-                //             donatedMinutes: donateMinutes,
-                //             donatedSeconds: donateSeconds,
-                //             totalSeconds: donateTotalSeconds,
-                //             donorNewTime: globalELMxArray[fromUserID]?.timers[donorTimerUpdated]?.remainingTime,
-                //             recipientNewTime: globalELMxArray[toUserID]?.timers[recipientTimerUpdated]?.remainingTime
+                //             ELMxID_Approval,
+                //             fromUserID_Approval,
+                //             toUserID_Approval,
+                //             timerName_Approval,
+                //             minutes_Approval,
+                //             seconds_Approval,
+                //             totalSeconds_Approval
                 //         }
                 //     };
 
-                //     console.log("donationResult", donationResult);
-                //     // Notify the donor and recipient with the updated times
-                //     const donationRecipients = ["particularSome", [String(fromUserID), String(toUserID)]];
-                //     sendToWho(wss, ws, donationRecipients, donationResult);
-                // } else {
-                //     console.error("Failed to update donor or recipient timer.");
-                // }
-
-
-
-                // for (let ELMxID in globalELMxArray) {
-                //     const meeting = globalELMxArray[ELMxID];
-                //     console.log(`🔹 Meeting ELMxID: ${ELMxID}`);
-                //     for (let timerID in meeting.timers) {
-                //         const timer = meeting.timers[timerID];
-                //         console.log(`   - User ${timer.personAssignedID}: ${formatTime(timer.remainingTime)} (${timer.remainingTime}s)`);
-                //     }
-                // }
-                // console.log("\n");
-
-                // break;
-
-
-                // case 'donateTime':
-                //     console.log("Received donateTime message: ", message);
-
-                //     const {
-                //         fromUserID,
-                //         toUserID,
-                //         timerName,
-                //         minutes: donateMinutes,
-                //         seconds: donateSeconds,
-                //         totalSeconds: donateTotalSeconds
-                //     } = message.msg;
-
-                //     // Validate message fields
-                //     if (fromUserID == null || !toUserID || !timerName || donateTotalSeconds == null) {
-                //         console.error("❌ Invalid donateTime message: missing required fields.");
-                //         break;
-                //     }
-
-                //     console.log(`⏳ User ${fromUserID} is donating ${donateMinutes}m ${donateSeconds}s (${donateTotalSeconds}s) to user ${toUserID} for timer "${timerName}".`);
-
-                //     // Ensure active meetings are available
-                //     if (!globalELMxArray) {
-                //         console.error("❌ No active meetings data available.");
-                //         break;
-                //     }
-
-                //     let donorTimer = null;
-                //     let recipientTimer = null;
-
-                //     // Log global meeting data
-                //     console.log("Current globalELMxArray:", JSON.stringify(globalELMxArray, null, 2));
-
-                //     // Iterate through meetings and timers to find the donor and recipient timers
-                //     for (let ELMxID in globalELMxArray) {
-                //         const meeting = globalELMxArray[ELMxID];
-
-                //         // Check all timers in this meeting
-                //         for (let timerID in meeting.timers) {
-                //             const timer = meeting.timers[timerID];
-
-                //             // Debugging log for timer info
-                //             console.log(`   ↪ TimerID ${timerID}: Assigned to ${timer.personAssignedID}, Remaining: ${timer.remainingTime}s`);
-
-                //             // Check if this timer belongs to the donor
-                //             if (String(timer.personAssignedID) === String(fromUserID)) {
-                //                 donorTimer = timer;
-                //             }
-
-                //             // Check if this timer belongs to the recipient
-                //             if (String(timer.personAssignedID) === String(toUserID)) {
-                //                 recipientTimer = timer;
-                //             }
-                //         }
-                //     }
-
-                //     // If either donor or recipient timer is not found, log an error
-                //     if (!donorTimer || !recipientTimer) {
-                //         console.error("❌ Donor or recipient timer not found.");
-                //     } else if (donorTimer.remainingTime < donateTotalSeconds) {
-                //         // If donor doesn't have enough time, log an error
-                //         console.error("❌ Donor does not have enough time to donate.");
-                //     } else {
-                //         // Perform time transfer
-                //         donorTimer.remainingTime -= donateTotalSeconds;
-                //         recipientTimer.remainingTime += donateTotalSeconds;
-
-                //         console.log(`✅ Donor's new time: ${formatTime(donorTimer.remainingTime)} (${donorTimer.remainingTime}s)`);
-                //         console.log(`✅ Recipient's new time: ${formatTime(recipientTimer.remainingTime)} (${recipientTimer.remainingTime}s)`);
-
-                //         // Send the donation result
-                //         const donationResult = {
-                //             cmd: "donateTimeResult",
-                //             msg: {
-                //                 fromUserID,
-                //                 toUserID,
-                //                 timerName,
-                //                 donatedMinutes: donateMinutes,
-                //                 donatedSeconds: donateSeconds,
-                //                 totalSeconds: donateTotalSeconds,
-                //                 donorNewTime: donorTimer.remainingTime,
-                //                 recipientNewTime: recipientTimer.remainingTime
-                //             }
-                //         };
-
-                //         console.log("📤 Sending donation result:", donationResult);
-
-                //         // Send to specified users (donor and recipient)
-                //         const donationRecipients = ["particularSome", [String(fromUserID), String(toUserID)]];
-                //         sendToWho(wss, ws, donationRecipients, donationResult);
-                //     }
-
-                //     // Log the current state of all timers in the meetings
-                //     console.log(`\n🕒 All users' remaining default times:`);
-                //     for (let ELMxID in globalELMxArray) {
-                //         const meeting = globalELMxArray[ELMxID];
-                //         console.log(`🔹 Meeting ELMxID: ${ELMxID}`);
-                //         for (let timerID in meeting.timers) {
-                //             const timer = meeting.timers[timerID];
-                //             const userID = timer.personAssignedID ?? "Unknown";
-                //             console.log(`   - User ${userID}: ${formatTime(timer.remainingTime)} (${timer.remainingTime}s)`);
-                //         }
-                //     }
-                //     console.log("\n");
+                //     console.log("Testing send showApprovalResponse", showApprovalResponse);
+                //     const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, recipients, showApprovalResponse);
 
                 //     break;
 
-                //     function formatTime(seconds) {
-                //         let h = Math.floor(seconds / 3600);
-                //         let m = Math.floor((seconds % 3600) / 60);
-                //         let s = seconds % 60;
-                //         return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
-                //     }
 
 
                 // case 'showApproval':
-                //     console.log("📩 Received show approval message: ", message);
-                // break;
+                //     console.log("📩 Received showApproval message: ", message);
+
+                //     const approvalMsg = message.msg;
+                //     const {
+                //         ELMxID_Approval = 0,
+                //         fromUserID_Approval = message.msg.fromUserID,
+                //         toUserID_Approval = message.msg.toUserID,
+                //         timerName_Approval = message.msg.timerName,
+                //         minutes_Approval = message.msg.minutes,
+                //         seconds_Approval = message.msg.seconds,
+                //         totalSeconds_Approval = message.msg.totalSeconds
+                //     } = approvalMsg;
+
+                //     // ✅ Create a unique key to track approval
+                //     const approvalKey = `${fromUserID_Approval}_${toUserID_Approval}_${totalSeconds_Approval}`;
+
+                //     // ✅ Ensure globalELMxArray and approvedDonations structure exists
+                //     if (!globalELMxArray[ELMxID_Approval]) {
+                //         globalELMxArray[ELMxID_Approval] = {};
+                //     }
+
+                //     if (!globalELMxArray[ELMxID_Approval].approvedDonations) {
+                //         globalELMxArray[ELMxID_Approval].approvedDonations = {};
+                //     }
+
+                //     // ✅ Check if already approved
+                //     if (globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey]) {
+                //         console.log("✅ Approval already exists. Skipping UI broadcast.");
+                //         break;
+                //     }
+
+                //     // ✅ Store approval as shown (but not yet finalized)
+                //     globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey] = false; // 'false' means shown but not approved yet
+
+                //     // ✅ Prepare and send approval UI to clients
+                //     const showApprovalResponse = {
+                //         cmd: "returnShowApproval",
+                //         msg: {
+                //             ELMxID_Approval,
+                //             fromUserID_Approval,
+                //             toUserID_Approval,
+                //             timerName_Approval,
+                //             minutes_Approval,
+                //             seconds_Approval,
+                //             totalSeconds_Approval
+                //         }
+                //     };
+
+                //     console.log("📤 Sending showApprovalResponse to clients", showApprovalResponse);
+                //     const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, recipients, showApprovalResponse);
+
+                //     break;
+
 
                 case 'showApproval':
                     console.log("📩 Received showApproval message: ", message);
-
-                    // let ELMxID_Approval = message.msg.ELMxID;
-                    // let fromUserID_Approval = message.msg.fromUserID;
-                    // let toUserID_Approval = message.msg.toUserID;
-                    // let timerName_Approval = message.msg.timerName;
-                    // let minutes_Approval = message.msg.minutes;
-                    // let seconds_Approval = message.msg.seconds;
-                    // let totalSeconds_Approval = message.msg.totalSeconds;
-
 
                     const approvalMsg = message.msg;
                     const {
@@ -1420,16 +1307,31 @@ wss.on("connection", (ws) => {
                         totalSeconds_Approval = message.msg.totalSeconds
                     } = approvalMsg;
 
+                    const approvalKey = `${fromUserID_Approval}_${toUserID_Approval}_${totalSeconds_Approval}`;
 
+                    if (!globalELMxArray[ELMxID_Approval]) {
+                        globalELMxArray[ELMxID_Approval] = {};
+                    }
 
-                    // if (!toUserID_Approval || !timerName_Approval) {
-                    //     console.error("❌ Missing required fields in showApproval:", approvalMsg);
+                    if (!globalELMxArray[ELMxID_Approval].approvedDonations) {
+                        globalELMxArray[ELMxID_Approval].approvedDonations = {};
+                    }
+
+                    // if (globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey]) {
+                    //     console.log("✅ Approval already exists. Skipping UI broadcast.");
                     //     break;
                     // }
 
-                    // if (!fromUserID_Approval) {
-                    //     console.warn("⚠️ fromUserID_Approval is missing in showApproval. Proceeding anyway.");
-                    // }
+                    // ✅ Store full approval message
+                    globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey] = {
+                        shown: true,
+                        fromUserID: fromUserID_Approval,
+                        toUserID: toUserID_Approval,
+                        timerName: timerName_Approval,
+                        minutes: minutes_Approval,
+                        seconds: seconds_Approval,
+                        totalSeconds: totalSeconds_Approval
+                    };
 
                     const showApprovalResponse = {
                         cmd: "returnShowApproval",
@@ -1444,7 +1346,7 @@ wss.on("connection", (ws) => {
                         }
                     };
 
-                    console.log("Testing send showApprovalResponse", showApprovalResponse);
+                    console.log("📤 Sending showApprovalResponse to clients", showApprovalResponse);
                     const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
                     sendToWho(wss, ws, recipients, showApprovalResponse);
 
@@ -1452,27 +1354,26 @@ wss.on("connection", (ws) => {
 
 
 
-                    case "sendingremoveApprovalUI":
-                        console.log("📩 Received removeshowApproval message: ", message);
-                        const unapprovalMsg = message.msg;
-                        const {
-                            ELMxID_unApproval = 0,
-                        } = unapprovalMsg;
-
-                        const showunApprovalResponse = {
-                            cmd: "returnRemoveApproval",
-                            msg: {
-                                ELMxID_unApproval,
-                            }
-                        };
-                        console.log("Testing send showunApprovalResponse", showunApprovalResponse);
-                        const unrecipients = ["particularSome", globalELMxArray[ELMxID_unApproval]?.arrayOfAttendanceIDs];
-                        sendToWho(wss, ws, unrecipients, showunApprovalResponse);
-    
-                        break;
-                      
 
 
+                case "sendingremoveApprovalUI":
+                    console.log("📩 Received removeshowApproval message: ", message);
+                    const unapprovalMsg = message.msg;
+                    const {
+                        ELMxID_unApproval = 0,
+                    } = unapprovalMsg;
+
+                    const showunApprovalResponse = {
+                        cmd: "returnRemoveApproval",
+                        msg: {
+                            ELMxID_unApproval,
+                        }
+                    };
+                    console.log("Testing send showunApprovalResponse", showunApprovalResponse);
+                    const unrecipients = ["particularSome", globalELMxArray[ELMxID_unApproval]?.arrayOfAttendanceIDs];
+                    sendToWho(wss, ws, unrecipients, showunApprovalResponse);
+
+                    break;
 
 
 
@@ -1480,9 +1381,8 @@ wss.on("connection", (ws) => {
                 case 'donateTime':
                     console.log("📩 Received donateTime message: ", message);
                     let ELMxID_DonateTimer = message.msg.ELMxID;
-                    // console.log("ELMxID_DonateTimer" + ELMxID_DonateTimer);
+
                     const {
-                        // ELMxID_DonateTimer,
                         fromUserID,
                         toUserID,
                         timerName,
@@ -1493,15 +1393,14 @@ wss.on("connection", (ws) => {
                         approvedByName = null
                     } = message.msg;
 
-                    // if (!fromUserID || !toUserID || !timerName || donateTotalSeconds == null) {
-                    //     console.error("❌ Invalid donateTime message: missing required fields.");
-                    //     break;
-                    // }
+                    if (donateTotalSeconds == null) {
+                        console.error("❌ Invalid donateTime message: missing totalSeconds.");
+                        break;
+                    }
 
                     if (approvedByID && approvedByName) {
                         console.log(`✅ Donation approved by User ${approvedByID} (${approvedByName})`);
                     }
-
 
                     console.log(`⏳ User ${fromUserID} is donating ${donateMinutes}m ${donateSeconds}s (${donateTotalSeconds}s) to user ${toUserID} for timer "${timerName}".`);
 
@@ -1515,38 +1414,19 @@ wss.on("connection", (ws) => {
 
                     for (let ELMxID in globalELMxArray) {
                         const meeting = globalELMxArray[ELMxID];
-
                         for (let timerID in meeting.timers) {
                             const timer = meeting.timers[timerID];
-
-                            // Debug logging
-                            console.log(`🔍 Checking timer "${timer.name}" with owner ${timer.ownerID}`);
-
-                            // Find donor timer by both name and owner
-                            // if (!donorTimer && String(timer.ownerID) === String(fromUserID) && timer.name === timerName) {
-                            //     donorTimer = timer;
-                            // }
-
                             if (!donorTimer && String(timer.ownerID) === String(fromUserID)) {
                                 donorTimer = timer;
                             }
-                            // Find recipient timer - relax condition to match owner only
                             if (!recipientTimer && String(timer.ownerID) === String(toUserID)) {
                                 recipientTimer = timer;
                             }
                         }
                     }
 
-                    console.log("✅ Found donorTimer: " + JSON.stringify(donorTimer));
-                    console.log("✅ Found recipientTimer: " + JSON.stringify(recipientTimer));
-
-                    if (!donorTimer) {
-                        console.error(`❌ Donor's timer not found for user ${fromUserID}.`);
-                        break;
-                    }
-
-                    if (!recipientTimer) {
-                        console.error(`❌ Recipient's timer not found for user ${toUserID}.`);
+                    if (!donorTimer || !recipientTimer) {
+                        console.error("❌ Donor or recipient timer not found.");
                         break;
                     }
 
@@ -1555,25 +1435,56 @@ wss.on("connection", (ws) => {
                         break;
                     }
 
-
-                    console.log(`🎁 Recipient's timer title: "${recipientTimer.name}"`);
-
-                    // Perform the donation
                     donorTimer.remainingTime -= donateTotalSeconds;
                     recipientTimer.remainingTime += donateTotalSeconds;
 
-                    console.log(`✅ Donor's new time: ${formatTime(donorTimer.remainingTime)} (${donorTimer.remainingTime}s)`);
-                    console.log(`✅ Recipient's new time: ${formatTime(recipientTimer.remainingTime)} (${recipientTimer.remainingTime}s)`);
-
-
-
-                    // globalELMxArray[resetVetoName_meetingID].timers[newTimeVetoID].veto = vetoNewName;
-
                     const recipientName = recipientTimer.name || "";
+                    const donationMessageText = `${timerName} Donated ${donateMinutes}m ${donateSeconds}s to ${recipientName || toUserID}`;
 
-                    const donationMessage = `${timerName} Donated ${donateMinutes}m ${donateSeconds}s to ${recipientName || toUserID}`;
+                    if (!globalELMxArray.donationCounts) {
+                        globalELMxArray.donationCounts = {};
+                    }
 
-                    globalELMxArray[ELMxID_DonateTimer].donateHistory = donationMessage;
+                    const donationKey = `${fromUserID}_${toUserID}`;
+                    if (!globalELMxArray.donationCounts[donationKey]) {
+                        globalELMxArray.donationCounts[donationKey] = 0;
+                    }
+
+                    globalELMxArray.donationCounts[donationKey]++;
+
+                    // globalELMxArray[ELMxID_DonateTimer].donateHistory = {
+                    //     fromUserID,
+                    //     toUserID,
+                    //     timerName,
+                    //     donatedMinutes: donateMinutes,
+                    //     donatedSeconds: donateSeconds,
+                    //     totalSeconds: donateTotalSeconds,
+                    //     donorNewTime: donorTimer.remainingTime,
+                    //     recipientName: recipientName,
+                    //     approvedByID,
+                    //     approvedByName,
+                    //     donationCount: globalELMxArray.donationCounts[donationKey]
+                    // };
+
+
+                    if (!Array.isArray(globalELMxArray[ELMxID_DonateTimer].donateHistory)) {
+                        globalELMxArray[ELMxID_DonateTimer].donateHistory = [];
+                    }
+
+                    globalELMxArray[ELMxID_DonateTimer].donateHistory.push({
+                        fromUserID,
+                        toUserID,
+                        timerName,
+                        donatedMinutes: donateMinutes,
+                        donatedSeconds: donateSeconds,
+                        totalSeconds: donateTotalSeconds,
+                        donorNewTime: donorTimer.remainingTime,
+                        recipientName: recipientName,
+                        approvedByID,
+                        approvedByName,
+                        donationCount: globalELMxArray.donationCounts[donationKey],
+                    });
+
 
                     const donationResult = {
                         cmd: "donateTimeResult",
@@ -1589,35 +1500,100 @@ wss.on("connection", (ws) => {
                             recipientNewTime: recipientTimer.remainingTime,
                             recipientName: recipientTimer.name,
                             approvedByID,
-                            approvedByName
+                            approvedByName,
+                            donationCount: globalELMxArray.donationCounts[donationKey]
                         }
                     };
 
-
-                    console.log("📤 Sending donation result:", donationResult);
-
-
                     let targetDonateAudience = ["particularSome", globalELMxArray[ELMxID_DonateTimer].arrayOfAttendanceIDs];
-
-                    console.log("🎯 Target donation audience:", JSON.stringify(targetDonateAudience));
                     sendToWho(wss, ws, targetDonateAudience, donationResult);
 
-                    // sendToWho(wss, ws, targetDonateAudience, donationResult);
-
-                    // Print debug list of all timers
-                    console.log(`\n🕒 All users' remaining default times:`);
-                    for (let ELMxID in globalELMxArray) {
-                        const meeting = globalELMxArray[ELMxID];
-                        console.log(`🔹 Meeting ELMxID: ${ELMxID}`);
-                        for (let timerID in meeting.timers) {
-                            const timer = meeting.timers[timerID];
-                            console.log(`   - Timer "${timer.name}" (ID: ${timer.timerServerID}) owned by ${timer.ownerID}: ${formatTime(timer.remainingTime)} (${timer.remainingTime}s)`);
-
-                        }
+                    // ✅ STORE donation message for later display
+                    if (!globalELMxArray[ELMxID_DonateTimer].donationMessages) {
+                        globalELMxArray[ELMxID_DonateTimer].donationMessages = [];
                     }
-                    console.log("\n");
 
+                    globalELMxArray[ELMxID_DonateTimer].donationMessages.push({
+                        message: donationMessageText,
+                    });
+
+                    const donationDisplayMsg = {
+                        cmd: "displayDonationMessage",
+                        msg: {
+                            message: donationMessageText
+                        }
+                    };
+
+                    sendToWho(wss, ws, targetDonateAudience, donationDisplayMsg);
                     break;
+
+
+
+
+
+                    case 'checkDonationCount':
+    const { fromUserID: fromID, toUserID: toID } = message.msg;
+    let countKey = `${fromID}_${toID}`;
+    let existingCount = 0;
+
+    if (globalELMxArray.donationCounts && globalELMxArray.donationCounts[countKey]) {
+        existingCount = globalELMxArray.donationCounts[countKey];
+    }
+
+    const resultMsg = {
+        cmd: "checkDonationCountResult",
+        msg: {
+            fromUserID: fromID,
+            toUserID: toID,
+            donationCount: existingCount
+        }
+    };
+
+    ws.send(JSON.stringify(resultMsg));
+    break;
+
+    
+                case 'getDonationMessages': {
+                    const ELMxID = message.msg.ELMxID;
+
+                    const messages = globalELMxArray[ELMxID]?.donateHistory || [];
+
+                    console.log("📜 Retrieved donateHistory for ELMxID", ELMxID, ":", messages);
+
+                    const response = {
+                        cmd: "donationMessagesList",
+                        msg: { messages }
+                    };
+
+                    ws.send(JSON.stringify(response));
+                    break;
+                }
+
+
+
+                // case 'getDonationMessages': {
+                //     const ELMxID = message.msg.ELMxID;
+
+                //     const messages = globalELMxArray[ELMxID]?.donateHistory || "No donation history found";
+
+                //     // ✅ Print actual data to terminal
+                //     console.log("📜 Retrieved donateHistory for ELMxID", ELMxID, ":", messages);
+
+                //     const response = {
+                //         cmd: "donationMessagesList",
+                //         msg: {
+                //             messages
+                //         }
+                //     };
+
+                //     ws.send(JSON.stringify(response));
+                //     break;
+                // }
+
+
+
+
+
 
 
                 case 'hardcodeNewTimeIntoTimer':
@@ -1889,7 +1865,7 @@ function formatTime(seconds) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
+    return [h, m, s].map(v => String(-v).padStart(2, "0")).join(":");
 }
 
 
