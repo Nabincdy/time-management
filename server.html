@@ -1654,9 +1654,11 @@
       });
     }
 
+    
     // Show pending approval
     function showPendingApproval(data) {
       console.log("show pending approval check data ", data);
+
       const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
 
       const fromName = getUsernameByID(data.fromUserID);
@@ -1687,31 +1689,59 @@
 
         sendDonation(data, parseInt(approverID));
 
-        // Remove only THIS approval box
-        container.remove();
+        container.remove(); // Remove this box locally
 
         // Notify other browsers to remove it too
         socket.send(JSON.stringify({
           cmd: "sendingremoveApprovalUI",
-          msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
+          msg: {
+            ELMxID: data.ELMxID,
+            fromUserID: data.fromUserID,
+            toUserID: data.toUserID,
+            totalSeconds: data.totalSeconds
+          }
         }));
       });
 
       // Remove button click
       container.querySelector(".remove-btn").addEventListener("click", () => {
         if (confirm("Are you sure you want to remove this pending approval?")) {
-          container.remove();
+          container.remove(); // Remove this box locally
 
-          // Notify other browsers to remove it too
+          // First: Tell server to **remove from memory** (VERY IMPORTANT)
+          socket.send(JSON.stringify({
+            cmd: "removeApprovedDonation",
+            msg: {
+              ELMxID: data.ELMxID,
+              fromUserID: data.fromUserID,
+              toUserID: data.toUserID,
+              totalSeconds: data.totalSeconds
+            }
+          }));
+
+          console.log("❌ Manual removal of approval sent to server:", {
+            ELMxID: data.ELMxID,
+            fromUserID: data.fromUserID,
+            toUserID: data.toUserID,
+            totalSeconds: data.totalSeconds
+          });
+
+          // Second: Also notify other browsers to remove from their UI
           socket.send(JSON.stringify({
             cmd: "sendingremoveApprovalUI",
-            msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
+            msg: {
+              ELMxID: data.ELMxID,
+              fromUserID: data.fromUserID,
+              toUserID: data.toUserID,
+              totalSeconds: data.totalSeconds
+            }
           }));
         }
       });
 
       document.getElementById("unapprovedItems").appendChild(container);
     }
+
 
     // Get username by ID
     function getUsernameByID(userID) {
@@ -1786,43 +1816,43 @@
 
 
     function sendDonation(data, approverID = null) {
-  const payload = {
-    cmd: "donateTime",
-    msg: {
-      ELMxID: 0, // Always include the ELMxID
-      fromUserID: data.fromUserID,
-      toUserID: data.toUserID,
-      timerName: data.timerName,
-      minutes: data.minutes,
-      seconds: data.seconds,
-      totalSeconds: data.totalSeconds
+      const payload = {
+        cmd: "donateTime",
+        msg: {
+          ELMxID: 0, // Always include the ELMxID
+          fromUserID: data.fromUserID,
+          toUserID: data.toUserID,
+          timerName: data.timerName,
+          minutes: data.minutes,
+          seconds: data.seconds,
+          totalSeconds: data.totalSeconds
+        }
+      };
+
+      // Add approver info if provided
+      if (approverID) {
+        payload.msg.approvedByID = approverID;
+        payload.msg.approvedByName = getUsernameByID(approverID);
+      }
+
+      // Send the donation information to the server
+      socket.send(JSON.stringify(payload));
+      console.log("Donation sent via WebSocket:", payload);
+
+      // After donation is sent, notify the server to remove the approved donation
+      const removalPayload = {
+        cmd: "removeApprovedDonation",
+        msg: {
+          ELMxID: 0, // <-- Make sure to include ELMxID here also
+          fromUserID: data.fromUserID,
+          toUserID: data.toUserID,
+          totalSeconds: data.totalSeconds
+        }
+      };
+
+      socket.send(JSON.stringify(removalPayload));
+      console.log("Approved donation removal requested:", removalPayload);
     }
-  };
-
-  // Add approver info if provided
-  if (approverID) {
-    payload.msg.approvedByID = approverID;
-    payload.msg.approvedByName = getUsernameByID(approverID);
-  }
-
-  // Send the donation information to the server
-  socket.send(JSON.stringify(payload));
-  console.log("Donation sent via WebSocket:", payload);
-
-  // After donation is sent, notify the server to remove the approved donation
-  const removalPayload = {
-    cmd: "removeApprovedDonation",
-    msg: {
-      ELMxID: 0, // <-- Make sure to include ELMxID here also
-      fromUserID: data.fromUserID,
-      toUserID: data.toUserID,
-      totalSeconds: data.totalSeconds
-    }
-  };
-
-  socket.send(JSON.stringify(removalPayload));
-  console.log("Approved donation removal requested:", removalPayload);
-}
 
 
     // Render donation messages
@@ -1878,7 +1908,8 @@
       });
     }
 
-    // Handle showing approval
+
+
     function handleShowApproval(msg) {
       console.log("🔵 handleShowApproval received:", msg);
 
@@ -1888,7 +1919,7 @@
         return;
       }
 
-      approvalList.innerHTML = ''; // Clear previous
+      approvalList.innerHTML = ''; // Clear previous list
 
       // Loop over each approval
       for (const key in msg) {
@@ -1914,11 +1945,14 @@
       <strong>User ${toUserID}</strong> (Timer: <em>${timerName}</em>)</p>
 
       <button class="approve-btn">Approve</button>
+      <button class="remove-btn">Remove</button>
     `;
 
         approvalList.appendChild(item);
 
         const approveButton = item.querySelector('.approve-btn');
+        const removeButton = item.querySelector('.remove-btn');
+
         approveButton.addEventListener('click', () => {
           const approverID = item.querySelector('.approver-dropdown').value;
           if (!approverID || approverID == fromUserID || approverID == toUserID) {
@@ -1926,11 +1960,44 @@
             return;
           }
 
-          sendDonation({ fromUserID, toUserID, minutes, seconds, totalSeconds }, parseInt(approverID));
-          item.remove(); // Remove after approval
+          sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
+          item.remove(); // Remove the item after approval
+        });
+
+        removeButton.addEventListener('click', () => {
+          // Create a message to remove the approval without approving
+          const removalPayload = {
+            cmd: "removeApprovedDonation",
+            msg: {
+              ELMxID: 0, // If you have dynamic ELMxID, replace 0 accordingly
+              fromUserID: fromUserID,
+              toUserID: toUserID,
+              totalSeconds: totalSeconds
+            }
+          };
+
+          socket.send(JSON.stringify(removalPayload));
+          console.log("❌ Manual removal requested:", removalPayload);
+
+          item.remove(); // Remove the item immediately from UI
         });
       }
     }
+
+
+
+    function removeApprovalBox(data) {
+    const approvalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+    const approvalElement = document.getElementById(approvalID);
+
+    if (approvalElement) {
+        approvalElement.remove();
+        console.log("✅ Approval box removed:", approvalID);
+    } else {
+        console.log("⚠️ Approval box not found:", approvalID);
+    }
+}
+
 
 
   </script>
@@ -2191,8 +2258,11 @@
 
 
 
+
+
         case "returnRemoveApproval":
           console.log("📩 Received returnRemoveApproval message:", data);
+          removeApprovalBox(data.msg);
 
           if (data.msg && typeof data.msg.ELMxID_unApproval !== "undefined") {
             const removeID = data.msg.ELMxID_unApproval;

@@ -1422,29 +1422,70 @@ wss.on("connection", (ws) => {
                 
 
 
+                    
+
+
+                // case "sendingremoveApprovalUI":
+                //     console.log("📩 Received removeshowApproval message: ", message);
+                //     const unapprovalMsg = message.msg;
+                //     const {
+                //         ELMxID_unApproval = 0,
+                //     } = unapprovalMsg;
+
+                //     const showunApprovalResponse = {
+                //         cmd: "returnRemoveApproval",
+                //         msg: {
+                //             ELMxID_unApproval,
+                //         }
+                //     };
+
+
+                //     console.log("Testing send showunApprovalResponse", showunApprovalResponse);
+                //     const unrecipients = ["particularSome", globalELMxArray[ELMxID_unApproval]?.arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, unrecipients, showunApprovalResponse);
+
+                //     break;
+
+
+
+
+
 
 
                 case "sendingremoveApprovalUI":
                     console.log("📩 Received removeshowApproval message: ", message);
                     const unapprovalMsg = message.msg;
-                    const {
-                        ELMxID_unApproval = 0,
+                
+                    // Rename variables to avoid conflicts with previously declared variables
+                    const { 
+                        ELMxID: receivedELMxID = 0, 
+                        fromUserID: receivedFromUserID,  // Renamed fromUserID to receivedFromUserID
+                        toUserID: receivedToUserID,      // Renamed toUserID to receivedToUserID
+                        totalSeconds: receivedTotalSeconds // Renamed totalSeconds to receivedTotalSeconds
                     } = unapprovalMsg;
-
+                
+                    // Use the renamed variables in the response
                     const showunApprovalResponse = {
                         cmd: "returnRemoveApproval",
                         msg: {
-                            ELMxID_unApproval,
+                            ELMxID: receivedELMxID,  // Correctly passing the renamed ELMxID
+                            fromUserID: receivedFromUserID,
+                            toUserID: receivedToUserID,
+                            totalSeconds: receivedTotalSeconds  // Using the renamed totalSeconds
                         }
                     };
+                
                     console.log("Testing send showunApprovalResponse", showunApprovalResponse);
-                    const unrecipients = ["particularSome", globalELMxArray[ELMxID_unApproval]?.arrayOfAttendanceIDs];
+                
+                    // Make sure the recipients list is correct and includes attendees
+                    const unrecipients = ["particularSome", globalELMxArray[receivedELMxID]?.arrayOfAttendanceIDs];
                     sendToWho(wss, ws, unrecipients, showunApprovalResponse);
-
+                
                     break;
+                
 
 
-
+              
 
                 case 'donateTime':
                     console.log("📩 Received donateTime message: ", message);
