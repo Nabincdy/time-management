@@ -344,6 +344,20 @@ wss.on("connection", (ws) => {
         });
     }
 
+
+
+    // helper to broadcast to everyone
+function broadcastToAllClients(messageObj) {
+    const message = JSON.stringify(messageObj);
+    clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+}
+
+
+
     function saveDonationHistoryToFile() {
         const dataToSave = {};
 
@@ -483,15 +497,6 @@ wss.on("connection", (ws) => {
                         console.log(`Timers object for ELMxID ${toggle_ELMxID} does not exist`);
                         globalELMxArray[startTimer_ELMxID].timers = {};
                     }
-
-
-
-
-
-
-
-
-
 
                     break;//startTimer (added March 14 2025 by Mark to start simplifying)
 
@@ -1695,6 +1700,8 @@ wss.on("connection", (ws) => {
                             return;
                         }
                     
+                        broadcastToAllClients(removalMsg);
+
                         const { fromUserID, toUserID, totalSeconds, ELMxID } = message.msg; // <-- IMPORTANT: Add ELMxID here!
                     
                         const key = `${fromUserID}_${toUserID}_${totalSeconds}`;
@@ -1766,24 +1773,48 @@ wss.on("connection", (ws) => {
 
 
 
+                // case 'getDonationMessages': {
+                //     const ELMxID = message.msg.ELMxID;
+                //     const messages = globalELMxArray[ELMxID]?.donateHistory || [];
+                //     const unapproveusermessage = globalELMxArray[ELMxID]?.approvedDonations || [];
+                //     console.log("📜 Retrieved unapproveusermessage for ELMxID", ELMxID, ":", unapproveusermessage);
+                //     console.log("📜 Retrieved donateHistory for ELMxID", ELMxID, ":", messages);
+                //     const response = {
+                //         cmd: "donationMessagesList",
+                //         msg: {
+                //             messages,
+                //             unapproveusermessage
+                //         }
+                //     };
+                //     ws.send(JSON.stringify(response));
+                //     break;
+                // }
+                
+
+
                 case 'getDonationMessages': {
                     const ELMxID = message.msg.ELMxID;
                     const messages = globalELMxArray[ELMxID]?.donateHistory || [];
                     const unapproveusermessage = globalELMxArray[ELMxID]?.approvedDonations || [];
-                    console.log("📜 Retrieved unapproveusermessage for ELMxID", ELMxID, ":", unapproveusermessage);
+                  
+                    // Ensure unapproveusermessage is an array
+                    const unapproveMessagesArray = Array.isArray(unapproveusermessage) ? unapproveusermessage : Object.values(unapproveusermessage);
+                  
+                    console.log("📜 Retrieved unapproveusermessage for ELMxID", ELMxID, ":", unapproveMessagesArray);
                     console.log("📜 Retrieved donateHistory for ELMxID", ELMxID, ":", messages);
+                  
                     const response = {
-                        cmd: "donationMessagesList",
-                        msg: {
-                            messages,
-                            unapproveusermessage
-                        }
+                      cmd: "donationMessagesList",
+                      msg: {
+                        messages,
+                        unapproveusermessage: unapproveMessagesArray
+                      }
                     };
                     ws.send(JSON.stringify(response));
                     break;
-                }
-                
+                  }
 
+                  
 
                 
                 // case 'getApprovedDonations': {

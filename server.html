@@ -986,6 +986,136 @@
 
 
     /* veto selection end */
+
+
+
+    /* donation list*/
+    
+
+  
+/* Styles for the approval details (User info and timer) */
+.approval-details {
+  margin-bottom: 20px;
+}
+
+.approval-details p {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+}
+
+.approval-details strong {
+  font-weight: bold;
+  color: #333;
+}
+
+.approval-details em {
+  font-style: italic;
+  color: #777;
+}
+
+/* Styles for the button container */
+.buttons-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Approver dropdown */
+.approver-dropdown {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fafafa;
+  color: #333;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.approver-dropdown:hover {
+  border-color: #888;
+  background-color: #f2f2f2;
+}
+
+/* Approve and Remove buttons */
+.approve-btn,
+.remove-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  border: none;
+  font-weight: 600;
+}
+
+/* Approve button styles */
+.approve-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.approve-btn:hover {
+  background-color: #45a049;
+  transform: scale(1.05);  /* Subtle hover effect */
+}
+
+.approve-btn:active {
+  background-color: #388e3c;
+}
+
+/* Remove button styles */
+.remove-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.remove-btn:hover {
+  background-color: #e53935;
+  transform: scale(1.05);  /* Subtle hover effect */
+}
+
+.remove-btn:active {
+  background-color: #d32f2f;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .approval-item {
+    padding: 15px;
+  }
+
+  .buttons-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .approve-btn,
+  .remove-btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .approver-dropdown {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .approval-details p {
+    font-size: 14px;
+  }
+
+  .approve-btn,
+  .remove-btn {
+    padding: 8px 15px;
+    font-size: 12px;
+  }
+}
+
+
   </style>
 </head>
 
@@ -1749,72 +1879,6 @@
       return input ? input.value.trim() || `User ${userID}` : `User ${userID}`;
     }
 
-    // Send donation
-    // function sendDonation(data, approverID = null) {
-    //   const payload = {
-    //     cmd: "donateTime",
-    //     msg: {
-    //       ELMxID: 0,
-    //       fromUserID: data.fromUserID,
-    //       toUserID: data.toUserID,
-    //       timerName: data.timerName,
-    //       minutes: data.minutes,
-    //       seconds: data.seconds,
-    //       totalSeconds: data.totalSeconds
-    //     }
-    //   };
-
-    //   if (approverID) {
-    //     payload.msg.approvedByID = approverID;
-    //     payload.msg.approvedByName = getUsernameByID(approverID);
-    //   }
-
-    //   socket.send(JSON.stringify(payload));
-    //   console.log("Donation sent via WebSocket:", payload);
-    // }
-
-    // function sendDonation(data, approverID = null) {
-    //   const payload = {
-    //     cmd: "donateTime",
-    //     msg: {
-    //       ELMxID: 0,
-    //       fromUserID: data.fromUserID,
-    //       toUserID: data.toUserID,
-    //       timerName: data.timerName,
-    //       minutes: data.minutes,
-    //       seconds: data.seconds,
-    //       totalSeconds: data.totalSeconds
-    //     }
-    //   };
-
-    //   // Add approver info if it's provided
-    //   if (approverID) {
-    //     payload.msg.approvedByID = approverID;
-    //     payload.msg.approvedByName = getUsernameByID(approverID);
-    //   }
-
-    //   // Send the donation information to the server
-    //   socket.send(JSON.stringify(payload));
-    //   console.log("Donation sent via WebSocket:", payload);
-
-    //   // After donation is sent, notify the server to remove the approved donation from the server
-    //   socket.send(JSON.stringify({
-    //     cmd: "removeApprovedDonation",
-    //     msg: {
-    //       fromUserID: data.fromUserID,
-    //       toUserID: data.toUserID,
-    //       totalSeconds: data.totalSeconds
-    //     }
-    //   }));
-
-    //   console.log("Approved donation removal requested:", {
-    //     fromUserID: data.fromUserID,
-    //     toUserID: data.toUserID,
-    //     totalSeconds: data.totalSeconds
-    //   });
-    // }
-
-
     function sendDonation(data, approverID = null) {
       const payload = {
         cmd: "donateTime",
@@ -1910,94 +1974,189 @@
 
 
 
-    function handleShowApproval(msg) {
-      console.log("🔵 handleShowApproval received:", msg);
 
-      const approvalList = document.getElementById('unapprovedItems');
-      if (!approvalList) {
-        console.error("⚠️ 'approvalList' element not found!");
+// function handleShowApproval(msg) {
+//   console.log("🔵 handleShowApproval received:", msg);
+
+//   const approvalList = document.getElementById('unapprovedItems');
+//   if (!approvalList) {
+//     console.error("⚠️ 'approvalList' element not found!");
+//     return;
+//   }
+
+//   approvalList.innerHTML = ''; // Clear previous list
+
+//   // If msg is an object (not array), convert it to an array
+//   const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
+
+//   const ELMxID = 0;
+//   // Loop over each approval
+//   for (const approvalData of approvalDataArray) {
+//     const {
+//       fromUserID,
+//       toUserID,
+//       timerName,
+//       minutes,
+//       seconds,
+//       totalSeconds,
+//       ELMxID // Ensure ELMxID is included
+//     } = approvalData;
+
+//     const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
+
+//     const item = document.createElement('div');
+//     item.className = 'approval-item';
+
+//     // Construct the unique ID
+//     const approvalID = `approval-${ELMxID}-${fromUserID}-${toUserID}-${totalSeconds}`;
+//     item.id = approvalID; // Set the ID here
+
+//     item.innerHTML = `
+//       <div class="approval-details">
+//         <p><strong>User ${fromUserID}</strong> ➜
+//         <strong>User ${toUserID}</strong> (Timer: <em>${minutes}m ${seconds}s</em>)</p>
+//       </div>
+//       <div class="buttons-container">
+//                 <select class="approver-dropdown">${approverOptions}</select>
+//         <button class="approve-btn">Approve</button>
+//         <button class="remove-btn">Remove</button>
+//       </div>
+//     `;
+
+//     approvalList.appendChild(item);
+
+//     const approveButton = item.querySelector('.approve-btn');
+//     const removeButton = item.querySelector('.remove-btn');
+
+//     approveButton.addEventListener('click', () => {
+//       const approverID = item.querySelector('.approver-dropdown').value;
+//       if (!approverID || approverID == fromUserID || approverID == toUserID) {
+//         alert("Invalid approver.");
+//         return;
+//       }
+
+//       sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
+//       item.remove(); // Remove the item after approval
+//     });
+
+//     removeButton.addEventListener('click', () => {
+//       const removalPayload = {
+//         cmd: "removeApprovedDonation",
+//         msg: {
+//           ELMxID: ELMxID, // If you have dynamic ELMxID, replace 0 accordingly
+//           fromUserID: fromUserID,
+//           toUserID: toUserID,
+//           totalSeconds: totalSeconds
+//         }
+//       };
+
+//       socket.send(JSON.stringify(removalPayload));
+//       console.log("❌ Manual removal requested:", removalPayload);
+
+//       item.remove(); // Remove the item immediately from UI
+//     });
+//   }
+// }
+
+
+function handleShowApproval(msg) {
+  console.log("🔵 handleShowApproval received:", msg);
+
+  const approvalList = document.getElementById('unapprovedItems');
+  if (!approvalList) {
+    console.error("⚠️ 'approvalList' element not found!");
+    return;
+  }
+
+  approvalList.innerHTML = ''; // Clear previous list
+
+  // If msg is an object (not array), convert it to an array
+  const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
+
+  // ❌ DO NOT declare `const ELMxID = 0;` here
+
+  // Loop over each approval
+  for (const approvalData of approvalDataArray) {
+    const {
+      fromUserID,
+      toUserID,
+      timerName,
+      minutes,
+      seconds,
+      totalSeconds,
+      ELMxID // ✅ Real ELMxID from server
+    } = approvalData;
+
+    const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
+
+    const item = document.createElement('div');
+    item.className = 'approval-item';
+
+    // Construct the unique ID
+    const approvalID = `approval-${ELMxID}-${fromUserID}-${toUserID}-${totalSeconds}`;
+    item.id = approvalID; // Set the ID here
+
+    item.innerHTML = `
+      <div class="approval-details">
+        <p><strong>User ${fromUserID}</strong> ➜
+        <strong>User ${toUserID}</strong> (Timer: <em>${minutes}m ${seconds}s</em>)</p>
+      </div>
+      <div class="buttons-container">
+        <select class="approver-dropdown">${approverOptions}</select>
+        <button class="approve-btn">Approve</button>
+        <button class="remove-btn">Remove</button>
+      </div>
+    `;
+
+    approvalList.appendChild(item);
+
+    const approveButton = item.querySelector('.approve-btn');
+    const removeButton = item.querySelector('.remove-btn');
+
+    approveButton.addEventListener('click', () => {
+      const approverID = item.querySelector('.approver-dropdown').value;
+      if (!approverID || approverID == fromUserID || approverID == toUserID) {
+        alert("Invalid approver.");
         return;
       }
 
-      approvalList.innerHTML = ''; // Clear previous list
+      sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
+      item.remove(); // Remove the item after approval
+    });
 
-      // Loop over each approval
-      for (const key in msg) {
-        const approvalData = msg[key];
+    removeButton.addEventListener('click', () => {
+      const removalPayload = {
+        cmd: "removeApprovedDonation",
+        msg: {
+          ELMxID: ELMxID, // ✅ Correct ELMxID
+          fromUserID: fromUserID,
+          toUserID: toUserID,
+          totalSeconds: totalSeconds
+        }
+      };
 
-        const {
-          fromUserID,
-          toUserID,
-          timerName,
-          minutes,
-          seconds,
-          totalSeconds
-        } = approvalData;
+      socket.send(JSON.stringify(removalPayload));
+      console.log("❌ Manual removal requested:", removalPayload);
 
-        const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
-
-        const item = document.createElement('div');
-        item.className = 'approval-item';
-        item.innerHTML = `
-      <p><strong>User ${fromUserID}</strong> wants to donate 
-      <strong>${minutes}m ${seconds}s</strong> to 
-      <select class="approver-dropdown">${approverOptions}</select>
-      <strong>User ${toUserID}</strong> (Timer: <em>${timerName}</em>)</p>
-
-      <button class="approve-btn">Approve</button>
-      <button class="remove-btn">Remove</button>
-    `;
-
-        approvalList.appendChild(item);
-
-        const approveButton = item.querySelector('.approve-btn');
-        const removeButton = item.querySelector('.remove-btn');
-
-        approveButton.addEventListener('click', () => {
-          const approverID = item.querySelector('.approver-dropdown').value;
-          if (!approverID || approverID == fromUserID || approverID == toUserID) {
-            alert("Invalid approver.");
-            return;
-          }
-
-          sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
-          item.remove(); // Remove the item after approval
-        });
-
-        removeButton.addEventListener('click', () => {
-          // Create a message to remove the approval without approving
-          const removalPayload = {
-            cmd: "removeApprovedDonation",
-            msg: {
-              ELMxID: 0, // If you have dynamic ELMxID, replace 0 accordingly
-              fromUserID: fromUserID,
-              toUserID: toUserID,
-              totalSeconds: totalSeconds
-            }
-          };
-
-          socket.send(JSON.stringify(removalPayload));
-          console.log("❌ Manual removal requested:", removalPayload);
-
-          item.remove(); // Remove the item immediately from UI
-        });
-      }
-    }
-
-
-
-    function removeApprovalBox(data) {
-    const approvalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-    const approvalElement = document.getElementById(approvalID);
-
-    if (approvalElement) {
-        approvalElement.remove();
-        console.log("✅ Approval box removed:", approvalID);
-    } else {
-        console.log("⚠️ Approval box not found:", approvalID);
-    }
+      item.remove(); // Remove the item immediately from UI
+    });
+  }
 }
 
+
+function removeApprovalBox(data) {
+  const approvalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+  console.log("Trying to remove approval box with ID:", approvalID);  // Log the ID
+
+  const approvalElement = document.getElementById(approvalID);
+
+  if (approvalElement) {
+    approvalElement.remove();
+    console.log("✅ Approval box removed:", approvalID);
+  } else {
+    console.log("⚠️ Approval box not found:", approvalID);
+  }
+}
 
 
   </script>
@@ -2114,28 +2273,6 @@
           }
           break;
 
-
-        // case "donationMessagesList":
-        //   const messages = data.msg.messages;
-        //   const unapprovalmessage = data.msg.unapprovalmessage;
-        //   // const { messages, unapprovalmessage } = data.msg;
-        //   // renderDonationMessages(messages, unapprovalmessage); // Pass both messages to the function
-        //   console.log("unapproval message ", unapprovalmessage);
-        //   renderDonationMessages(messages);
-        //   handleShowApproval(unapprovalmessage);
-
-        //   break;
-
-        // case "donationMessagesList":
-        //   const messages = data.msg.messages;           // ✅ approved donation history
-        //   const unapprovalmessage = data.msg.unapprovalmessage; // ✅ pending approval
-
-        //   console.log("unapproval message ", unapprovalmessage);
-
-        //   renderDonationMessages(messages);      // ⬅️  Renders into donationConsoleOutput
-        //   handleShowApproval(unapprovalmessage); // ⬅️  Renders pending approval
-
-        //   break;
 
 
         case "donationMessagesList":
@@ -2299,7 +2436,6 @@
 
 
           showPendingApproval(remapped);
-          // handleShowApproval(original);
 
           break;
 
