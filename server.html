@@ -320,7 +320,6 @@
       display: none;
       position: absolute;
       /* left: 100%; */
-      top: 38px;
       background: #f9f9f9;
       border-radius: 5px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -333,7 +332,10 @@
     .submenu.show {
       display: flex;
       opacity: 1;
+      top: 100%;
       transform: translateX(0);
+      z-index: 9999;
+
     }
 
     /*.dropdown-item:hover .submenu {
@@ -4757,71 +4759,55 @@
       // });
 
 
-      //changes by subhadra
-      // Toggle full dropdown menu visibility when clicking formBtn
-      formBtn.addEventListener("click", (e) => {
-        e.stopPropagation(); // Prevent bubbling to body
+      //changes  made by subhadra
 
-        // Reset dropdown to its clean state before toggling visibility
-        resetDropdownMenu();
-
-        // Check if dropdown is already visible
-        if (formDropdownMenu.classList.contains("show-dropdown")) {
-          formDropdownMenu.classList.remove("show-dropdown");
-        } else {
-          formDropdownMenu.classList.add("show-dropdown");
+      // Toggle dropdown show/hide
+      formBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        formDropdownMenu.classList.toggle('show-dropdown');
+        if (!formDropdownMenu.classList.contains('show-dropdown')) {
+          resetDropdownMenu();
         }
       });
 
-      // Handle clicking dropdown items (Turn / Free Flow / God Mode)
+      // Handle dropdown items
       const dropdownItems = formDropdownMenu.querySelectorAll('.dropdown-item');
-
       dropdownItems.forEach(item => {
         item.addEventListener('click', (e) => {
           e.stopPropagation();
 
-          // First, close all submenus (reset all submenus to hidden state)
+          
+          const submenu = item.querySelector('.submenu');
           dropdownItems.forEach(otherItem => {
             if (otherItem !== item) {
               const otherSubmenu = otherItem.querySelector('.submenu');
-              if (otherSubmenu) {
-                otherSubmenu.classList.remove('show');
-              }
+              if (otherSubmenu) otherSubmenu.classList.remove('show');
             }
           });
-
-          // Then, toggle the clicked submenu visibility
-          const submenu = item.querySelector('.submenu');
-          if (submenu) {
-            submenu.classList.toggle('show');
-          }
-
-          // Close the whole dropdown when submenu item is clicked
-          const submenuItems = item.querySelectorAll('.submenu-item');
-          submenuItems.forEach(submenuItem => {
-            submenuItem.addEventListener('click', (e) => {
-              e.stopPropagation(); // Stop bubbling
-              formDropdownMenu.classList.remove('show-dropdown'); // Close the dropdown
-              resetDropdownMenu();  // Reset state to clean after closing dropdown
-            });
-          });
+          if (submenu) submenu.classList.toggle('show');
         });
       });
 
-      // Reset dropdown to its clean state 
+      // Attach submenu clicks only ONCE
+      const submenuItems = formDropdownMenu.querySelectorAll('.submenu-item');
+      submenuItems.forEach(submenuItem => {
+        submenuItem.addEventListener('click', (e) => {
+          e.stopPropagation();
+          formDropdownMenu.classList.remove('show-dropdown');
+          resetDropdownMenu();
+
+          // Start your timer here
+          const timerId = submenuItem.dataset.timerServerID;
+          console.log('Start timer for', timerId);
+          // startTimer(timerId);
+        });
+      });
+
+      // Reset function
       function resetDropdownMenu() {
         const submenus = formDropdownMenu.querySelectorAll('.submenu');
-        submenus.forEach(submenu => {
-          submenu.classList.remove('show');
-        });
-
-        // Remove hover effect or active states
-        const dropdownItems = formDropdownMenu.querySelectorAll('.dropdown-item');
-        dropdownItems.forEach(item => {
-          item.classList.remove('hover'); // If you're using any hover class, remove it
-        });
+        submenus.forEach(submenu => submenu.classList.remove('show'));
       }
-
 
 
 
@@ -5228,6 +5214,8 @@
             const scrollWrapper = timerContainer.querySelector(".scroll-wrapper");
             scrollWrapper.style.display = "block";
           }
+
+
 
           // Set correct send button for this specific timer
           const sendButton = timerContainer.querySelector(".formbtntimersubmenu");
