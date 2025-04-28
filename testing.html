@@ -1,178 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Responsive Call UI</title>
+  <meta charset="UTF-8">
+  <title>Greet User Example</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      background-color: #000;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+  font-family: Arial, sans-serif;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f2f5;
+}
 
-    .top-banner {
-      background-color: #2d2d2d;
-      color: #fff;
-      padding: 10px 20px;
-      width: 100%;
-      text-align: center;
-      font-size: 14px;
-    }
+.card {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
 
-    .top-banner span {
-      background-color: #f0c200;
-      color: black;
-      padding: 4px 6px;
-      border-radius: 4px;
-      margin-right: 8px;
-    }
+input {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
 
-    .container {
-      width: 100%;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 30px;
-    }
+button {
+  padding: 10px 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  margin-top: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-    .meeting-info {
-      text-align: center;
-    }
+button:hover {
+  background-color: #45a049;
+}
 
-    .meeting-code {
-      font-size: 24px;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-    }
+#greetingMessage {
+  margin-top: 20px;
+  font-weight: bold;
+  color: #333;
+}
 
-    .participants {
-      font-size: 14px;
-      color: #ccc;
-    }
-
-    .host-name {
-      margin-top: 10px;
-      font-size: 18px;
-      font-weight: 500;
-    }
-
-    .main-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .control-button {
-      background-color: #f88d8d;
-      color: white;
-      text-align: center;
-      padding: 25px 0;
-      border-radius: 20px;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    .sub-controls {
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
-    }
-
-    .sub-button {
-      flex: 1;
-      background-color: #2e2e2e;
-      color: white;
-      text-align: center;
-      padding: 18px 0;
-      border-radius: 15px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .hangup-button {
-      background-color: red;
-      color: white;
-      padding: 15px 60px;
-      border-radius: 30px;
-      font-size: 18px;
-      cursor: pointer;
-      border: none;
-    }
-
-    /* ---------- Responsive Desktop View ---------- */
-    @media (min-width: 768px) {
-      .container {
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: flex-start;
-      }
-
-      .meeting-info {
-        flex: 1;
-        text-align: left;
-        padding-left: 40px;
-      }
-
-      .main-controls {
-        flex: 1;
-        max-width: none;
-      }
-
-      .hangup-button {
-        align-self: center;
-        margin-top: 0;
-      }
-    }
   </style>
 </head>
 <body>
 
-  <div class="top-banner">
-    <span>📴</span> Turn off On-the-Go
+  <div class="card">
+    <h2>Greet User</h2>
+    <input type="text" id="nameInput" placeholder="Enter your name">
+    <input type="number" id="ageInput" placeholder="Enter your age">
+    <input type="text" id="cityInput" placeholder="Enter your city">
+    <button onclick="handleGreet()">Greet Me!</button>
+    <div id="greetingMessage"></div>
   </div>
 
-  <div class="container">
-    <div class="meeting-info">
-      <div class="meeting-code">yvn-efjv-zvq</div>
-      <div class="participants">3 people</div>
-      <div class="host-name">Mark McCormack</div>
-    </div>
+  <script>
+    function greetUser({ name, age, city }) {
+  return `Hello, my name is ${name}. I am ${age} years old and I live in ${city}.`;
+}
 
-    <div class="main-controls">
-      <div class="control-button">🔇 Unmute</div>
-      <div class="sub-controls">
-        <div class="sub-button">✋ Raise</div>
-        <div class="sub-button">🔊 Audio</div>
-      </div>
-      <button class="hangup-button">📞</button>
-    </div>
-  </div>
+function handleGreet() {
+  const name = document.getElementById('nameInput').value;
+  const age = document.getElementById('ageInput').value;
+  const city = document.getElementById('cityInput').value;
 
-
-
-
-  <button onclick="startMeeting()">Join Google Meet</button>
-
-<script>
-  function startMeeting() {
-    const meetLink = "https://meet.google.com/hzu-jxyx-hdb"; // Replace with real link
-    window.open(meetLink, "_blank");
+  if (name && age && city) {
+    const message = greetUser({ name, age, city });
+    document.getElementById('greetingMessage').innerText = message;
+  } else {
+    document.getElementById('greetingMessage').innerText = "Please fill in all fields!";
   }
-</script>
+}
 
 
+  </script>
 </body>
 </html>

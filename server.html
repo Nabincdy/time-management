@@ -77,25 +77,30 @@
       flex-basis: 1;
       margin-left: 16px;
       margin-right: 16px;
+      text-align: center;
+      background-color: #f0f0f0;
     }
 
     .timer-value {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       width: 80px;
-      font-size: 30px;
       border: none;
       color: gold;
       font-weight: 600;
       background: black;
       margin-right: 8px;
       border-radius: 10px;
+      text-align: center;
     }
 
     .timer-asc {
       width: 80px;
-      font-size: 12px;
       text-align: center;
       border: none;
+      /*added by subhadra*/
+      border-radius: 10px;
+      font-size: 16px;
+      padding: 5px;
     }
 
     .timer-value:focus {
@@ -109,10 +114,13 @@
       background-color: yellow;
     }
 
+    /*added by subhadra*/
     .flex-row {
       display: flex;
-      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px;
     }
+
 
     .btn-container {
       padding: 4px;
@@ -234,13 +242,6 @@
     /* content */
 
 
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      background-color: white;
-      border: 1px solid #ccc;
-      padding: 10px;
-    }
 
     /* .show-dropdown {
       display: flex;
@@ -249,7 +250,7 @@
     .show-dropdown {
       display: flex;
       opacity: 1;
-      left: 55%;
+      /* left: 55%; */
       gap: 5px;
       margin-top: 10px;
       transform: scale(1);
@@ -275,28 +276,34 @@
 
     /* Dropdown Menu Base Styles */
     .dropdown-menu {
+      display: none;
       position: absolute;
-      background: #fff;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 10px;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      padding: 10px;
-      display: none;
       transition: opacity 0.3s ease, transform 0.3s ease;
       opacity: 0;
       transform: scale(0.9);
+
+
     }
 
+    /*added by subhadra - starts*/
     .show-dropdown {
       display: flex;
       opacity: 1;
-      left: 33%;
+
+      gap: 5px;
+      margin-top: 15px;
       transform: scale(1);
     }
 
     /* Main Menu Item Styles */
     .dropdown-item {
       position: relative;
-      padding: 10px 20px;
+      padding: 10px 14px;
       cursor: pointer;
       background: #f4f4f4;
       border-radius: 5px;
@@ -323,11 +330,17 @@
       transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
-    .dropdown-item:hover .submenu {
+    .submenu.show {
       display: flex;
       opacity: 1;
       transform: translateX(0);
     }
+
+    /*.dropdown-item:hover .submenu {
+      display: flex;
+      opacity: 1;
+      transform: translateX(0);
+    }*/
 
     /* Submenu Item Styles */
     .submenu-item {
@@ -344,11 +357,6 @@
       background: #81c784;
       color: #fff;
     }
-
-
-
-
-
 
     .row {
       display: flex;
@@ -421,6 +429,81 @@
         width: 90%;
         /* Makes boxes take more space on smaller screens */
         justify-content: center;
+      }
+
+
+      /*added by Subhadra */
+
+      .timer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .timer-title {
+        font-size: 18px;
+        width: 100px;
+      }
+
+      .timer-value {
+        font-size: 18px;
+        width: 60px;
+      }
+
+
+      .timer-input {
+        overflow-x: visible;
+      }
+
+      .timer-asc {
+        font-size: 14px;
+        width: 50px;
+      }
+
+      .flex-row {
+        display: flex;
+        flex-wrap: wrap;
+
+        flex-direction: row;
+        justify-content: flex-start;
+        overflow-x: visible;
+      }
+
+
+
+      .vote-btn,
+      .donateUserTIme {
+        flex-basis: 0%;
+      }
+
+      .btn-container>button {
+        font-size: 12px;
+        padding: 8px 10px;
+
+      }
+
+      .row {
+        flex-direction: column;
+      }
+
+      .col {
+        width: 100%;
+        margin-bottom: 15px;
+      }
+
+      .show-dropdown {
+        display: flex;
+        left: 25%;
+        margin-top: 15px;
+      }
+
+      .dropdown-item {
+        font-size: 14px;
+      }
+
+      .submenu {
+        margin-top: 5px;
+        display: flex;
+
       }
     }
 
@@ -543,10 +626,13 @@
 
 
     .user-card {
+      position: absolute;
       background-color: #fff;
       border: 1px solid #ddd;
       border-radius: 5px;
       padding: 5px 16px;
+      /* right: 0%; */
+
       margin: 0px 3px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       max-width: 400px;
@@ -716,6 +802,7 @@
     .time-option {
       font-size: 14px;
     }
+
 
 
     .selected {
@@ -893,6 +980,7 @@
       background-color: purple;
     }
 
+
     /* veto selection end */
   </style>
 </head>
@@ -1015,6 +1103,9 @@
 
 
 
+
+
+
     <style>
       .history-content {
         display: flex;
@@ -1039,6 +1130,18 @@
         border-bottom: 1px solid #ddd;
         color: #555;
       }
+
+      .button-with-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .tiny-label {
+        font-size: 4px;
+        margin-top: 2px;
+        color: gray;
+      }
     </style>
 
     <div id="donationHistoryContainer" class="donation-box">
@@ -1052,7 +1155,6 @@
     </div>
 
 
-    <!-- <div id="donationConsoleOutput"></div> -->
 
 
 
@@ -1066,6 +1168,9 @@
 
 
     <button class="toggle-btn" onclick="toggleTable()">Total Cycle</button>
+
+    <button onclick="showSelectedTimers()">Show Selected Timers</button>
+
 
     <div class="table-container hidden" id="tableContainer">
       <table>
@@ -1175,6 +1280,18 @@
 
 
 
+
+
+    function showSelectedTimers() {
+      const checkboxes = document.querySelectorAll('.timer-checkbox');
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          const timerDiv = checkbox.closest('.timer'); // The parent timer component div
+          const timerTitleInput = timerDiv.querySelector('.timer-title'); // Find the title input
+          console.log("Selected Timer Title:", timerTitleInput.value);
+        }
+      });
+    }
 
 
 
@@ -1455,107 +1572,107 @@
 
 
 
-  //   function showPendingApproval(data) {
+    //   function showPendingApproval(data) {
 
-  //     console.log("show pending approval check data ", data);
-  //     const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
+    //     console.log("show pending approval check data ", data);
+    //     const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
 
-  //     const fromName = getUsernameByID(data.fromUserID);
-  //     const toName = getUsernameByID(data.toUserID);
+    //     const fromName = getUsernameByID(data.fromUserID);
+    //     const toName = getUsernameByID(data.toUserID);
 
-  //     const container = document.createElement("div");
-  //     container.id = `approval-${data.ELMxID}`; // ✅ Unique ID using ELMxID
+    //     const container = document.createElement("div");
+    //     container.id = `approval-${data.ELMxID}`; // ✅ Unique ID using ELMxID
 
-  //     container.innerHTML = `
-  //   <div class="pending-approval">
-  //     <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
-  //     <select class="approver-dropdown">${approverOptions}</select>
-  //     <button class="approve-btn">Approve</button>
-  //   </div>
-  // `;
+    //     container.innerHTML = `
+    //   <div class="pending-approval">
+    //     <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
+    //     <select class="approver-dropdown">${approverOptions}</select>
+    //     <button class="approve-btn">Approve</button>
+    //   </div>
+    // `;
 
-  //     container.querySelector(".approve-btn").addEventListener("click", () => {
-  //       const approverID = container.querySelector(".approver-dropdown").value;
-  //       if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-  //         alert("Invalid approver.");
-  //         return;
-  //       }
+    //     container.querySelector(".approve-btn").addEventListener("click", () => {
+    //       const approverID = container.querySelector(".approver-dropdown").value;
+    //       if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
+    //         alert("Invalid approver.");
+    //         return;
+    //       }
 
-  //       sendDonation(data, parseInt(approverID));
+    //       sendDonation(data, parseInt(approverID));
 
-  //       // ✅ Remove from this browser
-  //       container.remove();
+    //       // ✅ Remove from this browser
+    //       container.remove();
 
-  //       // ✅ Notify all other browsers to remove it too
-  //       socket.send(JSON.stringify({
-  //         cmd: "sendingremoveApprovalUI",
-  //         msg: { ELMxID: data.ELMxID }
-  //       }));
-  //     });
+    //       // ✅ Notify all other browsers to remove it too
+    //       socket.send(JSON.stringify({
+    //         cmd: "sendingremoveApprovalUI",
+    //         msg: { ELMxID: data.ELMxID }
+    //       }));
+    //     });
 
-  //     document.getElementById("unapprovedItems").appendChild(container);
-  //   }
-
-
-//   function showPendingApproval(data) {
-//   console.log("show pending approval check data ", data);
-//   const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
-
-//   const fromName = getUsernameByID(data.fromUserID);
-//   const toName = getUsernameByID(data.toUserID);
-
-//   const container = document.createElement("div");
-
-//   // 🛠 Make the ID truly unique
-//   const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-//   container.id = uniqueApprovalID;
-
-//   container.innerHTML = `
-//     <div class="pending-approval">
-//       <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
-//       <select class="approver-dropdown">${approverOptions}</select>
-//       <button class="approve-btn">Approve</button>
-//     </div>
-//   `;
-
-//   container.querySelector(".approve-btn").addEventListener("click", () => {
-//     const approverID = container.querySelector(".approver-dropdown").value;
-//     if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-//       alert("Invalid approver.");
-//       return;
-//     }
-
-//     sendDonation(data, parseInt(approverID));
-
-//     // ✅ Remove only THIS approval box, not others
-//     container.remove();
-
-//     // ✅ Notify all other browsers to remove it too
-//     socket.send(JSON.stringify({
-//       cmd: "sendingremoveApprovalUI",
-//       msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
-//     }));
-//   });
-
-//   document.getElementById("unapprovedItems").appendChild(container);
-// }
+    //     document.getElementById("unapprovedItems").appendChild(container);
+    //   }
 
 
+    //   function showPendingApproval(data) {
+    //   console.log("show pending approval check data ", data);
+    //   const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
 
-function showPendingApproval(data) {
-  console.log("show pending approval check data ", data);
-  const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
+    //   const fromName = getUsernameByID(data.fromUserID);
+    //   const toName = getUsernameByID(data.toUserID);
 
-  const fromName = getUsernameByID(data.fromUserID);
-  const toName = getUsernameByID(data.toUserID);
+    //   const container = document.createElement("div");
 
-  const container = document.createElement("div");
+    //   // 🛠 Make the ID truly unique
+    //   const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+    //   container.id = uniqueApprovalID;
 
-  // 🛠 Make the ID truly unique
-  const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-  container.id = uniqueApprovalID;
+    //   container.innerHTML = `
+    //     <div class="pending-approval">
+    //       <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
+    //       <select class="approver-dropdown">${approverOptions}</select>
+    //       <button class="approve-btn">Approve</button>
+    //     </div>
+    //   `;
 
-  container.innerHTML = `
+    //   container.querySelector(".approve-btn").addEventListener("click", () => {
+    //     const approverID = container.querySelector(".approver-dropdown").value;
+    //     if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
+    //       alert("Invalid approver.");
+    //       return;
+    //     }
+
+    //     sendDonation(data, parseInt(approverID));
+
+    //     // ✅ Remove only THIS approval box, not others
+    //     container.remove();
+
+    //     // ✅ Notify all other browsers to remove it too
+    //     socket.send(JSON.stringify({
+    //       cmd: "sendingremoveApprovalUI",
+    //       msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
+    //     }));
+    //   });
+
+    //   document.getElementById("unapprovedItems").appendChild(container);
+    // }
+
+
+
+    function showPendingApproval(data) {
+      console.log("show pending approval check data ", data);
+      const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
+
+      const fromName = getUsernameByID(data.fromUserID);
+      const toName = getUsernameByID(data.toUserID);
+
+      const container = document.createElement("div");
+
+      // 🛠 Make the ID truly unique
+      const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+      container.id = uniqueApprovalID;
+
+      container.innerHTML = `
     <div class="pending-approval">
       <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
       <select class="approver-dropdown">${approverOptions}</select>
@@ -1564,41 +1681,41 @@ function showPendingApproval(data) {
     </div>
   `;
 
-  // Approve button click
-  container.querySelector(".approve-btn").addEventListener("click", () => {
-    const approverID = container.querySelector(".approver-dropdown").value;
-    if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-      alert("Invalid approver.");
-      return;
+      // Approve button click
+      container.querySelector(".approve-btn").addEventListener("click", () => {
+        const approverID = container.querySelector(".approver-dropdown").value;
+        if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
+          alert("Invalid approver.");
+          return;
+        }
+
+        sendDonation(data, parseInt(approverID));
+
+        // ✅ Remove only THIS approval box
+        container.remove();
+
+        // ✅ Notify other browsers to remove it too
+        socket.send(JSON.stringify({
+          cmd: "sendingremoveApprovalUI",
+          msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
+        }));
+      });
+
+      // 🆕 Remove button click
+      container.querySelector(".remove-btn").addEventListener("click", () => {
+        if (confirm("Are you sure you want to remove this pending approval?")) {
+          container.remove();
+
+          // ✅ Notify other browsers to remove it too
+          socket.send(JSON.stringify({
+            cmd: "sendingremoveApprovalUI",
+            msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
+          }));
+        }
+      });
+
+      document.getElementById("unapprovedItems").appendChild(container);
     }
-
-    sendDonation(data, parseInt(approverID));
-
-    // ✅ Remove only THIS approval box
-    container.remove();
-
-    // ✅ Notify other browsers to remove it too
-    socket.send(JSON.stringify({
-      cmd: "sendingremoveApprovalUI",
-      msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
-    }));
-  });
-
-  // 🆕 Remove button click
-  container.querySelector(".remove-btn").addEventListener("click", () => {
-    if (confirm("Are you sure you want to remove this pending approval?")) {
-      container.remove();
-
-      // ✅ Notify other browsers to remove it too
-      socket.send(JSON.stringify({
-        cmd: "sendingremoveApprovalUI",
-        msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
-      }));
-    }
-  });
-
-  document.getElementById("unapprovedItems").appendChild(container);
-}
 
 
 
@@ -1844,10 +1961,29 @@ function showPendingApproval(data) {
           break;
 
 
+        // case "donationMessagesList":
+        //   const messages = data.msg.messages;
+        //   const unapprovalmessage = data.msg.unapprovalmessage;
+        //   // const { messages, unapprovalmessage } = data.msg;
+        //   // renderDonationMessages(messages, unapprovalmessage); // Pass both messages to the function
+        //   console.log("unapproval message ", unapprovalmessage);
+        //   renderDonationMessages(messages);
+        //   handleShowApproval(unapprovalmessage);
+
+        //   break;
+
         case "donationMessagesList":
-          const messages = data.msg.messages;
-          renderDonationMessages(messages);
+          const messages = data.msg.messages;           // ✅ approved donation history
+          const unapprovalmessage = data.msg.unapprovalmessage; // ✅ pending approval
+
+          console.log("unapproval message ", unapprovalmessage);
+
+          renderDonationMessages(messages);      // ⬅️  Renders into donationConsoleOutput
+          handleShowApproval(unapprovalmessage); // ⬅️  Renders pending approval
+
           break;
+
+
 
         case "returnedFromServerAddTimer": //this one is from server for the non Optimistic UI draw but the one from the server
           // Create the timer component in this browser
@@ -4199,30 +4335,65 @@ function showPendingApproval(data) {
       //timerComponent.appendChild(timerTitleInput);
 
       timerComponent.innerHTML = `
+<input type="checkbox" class="timer-checkbox"/>
         <input data-id="${newTimerID}-1" type="text" value="${timerTitle}" placeholder="Timer Title" class="timer-title"/>
         <input data-id="${newTimerID}-2" type="text" value="${defaultTime}" class="timer-value"/> 
         <input data-id="${newTimerID}-3" type="text" value="${formattedTime}" class="timer-asc"/>
         <input data-id="${newTimerID}-4" type="text" value="${vetoValue}" placeholder="veto" class="timer-veto"/> <!-- Shorter width for veto -->
 
-        <div class="flex-row">
-      
-          <button data-id="${newTimerID}-5" data-status="currently_paused" class="start-pause-btn">▶️</button>
-          <button id2="${newTimerID}"-6 class="reset-initial-btn">⏏️</button>
-          <button id2="${newTimerID}"-7 class="reset-default-btn">⤵️</button>
-          <button data-id="${newTimerID}-8" class="remove-btn">❌</button>
-          <button data-id="${newTimerID}-9" class="form-btn" id="formbtn">Form</button>
-          <button data-id="${newTimerID}"-10 class="content-btn" id="contentdata">Content</button>
-          <button data-id="${newTimerID}-11" class="people-btn" id="peoplebtn">People</button>
-          <button data-id="${newTimerID}-12" class="vote-btn" id="vote-btn" disabled >Vote</button>
-          <button data-id="${newTimerID}-13" class="donateUserTIme" id="donateUserTIme">Donate</button>
-        </div>
+        
+  <div class="flex-row">
+    <div class="button-with-label">
+      <button data-id="${newTimerID}-5" data-status="currently_paused" class="start-pause-btn">▶️</button>
+      <small class="tiny-label">${timerTitle}</small>
+    </div>
+    <div class="button-with-label">
+      <button data-id="${newTimerID}-6" class="reset-initial-btn">⏏️</button>
+      <small class="tiny-label">${timerTitle}</small>
+    </div>
+    <div class="button-with-label">
+      <button data-id="${newTimerID}-7" class="reset-default-btn">⤵️</button>
+      <small class="tiny-label">${timerTitle}</small>
+    </div>
+    <div class="button-with-label">
+      <button data-id="${newTimerID}-8" class="remove-btn">❌</button>
+      <small class="tiny-label">${timerTitle}</small>
+    </div>
+    <div class="button-with-label">
+      <button data-id="${newTimerID}-9" class="form-btn" id="formbtn">Form</button>
+      <small class="tiny-label">${timerTitle}</small>
+    </div>
+    <div class="button-with-label">
+      <button data-id="${newTimerID}-10" class="content-btn" id="contentdata">Content</button>
+      <small class="tiny-label">${timerTitle}</small>
+    </div>
+    <div class="button-with-label">
+      <button data-id="${newTimerID}-11" class="people-btn" id="peoplebtn">People</button>
+      <small class="tiny-label">${timerTitle}</small>
+    </div>
+    <div class="button-with-label">
+      <button data-id="${newTimerID}-12" class="vote-btn" id="vote-btn" disabled>Vote</button>
+      <small class="tiny-label">${timerTitle}</small>
+    </div>
+    <div class="button-with-label">
+      <button data-id="${newTimerID}-13" class="donateUserTIme" id="donateUserTIme">Donate</button>
+      <small class="tiny-label">${timerTitle}</small>
+    </div>
+  </div>
       `;
       // <input  data-id="${newTimerID}-timersenddata" class="datainputtimer" style="margin:0px 10px; display:none;" type="text" id="fname" name="fname"><br>
 
       // <button data-id="${newTimerID}-send" style="display:none;">Send</button>
 
 
+      const titleInput = timerComponent.querySelector(`input[data-id="${newTimerID}-1"]`);
+      const tinyLabels = timerComponent.querySelectorAll('.tiny-label');
 
+      titleInput.addEventListener('input', function () {
+        tinyLabels.forEach(label => {
+          label.textContent = titleInput.value; // live update
+        });
+      });
       timerList.appendChild(timerComponent);
 
       console.log("Event Listener set in createTimerComponent: ");
@@ -4581,9 +4752,75 @@ function showPendingApproval(data) {
 
 
       // Toggle dropdown visibility
-      formBtn.addEventListener("click", () => {
-        formDropdownMenu.classList.toggle("show-dropdown");
+      // formBtn.addEventListener("click", () => {
+      //   formDropdownMenu.classList.toggle("show-dropdown");
+      // });
+
+
+      //changes by subhadra
+      // Toggle full dropdown menu visibility when clicking formBtn
+      formBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent bubbling to body
+
+        // Reset dropdown to its clean state before toggling visibility
+        resetDropdownMenu();
+
+        // Check if dropdown is already visible
+        if (formDropdownMenu.classList.contains("show-dropdown")) {
+          formDropdownMenu.classList.remove("show-dropdown");
+        } else {
+          formDropdownMenu.classList.add("show-dropdown");
+        }
       });
+
+      // Handle clicking dropdown items (Turn / Free Flow / God Mode)
+      const dropdownItems = formDropdownMenu.querySelectorAll('.dropdown-item');
+
+      dropdownItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          // First, close all submenus (reset all submenus to hidden state)
+          dropdownItems.forEach(otherItem => {
+            if (otherItem !== item) {
+              const otherSubmenu = otherItem.querySelector('.submenu');
+              if (otherSubmenu) {
+                otherSubmenu.classList.remove('show');
+              }
+            }
+          });
+
+          // Then, toggle the clicked submenu visibility
+          const submenu = item.querySelector('.submenu');
+          if (submenu) {
+            submenu.classList.toggle('show');
+          }
+
+          // Close the whole dropdown when submenu item is clicked
+          const submenuItems = item.querySelectorAll('.submenu-item');
+          submenuItems.forEach(submenuItem => {
+            submenuItem.addEventListener('click', (e) => {
+              e.stopPropagation(); // Stop bubbling
+              formDropdownMenu.classList.remove('show-dropdown'); // Close the dropdown
+              resetDropdownMenu();  // Reset state to clean after closing dropdown
+            });
+          });
+        });
+      });
+
+      // Reset dropdown to its clean state 
+      function resetDropdownMenu() {
+        const submenus = formDropdownMenu.querySelectorAll('.submenu');
+        submenus.forEach(submenu => {
+          submenu.classList.remove('show');
+        });
+
+        // Remove hover effect or active states
+        const dropdownItems = formDropdownMenu.querySelectorAll('.dropdown-item');
+        dropdownItems.forEach(item => {
+          item.classList.remove('hover'); // If you're using any hover class, remove it
+        });
+      }
 
 
 

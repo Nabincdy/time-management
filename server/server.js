@@ -1531,44 +1531,80 @@ wss.on("connection", (ws) => {
 
 
 
-                    case 'checkDonationCount':
-    const { fromUserID: fromID, toUserID: toID } = message.msg;
-    let countKey = `${fromID}_${toID}`;
-    let existingCount = 0;
+                case 'checkDonationCount':
+                    const { fromUserID: fromID, toUserID: toID } = message.msg;
+                    let countKey = `${fromID}_${toID}`;
+                    let existingCount = 0;
 
-    if (globalELMxArray.donationCounts && globalELMxArray.donationCounts[countKey]) {
-        existingCount = globalELMxArray.donationCounts[countKey];
-    }
+                    if (globalELMxArray.donationCounts && globalELMxArray.donationCounts[countKey]) {
+                        existingCount = globalELMxArray.donationCounts[countKey];
+                    }
 
-    const resultMsg = {
-        cmd: "checkDonationCountResult",
-        msg: {
-            fromUserID: fromID,
-            toUserID: toID,
-            donationCount: existingCount
-        }
-    };
+                    const resultMsg = {
+                        cmd: "checkDonationCountResult",
+                        msg: {
+                            fromUserID: fromID,
+                            toUserID: toID,
+                            donationCount: existingCount
+                        }
+                    };
 
-    ws.send(JSON.stringify(resultMsg));
-    break;
+                    ws.send(JSON.stringify(resultMsg));
+                    break;
 
-    
+
+                // case 'getDonationMessages': {
+                //     const ELMxID = message.msg.ELMxID;
+
+                //     const messages = globalELMxArray[ELMxID]?.donateHistory || [];
+
+                //     const unapproveusermessage = globalELMxArray[ELMxID]?.approvedDonations || [];
+
+
+                //     console.log("📜 Retrieved unapproveusermessage for ELMxID", ELMxID, ":", unapproveusermessage);
+
+                //     console.log("📜 Retrieved donateHistory for ELMxID", ELMxID, ":", messages);
+
+                //     const response = {
+                //         cmd: "donationMessagesList",
+                //         msg: { messages },
+                //         unapprovalmessage : {unapproveusermessage}
+                //     };
+
+                //     ws.send(JSON.stringify(response));
+                //     break;
+                // }
+
+
+
                 case 'getDonationMessages': {
                     const ELMxID = message.msg.ELMxID;
-
+                
                     const messages = globalELMxArray[ELMxID]?.donateHistory || [];
-
+                    const unapproveusermessage = globalELMxArray[ELMxID]?.approvedDonations || [];
+                
+                    console.log("📜 Retrieved unapproveusermessage for ELMxID", ELMxID, ":", unapproveusermessage);
                     console.log("📜 Retrieved donateHistory for ELMxID", ELMxID, ":", messages);
+                
+                    // const response = {
+                    //     cmd: "donationMessagesList",
+                    //     msg: { messages, unapprovalmessage },  // Ensure messages is properly formatted
+                    // };
 
                     const response = {
                         cmd: "donationMessagesList",
-                        msg: { messages }
+                        msg: {
+                            messages,
+                            unapproveusermessage
+                        }
                     };
 
+                    
+                
                     ws.send(JSON.stringify(response));
                     break;
                 }
-
+                
 
 
                 // case 'getDonationMessages': {
