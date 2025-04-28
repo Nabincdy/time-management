@@ -1621,6 +1621,86 @@ wss.on("connection", (ws) => {
                     break;
 
 
+
+                    
+                    // case 'removeApprovedDonation':
+                    //     if (!message.msg) {
+                    //       console.error("Invalid message format: 'msg' field is missing.");
+                    //       return;
+                    //     }
+                      
+                    //     const { fromUserIDRemoval, toUserIDRemoval, totalSecondsRemoval } = message.msg;
+                    //     const key = `${fromUserIDRemoval}-${toUserIDRemoval}-${totalSecondsRemoval}`;
+                      
+                    //     console.log("removal data", message.msg);
+                    //     if (approvedDonations[key]) {
+                    //       delete approvedDonations[key];
+                    //       console.log(`Donation removed: ${key}`);
+                      
+                    //       clients.forEach(client => {
+                    //         client.send(JSON.stringify({
+                    //           cmd: "updateApprovedDonations",
+                    //           msg: approvedDonations
+                    //         }));
+                    //       });
+                    //     } else {
+                    //       console.log("Donation not found:", key);
+                    //     }
+                    //     break;
+                      
+                    case 'removeApprovedDonation': {
+                        if (!message.msg) {
+                            console.error("Invalid message format: 'msg' field is missing.");
+                            return;
+                        }
+                    
+                        const { fromUserID, toUserID, totalSeconds, ELMxID } = message.msg; // <-- IMPORTANT: Add ELMxID here!
+                    
+                        const key = `${fromUserID}_${toUserID}_${totalSeconds}`;
+                    
+                        console.log("removal data", message.msg);
+                        
+                        if (globalELMxArray[ELMxID] && globalELMxArray[ELMxID].approvedDonations && globalELMxArray[ELMxID].approvedDonations[key]) {
+                            delete globalELMxArray[ELMxID].approvedDonations[key];
+                            console.log(`Donation removed: ${key}`);
+                    
+                            clients.forEach(client => {
+                                client.send(JSON.stringify({
+                                    cmd: "updateApprovedDonations",
+                                    msg: globalELMxArray[ELMxID].approvedDonations
+                                }));
+                            });
+                        } else {
+                            console.log("Donation not found:", key);
+                        }
+                        break;
+                    }
+                    
+                    
+
+
+                    // case 'removeApprovedDonation':
+                    //     // Rename totalSeconds to donationSeconds to avoid conflict
+                    //     const { fromUserID: donorID, toUserID: recipientID, totalSeconds: donationSeconds } = data.msg;
+                    //     const key = `${donorID}-${recipientID}-${donationSeconds}`;
+                        
+                    //     // Check if donation exists, then remove it
+                    //     if (approvedDonations[key]) {
+                    //       delete approvedDonations[key];  // Remove donation from approvedDonations
+                    //       console.log(`Donation removed: ${key}`);
+                          
+                    //       // Optionally, notify other clients that the donation was removed
+                    //       clients.forEach(client => {
+                    //         client.send(JSON.stringify({
+                    //           cmd: "updateApprovedDonations",
+                    //           msg: approvedDonations
+                    //         }));
+                    //       });
+                    //     } else {
+                    //       console.log("Donation not found:", key);
+                    //     }
+                    //     break;
+                      
                 // case 'getDonationMessages': {
                 //     const ELMxID = message.msg.ELMxID;
 

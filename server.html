@@ -1626,49 +1626,49 @@
     //   });
     // }
 
-   // Renders approved donations
-function renderApprovedDonations(approvedDonations) {
-  const approvedDonationsContainer = document.getElementById('approvedDonationsOutput'); 
+    // Renders approved donations
+    function renderApprovedDonations(approvedDonations) {
+      const approvedDonationsContainer = document.getElementById('approvedDonationsOutput');
 
-  approvedDonationsContainer.innerHTML = ""; 
+      approvedDonationsContainer.innerHTML = "";
 
-  // Turn object into array of values
-  const donationsArray = Object.values(approvedDonations);
+      // Turn object into array of values
+      const donationsArray = Object.values(approvedDonations);
 
-  if (donationsArray.length === 0) {
-    approvedDonationsContainer.innerHTML = "<p>No approved donations found.</p>";
-    return;
-  }
+      if (donationsArray.length === 0) {
+        approvedDonationsContainer.innerHTML = "<p>No approved donations found.</p>";
+        return;
+      }
 
-  donationsArray.forEach((donation, index) => {
-    const donationItem = document.createElement('div');
-    donationItem.classList.add('approved-donation-item');
-    donationItem.innerHTML = `
+      donationsArray.forEach((donation, index) => {
+        const donationItem = document.createElement('div');
+        donationItem.classList.add('approved-donation-item');
+        donationItem.innerHTML = `
       <p><strong>Donation #${index + 1}</strong></p>
       <p>From: ${donation.fromUserID} → To: ${donation.toUserID}</p>
       <p>Timer: ${donation.timerName || "(No Name)"}</p>
       <p>Minutes: ${donation.minutes}, Seconds: ${donation.seconds}</p>
       <hr>
     `;
-    approvedDonationsContainer.appendChild(donationItem);
-  });
-}
+        approvedDonationsContainer.appendChild(donationItem);
+      });
+    }
 
-// Show pending approval
-function showPendingApproval(data) {
-  console.log("show pending approval check data ", data);
-  const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
+    // Show pending approval
+    function showPendingApproval(data) {
+      console.log("show pending approval check data ", data);
+      const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
 
-  const fromName = getUsernameByID(data.fromUserID);
-  const toName = getUsernameByID(data.toUserID);
+      const fromName = getUsernameByID(data.fromUserID);
+      const toName = getUsernameByID(data.toUserID);
 
-  const container = document.createElement("div");
+      const container = document.createElement("div");
 
-  // Make the ID truly unique
-  const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-  container.id = uniqueApprovalID;
+      // Make the ID truly unique
+      const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+      container.id = uniqueApprovalID;
 
-  container.innerHTML = `
+      container.innerHTML = `
     <div class="pending-approval">
       <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
       <select class="approver-dropdown">${approverOptions}</select>
@@ -1677,54 +1677,119 @@ function showPendingApproval(data) {
     </div>
   `;
 
-  // Approve button click
-  container.querySelector(".approve-btn").addEventListener("click", () => {
-    const approverID = container.querySelector(".approver-dropdown").value;
-    if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-      alert("Invalid approver.");
-      return;
+      // Approve button click
+      container.querySelector(".approve-btn").addEventListener("click", () => {
+        const approverID = container.querySelector(".approver-dropdown").value;
+        if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
+          alert("Invalid approver.");
+          return;
+        }
+
+        sendDonation(data, parseInt(approverID));
+
+        // Remove only THIS approval box
+        container.remove();
+
+        // Notify other browsers to remove it too
+        socket.send(JSON.stringify({
+          cmd: "sendingremoveApprovalUI",
+          msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
+        }));
+      });
+
+      // Remove button click
+      container.querySelector(".remove-btn").addEventListener("click", () => {
+        if (confirm("Are you sure you want to remove this pending approval?")) {
+          container.remove();
+
+          // Notify other browsers to remove it too
+          socket.send(JSON.stringify({
+            cmd: "sendingremoveApprovalUI",
+            msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
+          }));
+        }
+      });
+
+      document.getElementById("unapprovedItems").appendChild(container);
     }
 
-    sendDonation(data, parseInt(approverID));
-
-    // Remove only THIS approval box
-    container.remove();
-
-    // Notify other browsers to remove it too
-    socket.send(JSON.stringify({
-      cmd: "sendingremoveApprovalUI",
-      msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
-    }));
-  });
-
-  // Remove button click
-  container.querySelector(".remove-btn").addEventListener("click", () => {
-    if (confirm("Are you sure you want to remove this pending approval?")) {
-      container.remove();
-
-      // Notify other browsers to remove it too
-      socket.send(JSON.stringify({
-        cmd: "sendingremoveApprovalUI",
-        msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
-      }));
+    // Get username by ID
+    function getUsernameByID(userID) {
+      const input = document.querySelector(`[data-id="${userID}-1"]`);
+      return input ? input.value.trim() || `User ${userID}` : `User ${userID}`;
     }
-  });
 
-  document.getElementById("unapprovedItems").appendChild(container);
-}
+    // Send donation
+    // function sendDonation(data, approverID = null) {
+    //   const payload = {
+    //     cmd: "donateTime",
+    //     msg: {
+    //       ELMxID: 0,
+    //       fromUserID: data.fromUserID,
+    //       toUserID: data.toUserID,
+    //       timerName: data.timerName,
+    //       minutes: data.minutes,
+    //       seconds: data.seconds,
+    //       totalSeconds: data.totalSeconds
+    //     }
+    //   };
 
-// Get username by ID
-function getUsernameByID(userID) {
-  const input = document.querySelector(`[data-id="${userID}-1"]`);
-  return input ? input.value.trim() || `User ${userID}` : `User ${userID}`;
-}
+    //   if (approverID) {
+    //     payload.msg.approvedByID = approverID;
+    //     payload.msg.approvedByName = getUsernameByID(approverID);
+    //   }
 
-// Send donation
-function sendDonation(data, approverID = null) {
+    //   socket.send(JSON.stringify(payload));
+    //   console.log("Donation sent via WebSocket:", payload);
+    // }
+
+    // function sendDonation(data, approverID = null) {
+    //   const payload = {
+    //     cmd: "donateTime",
+    //     msg: {
+    //       ELMxID: 0,
+    //       fromUserID: data.fromUserID,
+    //       toUserID: data.toUserID,
+    //       timerName: data.timerName,
+    //       minutes: data.minutes,
+    //       seconds: data.seconds,
+    //       totalSeconds: data.totalSeconds
+    //     }
+    //   };
+
+    //   // Add approver info if it's provided
+    //   if (approverID) {
+    //     payload.msg.approvedByID = approverID;
+    //     payload.msg.approvedByName = getUsernameByID(approverID);
+    //   }
+
+    //   // Send the donation information to the server
+    //   socket.send(JSON.stringify(payload));
+    //   console.log("Donation sent via WebSocket:", payload);
+
+    //   // After donation is sent, notify the server to remove the approved donation from the server
+    //   socket.send(JSON.stringify({
+    //     cmd: "removeApprovedDonation",
+    //     msg: {
+    //       fromUserID: data.fromUserID,
+    //       toUserID: data.toUserID,
+    //       totalSeconds: data.totalSeconds
+    //     }
+    //   }));
+
+    //   console.log("Approved donation removal requested:", {
+    //     fromUserID: data.fromUserID,
+    //     toUserID: data.toUserID,
+    //     totalSeconds: data.totalSeconds
+    //   });
+    // }
+
+
+    function sendDonation(data, approverID = null) {
   const payload = {
     cmd: "donateTime",
     msg: {
-      ELMxID: 0,
+      ELMxID: 0, // Always include the ELMxID
       fromUserID: data.fromUserID,
       toUserID: data.toUserID,
       timerName: data.timerName,
@@ -1734,98 +1799,115 @@ function sendDonation(data, approverID = null) {
     }
   };
 
+  // Add approver info if provided
   if (approverID) {
     payload.msg.approvedByID = approverID;
     payload.msg.approvedByName = getUsernameByID(approverID);
   }
 
+  // Send the donation information to the server
   socket.send(JSON.stringify(payload));
   console.log("Donation sent via WebSocket:", payload);
+
+  // After donation is sent, notify the server to remove the approved donation
+  const removalPayload = {
+    cmd: "removeApprovedDonation",
+    msg: {
+      ELMxID: 0, // <-- Make sure to include ELMxID here also
+      fromUserID: data.fromUserID,
+      toUserID: data.toUserID,
+      totalSeconds: data.totalSeconds
+    }
+  };
+
+  socket.send(JSON.stringify(removalPayload));
+  console.log("Approved donation removal requested:", removalPayload);
 }
 
-// Render donation messages
-function renderDonationMessages(messages) {
-  console.log("📦 Messages received in renderDonationMessages:", messages);
 
-  const output = document.getElementById("donationConsoleOutput");
-  if (!output) {
-    console.error("❌ Element with ID 'donationConsoleOutput' not found.");
-    return;
-  }
+    // Render donation messages
+    function renderDonationMessages(messages) {
+      console.log("📦 Messages received in renderDonationMessages:", messages);
 
-  output.innerHTML = ""; 
+      const output = document.getElementById("donationConsoleOutput");
+      if (!output) {
+        console.error("❌ Element with ID 'donationConsoleOutput' not found.");
+        return;
+      }
 
-  if (!messages || messages.length === 0) {
-    const li = document.createElement("li");
-    li.textContent = "No donation history found.";
-    output.appendChild(li);
-    return;
-  }
+      output.innerHTML = "";
 
-  messages.forEach((entry, index) => {
-    console.log(`🔹 Entry ${index + 1}:`, entry);
+      if (!messages || messages.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "No donation history found.";
+        output.appendChild(li);
+        return;
+      }
 
-    const {
-      timerName,
-      donatedMinutes,
-      donatedSeconds,
-      recipientName,
-      toUserID,
-      donationCount,
-      approvedByName
-    } = entry;
+      messages.forEach((entry, index) => {
+        console.log(`🔹 Entry ${index + 1}:`, entry);
 
-    let messageText = `${timerName || "Timer"} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
-    if (donationCount) {
-      messageText += ` (Donated ${donationCount} ${donationCount === 1 ? "time" : "times"})`;
+        const {
+          timerName,
+          donatedMinutes,
+          donatedSeconds,
+          recipientName,
+          toUserID,
+          donationCount,
+          approvedByName
+        } = entry;
+
+        let messageText = `${timerName || "Timer"} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
+        if (donationCount) {
+          messageText += ` (Donated ${donationCount} ${donationCount === 1 ? "time" : "times"})`;
+        }
+        if (approvedByName) {
+          messageText += ` ✅ Approved by ${approvedByName}`;
+        }
+
+        const li = document.createElement("li");
+        li.textContent = `${index + 1}. ${messageText}`;
+
+        if (donationCount && donationCount > 1) {
+          li.style.backgroundColor = "#ffcccc";
+          li.style.padding = "5px";
+          li.style.borderRadius = "4px";
+        }
+
+        output.appendChild(li);
+      });
     }
-    if (approvedByName) {
-      messageText += ` ✅ Approved by ${approvedByName}`;
-    }
 
-    const li = document.createElement("li");
-    li.textContent = `${index + 1}. ${messageText}`;
+    // Handle showing approval
+    function handleShowApproval(msg) {
+      console.log("🔵 handleShowApproval received:", msg);
 
-    if (donationCount && donationCount > 1) {
-      li.style.backgroundColor = "#ffcccc";
-      li.style.padding = "5px";
-      li.style.borderRadius = "4px";
-    }
+      const approvalList = document.getElementById('unapprovedItems');
+      if (!approvalList) {
+        console.error("⚠️ 'approvalList' element not found!");
+        return;
+      }
 
-    output.appendChild(li);
-  });
-}
+      approvalList.innerHTML = ''; // Clear previous
 
-// Handle showing approval
-function handleShowApproval(msg) {
-  console.log("🔵 handleShowApproval received:", msg);
+      // Loop over each approval
+      for (const key in msg) {
+        const approvalData = msg[key];
 
-  const approvalList = document.getElementById('unapprovedItems');
-  if (!approvalList) {
-    console.error("⚠️ 'approvalList' element not found!");
-    return;
-  }
+        const {
+          fromUserID,
+          toUserID,
+          timerName,
+          minutes,
+          seconds,
+          totalSeconds
+        } = approvalData;
 
-  approvalList.innerHTML = ''; // Clear previous
+        const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
 
-  // Loop over each approval
-  for (const key in msg) {
-    const approvalData = msg[key];
-
-    const {
-      fromUserID,
-      toUserID,
-      timerName,
-      minutes,
-      seconds,
-      totalSeconds
-    } = approvalData;
-
-    const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
-
-    const item = document.createElement('div');
-    item.className = 'approval-item';
-    item.innerHTML = `
+        const item = document.createElement('div');
+        item.className = 'approval-item';
+        item.innerHTML = `
       <p><strong>User ${fromUserID}</strong> wants to donate 
       <strong>${minutes}m ${seconds}s</strong> to 
       <select class="approver-dropdown">${approverOptions}</select>
@@ -1834,21 +1916,21 @@ function handleShowApproval(msg) {
       <button class="approve-btn">Approve</button>
     `;
 
-    approvalList.appendChild(item);
+        approvalList.appendChild(item);
 
-    const approveButton = item.querySelector('.approve-btn');
-    approveButton.addEventListener('click', () => {
-      const approverID = item.querySelector('.approver-dropdown').value;
-      if (!approverID || approverID == fromUserID || approverID == toUserID) {
-        alert("Invalid approver.");
-        return;
+        const approveButton = item.querySelector('.approve-btn');
+        approveButton.addEventListener('click', () => {
+          const approverID = item.querySelector('.approver-dropdown').value;
+          if (!approverID || approverID == fromUserID || approverID == toUserID) {
+            alert("Invalid approver.");
+            return;
+          }
+
+          sendDonation({ fromUserID, toUserID, minutes, seconds, totalSeconds }, parseInt(approverID));
+          item.remove(); // Remove after approval
+        });
       }
-
-      sendDonation({ fromUserID, toUserID, minutes, seconds, totalSeconds }, parseInt(approverID));
-      item.remove(); // Remove after approval
-    });
-  }
-}
+    }
 
 
   </script>
