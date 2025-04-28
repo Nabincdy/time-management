@@ -333,7 +333,9 @@
     .submenu.show {
       display: flex;
       opacity: 1;
+      top: 100%;
       transform: translateX(0);
+      z-index: 1;
     }
 
     /*.dropdown-item:hover .submenu {
@@ -631,7 +633,9 @@
       border: 1px solid #ddd;
       border-radius: 5px;
       padding: 5px 16px;
-      /* right: 0%; */
+
+      left: 48%;
+      transform: translateX(-38.5%);
 
       margin: 0px 3px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -1150,6 +1154,8 @@
         <ul id="donationConsoleOutput"></ul>
         <div id="unapprovedItems"></div>
       </div>
+      <div id="approvedDonationsOutput"></div>
+
       <button onclick="showdonationhistory()">Show Donation History</button>
 
     </div>
@@ -1525,21 +1531,48 @@
 
 
 
+    // function showdonationhistory() {
+    //   let timerServerID = "yourTimerID"; // Define this somewhere if needed
+
+    //   let responseObject = {
+    //     cmd: "getDonationMessages",
+    //     msg: {
+    //       ELMxID: 0, // Hardcoded, update dynamically as needed
+    //       timerServerID: timerServerID,
+    //     }
+    //   };
+
+    //   // Send the request to the server
+    //   socket.send(JSON.stringify(responseObject));
+    // }
+
+
     function showdonationhistory() {
       let timerServerID = "yourTimerID"; // Define this somewhere if needed
 
-      let responseObject = {
+      // Request donation history (messages + unapprovalmessage)
+      let donationHistoryRequest = {
         cmd: "getDonationMessages",
         msg: {
-          ELMxID: 0, // Hardcoded, update dynamically as needed
+          ELMxID: 0, // Update dynamically if needed
           timerServerID: timerServerID,
         }
       };
 
-      // Send the request to the server
-      socket.send(JSON.stringify(responseObject));
-    }
+      // Request approved donations separately
+      // let approvedDonationsRequest = {
+      //   cmd: "getApprovedDonations",
+      //   msg: {
+      //     ELMxID: 0, // Same ELMxID
+      //   }
+      // };
 
+      // Send both requests to the server
+      socket.send(JSON.stringify(donationHistoryRequest));
+      // socket.send(JSON.stringify(approvedDonationsRequest));
+
+      console.log("📤 Sent getDonationMessages and getApprovedDonations requests");
+    }
 
 
 
@@ -1571,91 +1604,55 @@
     }
 
 
+    // function renderApprovedDonations(approvedDonations) {
+    //   const approvedDonationsContainer = document.getElementById('approvedDonationsOutput'); // Make sure you have this div in your HTML
 
-    //   function showPendingApproval(data) {
+    //   approvedDonationsContainer.innerHTML = ""; // Clear previous output
 
-    //     console.log("show pending approval check data ", data);
-    //     const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
-
-    //     const fromName = getUsernameByID(data.fromUserID);
-    //     const toName = getUsernameByID(data.toUserID);
-
-    //     const container = document.createElement("div");
-    //     container.id = `approval-${data.ELMxID}`; // ✅ Unique ID using ELMxID
-
-    //     container.innerHTML = `
-    //   <div class="pending-approval">
-    //     <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
-    //     <select class="approver-dropdown">${approverOptions}</select>
-    //     <button class="approve-btn">Approve</button>
-    //   </div>
-    // `;
-
-    //     container.querySelector(".approve-btn").addEventListener("click", () => {
-    //       const approverID = container.querySelector(".approver-dropdown").value;
-    //       if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-    //         alert("Invalid approver.");
-    //         return;
-    //       }
-
-    //       sendDonation(data, parseInt(approverID));
-
-    //       // ✅ Remove from this browser
-    //       container.remove();
-
-    //       // ✅ Notify all other browsers to remove it too
-    //       socket.send(JSON.stringify({
-    //         cmd: "sendingremoveApprovalUI",
-    //         msg: { ELMxID: data.ELMxID }
-    //       }));
-    //     });
-
-    //     document.getElementById("unapprovedItems").appendChild(container);
+    //   if (approvedDonations.length === 0) {
+    //     approvedDonationsContainer.innerHTML = "<p>No approved donations found.</p>";
+    //     return;
     //   }
 
-
-    //   function showPendingApproval(data) {
-    //   console.log("show pending approval check data ", data);
-    //   const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
-
-    //   const fromName = getUsernameByID(data.fromUserID);
-    //   const toName = getUsernameByID(data.toUserID);
-
-    //   const container = document.createElement("div");
-
-    //   // 🛠 Make the ID truly unique
-    //   const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-    //   container.id = uniqueApprovalID;
-
-    //   container.innerHTML = `
-    //     <div class="pending-approval">
-    //       <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
-    //       <select class="approver-dropdown">${approverOptions}</select>
-    //       <button class="approve-btn">Approve</button>
-    //     </div>
-    //   `;
-
-    //   container.querySelector(".approve-btn").addEventListener("click", () => {
-    //     const approverID = container.querySelector(".approver-dropdown").value;
-    //     if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-    //       alert("Invalid approver.");
-    //       return;
-    //     }
-
-    //     sendDonation(data, parseInt(approverID));
-
-    //     // ✅ Remove only THIS approval box, not others
-    //     container.remove();
-
-    //     // ✅ Notify all other browsers to remove it too
-    //     socket.send(JSON.stringify({
-    //       cmd: "sendingremoveApprovalUI",
-    //       msg: { ELMxID: data.ELMxID, fromUserID: data.fromUserID, toUserID: data.toUserID, totalSeconds: data.totalSeconds }
-    //     }));
+    //   approvedDonations.forEach((donation, index) => {
+    //     const donationItem = document.createElement('div');
+    //     donationItem.classList.add('approved-donation-item');
+    //     donationItem.innerHTML = `
+    //         <p><strong>Donation #${index + 1}</strong></p>
+    //         <p>${JSON.stringify(donation)}</p>
+    //         <hr>
+    //     `;
+    //     approvedDonationsContainer.appendChild(donationItem);
     //   });
-
-    //   document.getElementById("unapprovedItems").appendChild(container);
     // }
+
+    function renderApprovedDonations(approvedDonations) {
+  const approvedDonationsContainer = document.getElementById('approvedDonationsOutput'); // Make sure you have this div in your HTML
+
+  approvedDonationsContainer.innerHTML = ""; // Clear previous output
+
+  // ✅ Turn object into array of values
+  const donationsArray = Object.values(approvedDonations);
+
+  if (donationsArray.length === 0) {
+    approvedDonationsContainer.innerHTML = "<p>No approved donations found.</p>";
+    return;
+  }
+
+  donationsArray.forEach((donation, index) => {
+    const donationItem = document.createElement('div');
+    donationItem.classList.add('approved-donation-item');
+    donationItem.innerHTML = `
+      <p><strong>Donation #${index + 1}</strong></p>
+      <p>From: ${donation.fromUserID} → To: ${donation.toUserID}</p>
+      <p>Timer: ${donation.timerName || "(No Name)"}</p>
+      <p>Minutes: ${donation.minutes}, Seconds: ${donation.seconds}</p>
+      <hr>
+    `;
+    approvedDonationsContainer.appendChild(donationItem);
+  });
+}
+
 
 
 
@@ -1813,35 +1810,175 @@
 
 
 
+    // function handleShowApproval(msg) {
+    //   console.log("🔵 handleShowApproval received:", msg);
+    //   const approverOptions = getUserOptions(null, [msg.fromUserID.toString(), msg.toUserID.toString()]);
+
+    //   const approvalList = document.getElementById('unapprovedItems');
+    //   if (!approvalList) {
+    //     console.error("⚠️ 'approvalList' element not found!");
+    //     return;
+    //   }
+
+    //   // Clear previous approvals if you want:
+    //   approvalList.innerHTML = '';
+
+    //   // Loop over each pending approval
+    //   for (const key in msg) {
+    //     const approvalData = msg[key];
+
+    //     const {
+    //       fromUserID,
+    //       toUserID,
+    //       timerName,
+    //       minutes,
+    //       seconds,
+    //       totalSeconds
+    //     } = approvalData; // Correct destructuring now
+
+    //     const item = document.createElement('div');
+    //     item.className = 'approval-item';
+    //     item.innerHTML = `
+    //       <p><strong>User ${fromUserID}</strong> wants to donate 
+    //       <strong>${minutes}m ${seconds}s</strong> to 
+
+    //             <select class="approver-dropdown">${approverOptions}</select>
+    //       <strong>User ${toUserID}</strong> (Timer: <em>${timerName}</em>)</p>
+
+    //       <button class="approve-btn">Approve</button>
+    //     `;
+
+    //     // Add the new item to the approval list
+    //     approvalList.appendChild(item);
+
+    //     // Get the "Approve" button for the current item
+    //     const approveButton = item.querySelector('.approve-btn');
+
+    //     // Add an event listener to the "Approve" button
+    //     approveButton.addEventListener('click', () => {
+    //       // You can replace this function with your actual donation logic
+    //       approveDonation(fromUserID, toUserID, totalSeconds);
+
+    //       // Optionally, remove the approval item from the list after approval
+    //       item.remove();
+    //     });
+    //   }
+    // }
+
 
     function handleShowApproval(msg) {
-      const {
-        fromUserID_Approval,
-        toUserID_Approval,
-        timerName_Approval,
-        minutes_Approval,
-        seconds_Approval,
-        totalSeconds_Approval
-      } = msg;
+  console.log("🔵 handleShowApproval received:", msg);
 
-      console.log("handleShowApproval", data.msg);
+  const approvalList = document.getElementById('unapprovedItems');
+  if (!approvalList) {
+    console.error("⚠️ 'approvalList' element not found!");
+    return;
+  }
 
-      const approvalList = document.getElementById('approvalList'); // Make sure this exists in HTML
+  approvalList.innerHTML = ''; // Clear previous
 
-      const item = document.createElement('div');
-      item.className = 'approval-item';
-      item.innerHTML = `
-        <p><strong>${fromUserID_Approval}</strong> wants to donate 
-        <strong>${minutes_Approval}m ${seconds_Approval}s</strong> to 
-        <strong>${toUserID_Approval}</strong> (Timer: <em>${timerName_Approval}</em>)</p>
-        <button onclick="approveDonation('${fromUserID_Approval}', '${toUserID_Approval}', '${totalSeconds_Approval}')">Approve</button>
+  // ✅ Loop over each approval
+  for (const key in msg) {
+    const approvalData = msg[key];
+
+    const {
+      fromUserID,
+      toUserID,
+      timerName,
+      minutes,
+      seconds,
+      totalSeconds
+    } = approvalData; // Correct destructuring now
+
+    // ✅ Move getUserOptions INSIDE loop
+    const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
+
+    const item = document.createElement('div');
+    item.className = 'approval-item';
+    item.innerHTML = `
+      <p><strong>User ${fromUserID}</strong> wants to donate 
+      <strong>${minutes}m ${seconds}s</strong> to 
+      <select class="approver-dropdown">${approverOptions}</select>
+      <strong>User ${toUserID}</strong> (Timer: <em>${timerName}</em>)</p>
+
+      <button class="approve-btn">Approve</button>
     `;
 
-      approvalList.appendChild(item);
-    }
+    approvalList.appendChild(item);
+
+    const approveButton = item.querySelector('.approve-btn');
+    approveButton.addEventListener('click', () => {
+      approveDonation(fromUserID, toUserID, totalSeconds);
+      item.remove(); // Remove after approval
+    });
+  }
+}
 
 
+    // function handleShowApproval(msg) {
+    //   console.log("🔵 handleShowApproval received:", msg);
 
+    //   const approvalList = document.getElementById('unapprovedItems');
+    //   if (!approvalList) {
+    //     console.error("⚠️ 'approvalList' element not found!");
+    //     return;
+    //   }
+
+    //   // Clear previous approvals if you want:
+    //   approvalList.innerHTML = '';
+
+    //   // Loop over each pending approval
+    //   for (const key in msg) {
+    //     const approvalData = msg[key];
+
+    //     const {
+    //       fromUserID,
+    //       toUserID,
+    //       timerName,
+    //       minutes,
+    //       seconds,
+    //       totalSeconds
+    //     } = approvalData;
+
+    //     // 🔥 Get approver options specific to this approval
+    //     const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
+
+    //     const item = document.createElement('div');
+    //     item.className = 'approval-item';
+    //     item.innerHTML = `
+    //   <p><strong>User ${fromUserID}</strong> wants to donate 
+    //   <strong>${minutes}m ${seconds}s</strong> to 
+    //   <select class="approver-dropdown">${approverOptions}</select>
+    //   <strong>User ${toUserID}</strong> (Timer: <em>${timerName}</em>)</p>
+
+    //   <button class="approve-btn">Approve</button>
+    // `;
+
+    //     approvalList.appendChild(item);
+
+    //     const approveButton = item.querySelector('.approve-btn');
+    //     approveButton.addEventListener('click', () => {
+    //       approveDonation(fromUserID, toUserID, totalSeconds);
+
+    //       item.remove();
+    //     });
+    //   }
+    // }
+
+
+    // function approveDonation(fromUserID, toUserID, totalSeconds) {
+    //   console.log(`Donation approved: ${fromUserID} → ${toUserID}, ${totalSeconds} seconds`);
+
+    //   // Handle the logic for processing the donation here
+    //   // For example, you could send the donation to the server or update the UI
+    //   socket.send(JSON.stringify({
+    //     cmd: "approveDonation",
+    //     msg: { fromUserID, toUserID, totalSeconds }
+    //   }));
+
+    //   // Optional: Update the UI to reflect the approval or notify the users
+    //   // alert(`Donation from User ${fromUserID} to User ${toUserID} approved!`);
+    // }
 
 
 
@@ -1972,16 +2109,38 @@
 
         //   break;
 
+        // case "donationMessagesList":
+        //   const messages = data.msg.messages;           // ✅ approved donation history
+        //   const unapprovalmessage = data.msg.unapprovalmessage; // ✅ pending approval
+
+        //   console.log("unapproval message ", unapprovalmessage);
+
+        //   renderDonationMessages(messages);      // ⬅️  Renders into donationConsoleOutput
+        //   handleShowApproval(unapprovalmessage); // ⬅️  Renders pending approval
+
+        //   break;
+
+
         case "donationMessagesList":
-          const messages = data.msg.messages;           // ✅ approved donation history
-          const unapprovalmessage = data.msg.unapprovalmessage; // ✅ pending approval
+          const messages = data.msg.messages;
+          const unapproveusermessage = data.msg.unapproveusermessage;  // Correct field name
+          console.log("🟠 unapproveusermessage:", unapproveusermessage);
+          renderDonationMessages(messages);
+          handleShowApproval(unapproveusermessage);  // Pass correct data
+          break;
 
-          console.log("unapproval message ", unapprovalmessage);
 
-          renderDonationMessages(messages);      // ⬅️  Renders into donationConsoleOutput
-          handleShowApproval(unapprovalmessage); // ⬅️  Renders pending approval
+
+        case "approvedDonationsList":
+          const approvedDonations = data.msg.approvedDonations; // ✅ Approved donations
+
+          console.log("✅ Approved Donations: ", approvedDonations);
+
+          // renderApprovedDonations(approvedDonations); // ⬅️ A new function you will create
 
           break;
+
+
 
 
 
@@ -4759,71 +4918,107 @@
 
       //changes by subhadra
       // Toggle full dropdown menu visibility when clicking formBtn
-      formBtn.addEventListener("click", (e) => {
-        e.stopPropagation(); // Prevent bubbling to body
+      // formBtn.addEventListener("click", (e) => {
+      //   e.stopPropagation(); // Prevent bubbling to body
 
-        // Reset dropdown to its clean state before toggling visibility
-        resetDropdownMenu();
+      //   // Reset dropdown to its clean state before toggling visibility
+      //   resetDropdownMenu();
 
-        // Check if dropdown is already visible
-        if (formDropdownMenu.classList.contains("show-dropdown")) {
-          formDropdownMenu.classList.remove("show-dropdown");
-        } else {
-          formDropdownMenu.classList.add("show-dropdown");
-        }
-      });
+      //   // Check if dropdown is already visible
+      //   if (formDropdownMenu.classList.contains("show-dropdown")) {
+      //     formDropdownMenu.classList.remove("show-dropdown");
+      //   } else {
+      //     formDropdownMenu.classList.add("show-dropdown");
+      //   }
+      // });
 
-      // Handle clicking dropdown items (Turn / Free Flow / God Mode)
-      const dropdownItems = formDropdownMenu.querySelectorAll('.dropdown-item');
+      // // Handle clicking dropdown items (Turn / Free Flow / God Mode)
+      // const dropdownItems = formDropdownMenu.querySelectorAll('.dropdown-item');
 
-      dropdownItems.forEach(item => {
-        item.addEventListener('click', (e) => {
+      // dropdownItems.forEach(item => {
+      //   item.addEventListener('click', (e) => {
+      //     e.stopPropagation();
+
+      //     // First, close all submenus (reset all submenus to hidden state)
+      //     dropdownItems.forEach(otherItem => {
+      //       if (otherItem !== item) {
+      //         const otherSubmenu = otherItem.querySelector('.submenu');
+      //         if (otherSubmenu) {
+      //           otherSubmenu.classList.remove('show');
+      //         }
+      //       }
+      //     });
+
+      //     // Then, toggle the clicked submenu visibility
+      //     const submenu = item.querySelector('.submenu');
+      //     if (submenu) {
+      //       submenu.classList.toggle('show');
+      //     }
+
+      //     // Close the whole dropdown when submenu item is clicked
+      //     const submenuItems = item.querySelectorAll('.submenu-item');
+      //     submenuItems.forEach(submenuItem => {
+      //       submenuItem.addEventListener('click', (e) => {
+      //         e.stopPropagation(); // Stop bubbling
+      //         formDropdownMenu.classList.remove('show-dropdown'); // Close the dropdown
+      //         resetDropdownMenu();  // Reset state to clean after closing dropdown
+      //       });
+      //     });
+      //   });
+      // });
+
+      // // Reset dropdown to its clean state 
+      // function resetDropdownMenu() {
+      //   const submenus = formDropdownMenu.querySelectorAll('.submenu');
+      //   submenus.forEach(submenu => {
+      //     submenu.classList.remove('show');
+      //   });
+
+      //   // Remove hover effect or active states
+      //   const dropdownItems = formDropdownMenu.querySelectorAll('.dropdown-item');
+      //   dropdownItems.forEach(item => {
+      //     item.classList.remove('hover'); // If you're using any hover class, remove it
+      //   });
+      // }
+
+
+
+      formBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-
-          // First, close all submenus (reset all submenus to hidden state)
-          dropdownItems.forEach(otherItem => {
-            if (otherItem !== item) {
-              const otherSubmenu = otherItem.querySelector('.submenu');
-              if (otherSubmenu) {
-                otherSubmenu.classList.remove('show');
-              }
-            }
-          });
-
-          // Then, toggle the clicked submenu visibility
-          const submenu = item.querySelector('.submenu');
-          if (submenu) {
-            submenu.classList.toggle('show');
+          formDropdownMenu.classList.toggle('show-dropdown');
+          if (!formDropdownMenu.classList.contains('show-dropdown')) {
+              resetDropdownMenu();
           }
-
-          // Close the whole dropdown when submenu item is clicked
-          const submenuItems = item.querySelectorAll('.submenu-item');
-          submenuItems.forEach(submenuItem => {
-            submenuItem.addEventListener('click', (e) => {
-              e.stopPropagation(); // Stop bubbling
-              formDropdownMenu.classList.remove('show-dropdown'); // Close the dropdown
-              resetDropdownMenu();  // Reset state to clean after closing dropdown
-            });
+      });
+      const dropdownItems = formDropdownMenu.querySelectorAll('.dropdown-item');
+      dropdownItems.forEach(item => {
+          item.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const submenu = item.querySelector('.submenu');
+              dropdownItems.forEach(otherItem => {
+                  if (otherItem !== item) {
+                      const otherSubmenu = otherItem.querySelector('.submenu');
+                      if (otherSubmenu) otherSubmenu.classList.remove('show');
+                  }
+              });
+              if (submenu) submenu.classList.toggle('show');
           });
-        });
+      });
+      const submenuItems = formDropdownMenu.querySelectorAll('.submenu-item');
+      submenuItems.forEach(submenuItem => {
+          submenuItem.addEventListener('click', (e) => {
+              e.stopPropagation();
+              formDropdownMenu.classList.remove('show-dropdown');
+              resetDropdownMenu();
+              const timerId = submenuItem.dataset.timerServerID;
+              console.log('Start timer for', timerId);
+          });
       });
 
-      // Reset dropdown to its clean state 
       function resetDropdownMenu() {
-        const submenus = formDropdownMenu.querySelectorAll('.submenu');
-        submenus.forEach(submenu => {
-          submenu.classList.remove('show');
-        });
-
-        // Remove hover effect or active states
-        const dropdownItems = formDropdownMenu.querySelectorAll('.dropdown-item');
-        dropdownItems.forEach(item => {
-          item.classList.remove('hover'); // If you're using any hover class, remove it
-        });
+          const submenus = formDropdownMenu.querySelectorAll('.submenu');
+          submenus.forEach(submenu => submenu.classList.remove('show'));
       }
-
-
-
 
 
       // Create dropdown menu inside people-btn

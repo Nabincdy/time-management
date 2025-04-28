@@ -295,10 +295,7 @@ globalELMxArray = {
             },//end individualParticipantVotes
         },//end voting
         "donateHistory": "History No Data Found",
-        "approvedDonations": {
-            // Example:
-            // "fromUserID_toUserID_totalSeconds": true
-        }
+        "approvedDonations": "Approval His No Data Found",
 
     } //end ELMxID 1
 };//end globalELMxArray
@@ -1293,36 +1290,101 @@ wss.on("connection", (ws) => {
                 //     break;
 
 
+                // case 'showApproval':
+                //     console.log("📩 Received showApproval message: ", message);
+
+                //     const approvalMsg = message.msg;
+                //     const {
+                //         ELMxID_Approval = 0,
+                //         fromUserID_Approval = message.msg.fromUserID,
+                //         toUserID_Approval = message.msg.toUserID,
+                //         timerName_Approval = message.msg.timerName,
+                //         minutes_Approval = message.msg.minutes,
+                //         seconds_Approval = message.msg.seconds,
+                //         totalSeconds_Approval = message.msg.totalSeconds
+                //     } = approvalMsg;
+
+                //     const approvalKey = `${fromUserID_Approval}_${toUserID_Approval}_${totalSeconds_Approval}`;
+
+                //     if (!globalELMxArray[ELMxID_Approval]) {
+                //         globalELMxArray[ELMxID_Approval] = {};
+                //     }
+
+                //     if (!globalELMxArray[ELMxID_Approval].approvedDonations) {
+                //         globalELMxArray[ELMxID_Approval].approvedDonations = {};
+                //     }
+
+                //     // if (globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey]) {
+                //     //     console.log("✅ Approval already exists. Skipping UI broadcast.");
+                //     //     break;
+                //     // }
+
+                //     // ✅ Store full approval message
+                //     globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey] = {
+                //         shown: true,
+                //         fromUserID: fromUserID_Approval,
+                //         toUserID: toUserID_Approval,
+                //         timerName: timerName_Approval,
+                //         minutes: minutes_Approval,
+                //         seconds: seconds_Approval,
+                //         totalSeconds: totalSeconds_Approval
+                //     };
+
+                //     const showApprovalResponse = {
+                //         cmd: "returnShowApproval",
+                //         msg: {
+                //             ELMxID_Approval,
+                //             fromUserID_Approval,
+                //             toUserID_Approval,
+                //             timerName_Approval,
+                //             minutes_Approval,
+                //             seconds_Approval,
+                //             totalSeconds_Approval
+                //         }
+                //     };
+
+                //     console.log("📤 Sending showApprovalResponse to clients", showApprovalResponse);
+                //     const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, recipients, showApprovalResponse);
+
+                //     break;
+
+
                 case 'showApproval':
                     console.log("📩 Received showApproval message: ", message);
-
+                
                     const approvalMsg = message.msg;
+                
+                    // Destructure with fallbacks
                     const {
                         ELMxID_Approval = 0,
-                        fromUserID_Approval = message.msg.fromUserID,
-                        toUserID_Approval = message.msg.toUserID,
-                        timerName_Approval = message.msg.timerName,
-                        minutes_Approval = message.msg.minutes,
-                        seconds_Approval = message.msg.seconds,
-                        totalSeconds_Approval = message.msg.totalSeconds
+                        fromUserID_Approval = approvalMsg.fromUserID,
+                        toUserID_Approval = approvalMsg.toUserID,
+                        timerName_Approval = approvalMsg.timerName,
+                        minutes_Approval = approvalMsg.minutes,
+                        seconds_Approval = approvalMsg.seconds,
+                        totalSeconds_Approval = approvalMsg.totalSeconds
                     } = approvalMsg;
-
+                
                     const approvalKey = `${fromUserID_Approval}_${toUserID_Approval}_${totalSeconds_Approval}`;
-
+                
+                    // ✅ Ensure ELMxID exists
                     if (!globalELMxArray[ELMxID_Approval]) {
                         globalELMxArray[ELMxID_Approval] = {};
                     }
-
-                    if (!globalELMxArray[ELMxID_Approval].approvedDonations) {
+                
+                    // ✅ Ensure approvedDonations is an object
+                    if (typeof globalELMxArray[ELMxID_Approval].approvedDonations !== 'object' || globalELMxArray[ELMxID_Approval].approvedDonations === null) {
                         globalELMxArray[ELMxID_Approval].approvedDonations = {};
                     }
-
+                
+                    // ✅ Optional (remove this if you want to allow multiple approvals with same key)
                     // if (globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey]) {
                     //     console.log("✅ Approval already exists. Skipping UI broadcast.");
                     //     break;
                     // }
-
-                    // ✅ Store full approval message
+                
+                    // ✅ Store full approval message safely
                     globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey] = {
                         shown: true,
                         fromUserID: fromUserID_Approval,
@@ -1332,7 +1394,11 @@ wss.on("connection", (ws) => {
                         seconds: seconds_Approval,
                         totalSeconds: totalSeconds_Approval
                     };
-
+                
+                    // ✅ Debug: show current approvedDonations
+                    console.log("✅ Current approvedDonations:", globalELMxArray[ELMxID_Approval].approvedDonations);
+                
+                    // ✅ Prepare response to send back to clients
                     const showApprovalResponse = {
                         cmd: "returnShowApproval",
                         msg: {
@@ -1345,13 +1411,15 @@ wss.on("connection", (ws) => {
                             totalSeconds_Approval
                         }
                     };
-
+                
                     console.log("📤 Sending showApprovalResponse to clients", showApprovalResponse);
+                
+                    // ✅ Send to all attendees
                     const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
                     sendToWho(wss, ws, recipients, showApprovalResponse);
-
+                
                     break;
-
+                
 
 
 
@@ -1579,18 +1647,10 @@ wss.on("connection", (ws) => {
 
                 case 'getDonationMessages': {
                     const ELMxID = message.msg.ELMxID;
-                
                     const messages = globalELMxArray[ELMxID]?.donateHistory || [];
                     const unapproveusermessage = globalELMxArray[ELMxID]?.approvedDonations || [];
-                
                     console.log("📜 Retrieved unapproveusermessage for ELMxID", ELMxID, ":", unapproveusermessage);
                     console.log("📜 Retrieved donateHistory for ELMxID", ELMxID, ":", messages);
-                
-                    // const response = {
-                    //     cmd: "donationMessagesList",
-                    //     msg: { messages, unapprovalmessage },  // Ensure messages is properly formatted
-                    // };
-
                     const response = {
                         cmd: "donationMessagesList",
                         msg: {
@@ -1598,12 +1658,31 @@ wss.on("connection", (ws) => {
                             unapproveusermessage
                         }
                     };
-
-                    
-                
                     ws.send(JSON.stringify(response));
                     break;
                 }
+                
+
+
+                
+                // case 'getApprovedDonations': {
+                //     const ELMxID = message.msg.ELMxID;
+                
+                //     const approvedDonations = globalELMxArray[ELMxID]?.approvedDonations || [];
+                
+                //     console.log("📜 Retrieved approvedDonations for ELMxID", ELMxID, ":", approvedDonations);
+                
+                //     const response = {
+                //         cmd: "approvedDonationsList",
+                //         msg: {
+                //             approvedDonations
+                //         }
+                //     };
+                
+                //     ws.send(JSON.stringify(response));
+                //     break;
+                // }
+                
                 
 
 
