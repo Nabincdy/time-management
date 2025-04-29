@@ -783,7 +783,9 @@
     .scroll-box {
       width: 60px;
       height: 200px;
-      overflow-y: scroll;
+      /* overflow-y: scroll; */
+      overflow-y: auto;
+
       scroll-snap-type: y mandatory;
       border: 1px solid #ddd;
       background-color: #f9f9f9;
@@ -805,6 +807,9 @@
 
     .time-option {
       font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+
     }
 
 
@@ -990,132 +995,132 @@
 
 
     /* donation list*/
-    
-
-  
-/* Styles for the approval details (User info and timer) */
-.approval-details {
-  margin-bottom: 20px;
-}
-
-.approval-details p {
-  font-size: 16px;
-  color: #333;
-  line-height: 1.6;
-}
-
-.approval-details strong {
-  font-weight: bold;
-  color: #333;
-}
-
-.approval-details em {
-  font-style: italic;
-  color: #777;
-}
-
-/* Styles for the button container */
-.buttons-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-/* Approver dropdown */
-.approver-dropdown {
-  padding: 8px 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fafafa;
-  color: #333;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.approver-dropdown:hover {
-  border-color: #888;
-  background-color: #f2f2f2;
-}
-
-/* Approve and Remove buttons */
-.approve-btn,
-.remove-btn {
-  padding: 10px 20px;
-  font-size: 14px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  border: none;
-  font-weight: 600;
-}
-
-/* Approve button styles */
-.approve-btn {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.approve-btn:hover {
-  background-color: #45a049;
-  transform: scale(1.05);  /* Subtle hover effect */
-}
-
-.approve-btn:active {
-  background-color: #388e3c;
-}
-
-/* Remove button styles */
-.remove-btn {
-  background-color: #f44336;
-  color: white;
-}
-
-.remove-btn:hover {
-  background-color: #e53935;
-  transform: scale(1.05);  /* Subtle hover effect */
-}
-
-.remove-btn:active {
-  background-color: #d32f2f;
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 768px) {
-  .approval-item {
-    padding: 15px;
-  }
-
-  .buttons-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .approve-btn,
-  .remove-btn {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-  .approver-dropdown {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .approval-details p {
-    font-size: 14px;
-  }
-
-  .approve-btn,
-  .remove-btn {
-    padding: 8px 15px;
-    font-size: 12px;
-  }
-}
 
 
+
+    /* Styles for the approval details (User info and timer) */
+    .approval-details {
+      margin-bottom: 20px;
+    }
+
+    .approval-details p {
+      font-size: 16px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .approval-details strong {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .approval-details em {
+      font-style: italic;
+      color: #777;
+    }
+
+    /* Styles for the button container */
+    .buttons-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    /* Approver dropdown */
+    .approver-dropdown {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fafafa;
+      color: #333;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .approver-dropdown:hover {
+      border-color: #888;
+      background-color: #f2f2f2;
+    }
+
+    /* Approve and Remove buttons */
+    .approve-btn,
+    .remove-btn {
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      border: none;
+      font-weight: 600;
+    }
+
+    /* Approve button styles */
+    .approve-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .approve-btn:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+      /* Subtle hover effect */
+    }
+
+    .approve-btn:active {
+      background-color: #388e3c;
+    }
+
+    /* Remove button styles */
+    .remove-btn {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .remove-btn:hover {
+      background-color: #e53935;
+      transform: scale(1.05);
+      /* Subtle hover effect */
+    }
+
+    .remove-btn:active {
+      background-color: #d32f2f;
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 768px) {
+      .approval-item {
+        padding: 15px;
+      }
+
+      .buttons-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .approve-btn,
+      .remove-btn {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      .approver-dropdown {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .approval-details p {
+        font-size: 14px;
+      }
+
+      .approve-btn,
+      .remove-btn {
+        padding: 8px 15px;
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 
@@ -1305,7 +1310,8 @@
 
     <button class="toggle-btn" onclick="toggleTable()">Total Cycle</button>
 
-    <button onclick="showSelectedTimers()">Show Selected Timers</button>
+    <!-- <button onclick="showSelectedTimers()">Show Selected Timers</button> -->
+    <div id="selected-timers-output"></div>
 
 
     <div class="table-container hidden" id="tableContainer">
@@ -1416,18 +1422,54 @@
 
 
 
+    function updateSelectedTimersOutput() {
+  const selectedTitles = [];
+  const timerComponents = document.querySelectorAll('.timer-checkbox');
 
+  timerComponents.forEach((checkbox) => {
+    if (checkbox.checked) {
+      const timerComponent = checkbox.closest('div'); // Adjust if needed
+      const titleInput = timerComponent.querySelector('.timer-title');
 
-    function showSelectedTimers() {
-      const checkboxes = document.querySelectorAll('.timer-checkbox');
-      checkboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-          const timerDiv = checkbox.closest('.timer'); // The parent timer component div
-          const timerTitleInput = timerDiv.querySelector('.timer-title'); // Find the title input
-          console.log("Selected Timer Title:", timerTitleInput.value);
-        }
-      });
+      let title = titleInput?.value.trim();
+
+      if (!title) {
+        // Get data-id from the title input or fallback to any available input
+        const dataId = titleInput?.getAttribute('data-id') || '';
+        const newTimerID = dataId.split('-')[0];
+        title = `User-${newTimerID}`;
+      }
+
+      selectedTitles.push(title);
     }
+  });
+
+  // Display selected timer titles
+  const outputDiv = document.getElementById('selected-timers-output');
+  outputDiv.innerHTML = selectedTitles.map(title => `<div>${title}</div>`).join('');
+}
+
+
+
+
+
+//     function showSelectedTimers() {
+//   const checkboxes = document.querySelectorAll('.timer-checkbox');
+//   const outputDiv = document.getElementById('selected-timers-output');
+//   let outputHTML = '<ul>';
+
+//   checkboxes.forEach(checkbox => {
+//     if (checkbox.checked) {
+//       const timerDiv = checkbox.closest('.timer');
+//       const timerTitleInput = timerDiv.querySelector('.timer-title');
+//       outputHTML += `<li>${timerTitleInput.value}</li>`;
+//     }
+//   });
+
+//   outputHTML += '</ul>';
+//   outputDiv.innerHTML = outputHTML;
+// }
+
 
 
 
@@ -1784,7 +1826,7 @@
       });
     }
 
-    
+
     // Show pending approval
     function showPendingApproval(data) {
       console.log("show pending approval check data ", data);
@@ -1975,128 +2017,128 @@
 
 
 
-// function handleShowApproval(msg) {
-//   console.log("🔵 handleShowApproval received:", msg);
+    // function handleShowApproval(msg) {
+    //   console.log("🔵 handleShowApproval received:", msg);
 
-//   const approvalList = document.getElementById('unapprovedItems');
-//   if (!approvalList) {
-//     console.error("⚠️ 'approvalList' element not found!");
-//     return;
-//   }
+    //   const approvalList = document.getElementById('unapprovedItems');
+    //   if (!approvalList) {
+    //     console.error("⚠️ 'approvalList' element not found!");
+    //     return;
+    //   }
 
-//   approvalList.innerHTML = ''; // Clear previous list
+    //   approvalList.innerHTML = ''; // Clear previous list
 
-//   // If msg is an object (not array), convert it to an array
-//   const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
+    //   // If msg is an object (not array), convert it to an array
+    //   const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
 
-//   const ELMxID = 0;
-//   // Loop over each approval
-//   for (const approvalData of approvalDataArray) {
-//     const {
-//       fromUserID,
-//       toUserID,
-//       timerName,
-//       minutes,
-//       seconds,
-//       totalSeconds,
-//       ELMxID // Ensure ELMxID is included
-//     } = approvalData;
+    //   const ELMxID = 0;
+    //   // Loop over each approval
+    //   for (const approvalData of approvalDataArray) {
+    //     const {
+    //       fromUserID,
+    //       toUserID,
+    //       timerName,
+    //       minutes,
+    //       seconds,
+    //       totalSeconds,
+    //       ELMxID // Ensure ELMxID is included
+    //     } = approvalData;
 
-//     const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
+    //     const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
 
-//     const item = document.createElement('div');
-//     item.className = 'approval-item';
+    //     const item = document.createElement('div');
+    //     item.className = 'approval-item';
 
-//     // Construct the unique ID
-//     const approvalID = `approval-${ELMxID}-${fromUserID}-${toUserID}-${totalSeconds}`;
-//     item.id = approvalID; // Set the ID here
+    //     // Construct the unique ID
+    //     const approvalID = `approval-${ELMxID}-${fromUserID}-${toUserID}-${totalSeconds}`;
+    //     item.id = approvalID; // Set the ID here
 
-//     item.innerHTML = `
-//       <div class="approval-details">
-//         <p><strong>User ${fromUserID}</strong> ➜
-//         <strong>User ${toUserID}</strong> (Timer: <em>${minutes}m ${seconds}s</em>)</p>
-//       </div>
-//       <div class="buttons-container">
-//                 <select class="approver-dropdown">${approverOptions}</select>
-//         <button class="approve-btn">Approve</button>
-//         <button class="remove-btn">Remove</button>
-//       </div>
-//     `;
+    //     item.innerHTML = `
+    //       <div class="approval-details">
+    //         <p><strong>User ${fromUserID}</strong> ➜
+    //         <strong>User ${toUserID}</strong> (Timer: <em>${minutes}m ${seconds}s</em>)</p>
+    //       </div>
+    //       <div class="buttons-container">
+    //                 <select class="approver-dropdown">${approverOptions}</select>
+    //         <button class="approve-btn">Approve</button>
+    //         <button class="remove-btn">Remove</button>
+    //       </div>
+    //     `;
 
-//     approvalList.appendChild(item);
+    //     approvalList.appendChild(item);
 
-//     const approveButton = item.querySelector('.approve-btn');
-//     const removeButton = item.querySelector('.remove-btn');
+    //     const approveButton = item.querySelector('.approve-btn');
+    //     const removeButton = item.querySelector('.remove-btn');
 
-//     approveButton.addEventListener('click', () => {
-//       const approverID = item.querySelector('.approver-dropdown').value;
-//       if (!approverID || approverID == fromUserID || approverID == toUserID) {
-//         alert("Invalid approver.");
-//         return;
-//       }
+    //     approveButton.addEventListener('click', () => {
+    //       const approverID = item.querySelector('.approver-dropdown').value;
+    //       if (!approverID || approverID == fromUserID || approverID == toUserID) {
+    //         alert("Invalid approver.");
+    //         return;
+    //       }
 
-//       sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
-//       item.remove(); // Remove the item after approval
-//     });
+    //       sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
+    //       item.remove(); // Remove the item after approval
+    //     });
 
-//     removeButton.addEventListener('click', () => {
-//       const removalPayload = {
-//         cmd: "removeApprovedDonation",
-//         msg: {
-//           ELMxID: ELMxID, // If you have dynamic ELMxID, replace 0 accordingly
-//           fromUserID: fromUserID,
-//           toUserID: toUserID,
-//           totalSeconds: totalSeconds
-//         }
-//       };
+    //     removeButton.addEventListener('click', () => {
+    //       const removalPayload = {
+    //         cmd: "removeApprovedDonation",
+    //         msg: {
+    //           ELMxID: ELMxID, // If you have dynamic ELMxID, replace 0 accordingly
+    //           fromUserID: fromUserID,
+    //           toUserID: toUserID,
+    //           totalSeconds: totalSeconds
+    //         }
+    //       };
 
-//       socket.send(JSON.stringify(removalPayload));
-//       console.log("❌ Manual removal requested:", removalPayload);
+    //       socket.send(JSON.stringify(removalPayload));
+    //       console.log("❌ Manual removal requested:", removalPayload);
 
-//       item.remove(); // Remove the item immediately from UI
-//     });
-//   }
-// }
+    //       item.remove(); // Remove the item immediately from UI
+    //     });
+    //   }
+    // }
 
 
-function handleShowApproval(msg) {
-  console.log("🔵 handleShowApproval received:", msg);
+    function handleShowApproval(msg) {
+      console.log("🔵 handleShowApproval received:", msg);
 
-  const approvalList = document.getElementById('unapprovedItems');
-  if (!approvalList) {
-    console.error("⚠️ 'approvalList' element not found!");
-    return;
-  }
+      const approvalList = document.getElementById('unapprovedItems');
+      if (!approvalList) {
+        console.error("⚠️ 'approvalList' element not found!");
+        return;
+      }
 
-  approvalList.innerHTML = ''; // Clear previous list
+      approvalList.innerHTML = ''; // Clear previous list
 
-  // If msg is an object (not array), convert it to an array
-  const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
+      // If msg is an object (not array), convert it to an array
+      const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
 
-  // ❌ DO NOT declare `const ELMxID = 0;` here
+      // ❌ DO NOT declare `const ELMxID = 0;` here
 
-  // Loop over each approval
-  for (const approvalData of approvalDataArray) {
-    const {
-      fromUserID,
-      toUserID,
-      timerName,
-      minutes,
-      seconds,
-      totalSeconds,
-      ELMxID // ✅ Real ELMxID from server
-    } = approvalData;
+      // Loop over each approval
+      for (const approvalData of approvalDataArray) {
+        const {
+          fromUserID,
+          toUserID,
+          timerName,
+          minutes,
+          seconds,
+          totalSeconds,
+          ELMxID // ✅ Real ELMxID from server
+        } = approvalData;
 
-    const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
+        const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
 
-    const item = document.createElement('div');
-    item.className = 'approval-item';
+        const item = document.createElement('div');
+        item.className = 'approval-item';
 
-    // Construct the unique ID
-    const approvalID = `approval-${ELMxID}-${fromUserID}-${toUserID}-${totalSeconds}`;
-    item.id = approvalID; // Set the ID here
+        // Construct the unique ID
+        const approvalID = `approval-${ELMxID}-${fromUserID}-${toUserID}-${totalSeconds}`;
+        item.id = approvalID; // Set the ID here
 
-    item.innerHTML = `
+        item.innerHTML = `
       <div class="approval-details">
         <p><strong>User ${fromUserID}</strong> ➜
         <strong>User ${toUserID}</strong> (Timer: <em>${minutes}m ${seconds}s</em>)</p>
@@ -2108,55 +2150,55 @@ function handleShowApproval(msg) {
       </div>
     `;
 
-    approvalList.appendChild(item);
+        approvalList.appendChild(item);
 
-    const approveButton = item.querySelector('.approve-btn');
-    const removeButton = item.querySelector('.remove-btn');
+        const approveButton = item.querySelector('.approve-btn');
+        const removeButton = item.querySelector('.remove-btn');
 
-    approveButton.addEventListener('click', () => {
-      const approverID = item.querySelector('.approver-dropdown').value;
-      if (!approverID || approverID == fromUserID || approverID == toUserID) {
-        alert("Invalid approver.");
-        return;
+        approveButton.addEventListener('click', () => {
+          const approverID = item.querySelector('.approver-dropdown').value;
+          if (!approverID || approverID == fromUserID || approverID == toUserID) {
+            alert("Invalid approver.");
+            return;
+          }
+
+          sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
+          item.remove(); // Remove the item after approval
+        });
+
+        removeButton.addEventListener('click', () => {
+          const removalPayload = {
+            cmd: "removeApprovedDonation",
+            msg: {
+              ELMxID: ELMxID, // ✅ Correct ELMxID
+              fromUserID: fromUserID,
+              toUserID: toUserID,
+              totalSeconds: totalSeconds
+            }
+          };
+
+          socket.send(JSON.stringify(removalPayload));
+          console.log("❌ Manual removal requested:", removalPayload);
+
+          item.remove(); // Remove the item immediately from UI
+        });
       }
-
-      sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
-      item.remove(); // Remove the item after approval
-    });
-
-    removeButton.addEventListener('click', () => {
-      const removalPayload = {
-        cmd: "removeApprovedDonation",
-        msg: {
-          ELMxID: ELMxID, // ✅ Correct ELMxID
-          fromUserID: fromUserID,
-          toUserID: toUserID,
-          totalSeconds: totalSeconds
-        }
-      };
-
-      socket.send(JSON.stringify(removalPayload));
-      console.log("❌ Manual removal requested:", removalPayload);
-
-      item.remove(); // Remove the item immediately from UI
-    });
-  }
-}
+    }
 
 
-function removeApprovalBox(data) {
-  const approvalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-  console.log("Trying to remove approval box with ID:", approvalID);  // Log the ID
+    function removeApprovalBox(data) {
+      const approvalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+      console.log("Trying to remove approval box with ID:", approvalID);  // Log the ID
 
-  const approvalElement = document.getElementById(approvalID);
+      const approvalElement = document.getElementById(approvalID);
 
-  if (approvalElement) {
-    approvalElement.remove();
-    console.log("✅ Approval box removed:", approvalID);
-  } else {
-    console.log("⚠️ Approval box not found:", approvalID);
-  }
-}
+      if (approvalElement) {
+        approvalElement.remove();
+        console.log("✅ Approval box removed:", approvalID);
+      } else {
+        console.log("⚠️ Approval box not found:", approvalID);
+      }
+    }
 
 
   </script>
@@ -5738,6 +5780,13 @@ function removeApprovalBox(data) {
     //MAIN Start Of Page Loading (the above createTimerComponent is called within AFTER the DOM loads) 
     document.addEventListener("DOMContentLoaded", () => {
 
+
+      document.body.addEventListener('change', function (e) {
+    if (e.target.classList.contains('timer-checkbox')) {
+      updateSelectedTimersOutput();
+    }
+  });
+
       //Mark/Nabin, where you left off: comment out these const variables and put them in setGlobalVariableOnceDOMContentLoaded and call global versions of these from within the function and set them to the new DOM elements created
       setGlobalVariablesOnceDOMContentLoaded();
       synchronizeScreenDraw();
@@ -5781,101 +5830,203 @@ function removeApprovalBox(data) {
 
     // /*scroll effect in form submenu*/
 
-    let selectedMinute = 1;  // Default to 1 minute
-    let selectedSecond = 0;
-    let formSubmenuTimerSet = false;
-    let formSubmenuTimerTime = null;
+    // let selectedMinute = 1;  // Default to 1 minute
+    // let selectedSecond = 0;
+    // let formSubmenuTimerSet = false;
+    // let formSubmenuTimerTime = null;
 
-    function populateScrollBox(id, range) {
-      const box = document.getElementById(id);
-      if (!box) return;
+    // function populateScrollBox(id, range) {
+    //   const box = document.getElementById(id);
+    //   if (!box) return;
 
-      box.innerHTML = "";  // Clear previous entries
+    //   box.innerHTML = "";  // Clear previous entries
 
-      let defaultSelection = 0;
-      if (id.includes("minutes")) defaultSelection = 1; // Set default to 1 minute
+    //   let defaultSelection = 0;
+    //   if (id.includes("minutes")) defaultSelection = 1; // Set default to 1 minute
 
-      for (let i = 0; i < range; i++) {
-        let div = document.createElement("div");
-        div.textContent = i.toString().padStart(2, '0');
-        div.classList.add("time-option");
+    //   for (let i = 0; i < range; i++) {
+    //     let div = document.createElement("div");
+    //     div.textContent = i.toString().padStart(2, '0');
+    //     div.classList.add("time-option");
 
-        if (i === defaultSelection) {
-          div.classList.add("selected");  // Default selection
-          selectedMinute = i;
-        }
+    //     if (i === defaultSelection) {
+    //       div.classList.add("selected");  // Default selection
+    //       selectedMinute = i;
+    //     }
 
-        div.onclick = function () {
-          selectTime(id, div, i);
-        };
-        box.appendChild(div);
+    //     div.onclick = function () {
+    //       selectTime(id, div, i);
+    //     };
+    //     box.appendChild(div);
+    //   }
+
+    //   // ✅ Scroll to default selection
+    //   setTimeout(() => {
+    //     let defaultElement = box.children[defaultSelection];
+    //     if (defaultElement) {
+    //       box.scrollTop = defaultElement.offsetTop;
+    //     }
+    //   }, 100);
+
+    //   // ✅ Auto-select when scrolling
+    //   box.addEventListener("scroll", () => {
+    //     let items = box.children;
+    //     let closest = null;
+    //     let minDiff = Infinity;
+
+    //     for (let item of items) {
+    //       let diff = Math.abs(item.offsetTop - box.scrollTop);
+    //       if (diff < minDiff) {
+    //         minDiff = diff;
+    //         closest = item;
+    //       }
+    //     }
+
+    //     if (closest) {
+    //       let value = parseInt(closest.textContent);
+    //       selectTime(id, closest, value);
+    //     }
+    //   });
+    // }
+
+    // function selectTime(id, element, value) {
+    //   document.querySelectorAll(`#${id} div`).forEach(el => el.classList.remove("selected"));
+    //   element.classList.add("selected");
+
+    //   if (id.includes("minutes")) selectedMinute = value;
+    //   if (id.includes("seconds")) selectedSecond = value;
+
+    //   console.log(`🎯 Selected ${id}: ${value}`);
+    // }
+
+    // function setFormSubmenuTimer() {
+    //   formSubmenuTimerTime = new Date();
+    //   formSubmenuTimerTime.setMinutes(selectedMinute);
+    //   formSubmenuTimerTime.setSeconds(selectedSecond);
+    //   formSubmenuTimerTime.setMilliseconds(0);
+    //   formSubmenuTimerSet = true;
+
+    //   let timerStatus = `Timer set for ${selectedMinute}:${selectedSecond.toString().padStart(2, '0')}`;
+    //   document.getElementById("form-submenu-timer-status").textContent = timerStatus;
+    //   document.getElementById("form-submenu-timer-input").value = timerStatus;
+    // }
+
+    // // Check the timer every second
+    // setInterval(() => {
+    //   if (formSubmenuTimerSet) {
+    //     let now = new Date();
+    //     if (now.getMinutes() === formSubmenuTimerTime.getMinutes() && now.getSeconds() === formSubmenuTimerTime.getSeconds()) {
+    //       alert("⏳ Timer Completed!");
+    //       formSubmenuTimerSet = false;
+    //     }
+    //   }
+    // }, 1000);
+
+    // populateScrollBox("minutes", 60);
+    // populateScrollBox("seconds", 60);
+
+    let selectedMinute = 1;
+  let selectedSecond = 0;
+  let formSubmenuTimerSet = false;
+  let formSubmenuTimerTime = null;
+
+  function populateScrollBox(id, range) {
+    const box = document.getElementById(id);
+    if (!box) return;
+
+    box.innerHTML = "";
+
+    const defaultSelection = id.includes("minutes") ? 1 : 0;
+
+    for (let i = 0; i < range; i++) {
+      const div = document.createElement("div");
+      div.textContent = i.toString().padStart(2, '0');
+      div.classList.add("time-option");
+
+      if (i === defaultSelection) {
+        div.classList.add("selected");
+        if (id.includes("minutes")) selectedMinute = i;
+        else selectedSecond = i;
       }
 
-      // ✅ Scroll to default selection
-      setTimeout(() => {
-        let defaultElement = box.children[defaultSelection];
-        if (defaultElement) {
-          box.scrollTop = defaultElement.offsetTop;
-        }
-      }, 100);
+      div.addEventListener("click", () => {
+        selectTime(id, div, i);
 
-      // ✅ Auto-select when scrolling
-      box.addEventListener("scroll", () => {
-        let items = box.children;
-        let closest = null;
-        let minDiff = Infinity;
-
-        for (let item of items) {
-          let diff = Math.abs(item.offsetTop - box.scrollTop);
-          if (diff < minDiff) {
-            minDiff = diff;
-            closest = item;
-          }
-        }
-
-        if (closest) {
-          let value = parseInt(closest.textContent);
-          selectTime(id, closest, value);
-        }
+        // Prevent scroll handler from interfering right after a click
+        box.dataset.justClicked = "true";
+        setTimeout(() => box.dataset.justClicked = "false", 150);
       });
+
+      box.appendChild(div);
     }
 
-    function selectTime(id, element, value) {
-      document.querySelectorAll(`#${id} div`).forEach(el => el.classList.remove("selected"));
-      element.classList.add("selected");
+    setTimeout(() => {
+      const defaultElement = box.children[defaultSelection];
+      if (defaultElement) box.scrollTop = defaultElement.offsetTop;
+    }, 100);
 
-      if (id.includes("minutes")) selectedMinute = value;
-      if (id.includes("seconds")) selectedSecond = value;
+    box.addEventListener("scroll", () => {
+      if (box.dataset.justClicked === "true") return;
 
-      console.log(`🎯 Selected ${id}: ${value}`);
-    }
+      let items = box.children;
+      let closest = null;
+      let minDiff = Infinity;
 
-    function setFormSubmenuTimer() {
-      formSubmenuTimerTime = new Date();
-      formSubmenuTimerTime.setMinutes(selectedMinute);
-      formSubmenuTimerTime.setSeconds(selectedSecond);
-      formSubmenuTimerTime.setMilliseconds(0);
-      formSubmenuTimerSet = true;
-
-      let timerStatus = `Timer set for ${selectedMinute}:${selectedSecond.toString().padStart(2, '0')}`;
-      document.getElementById("form-submenu-timer-status").textContent = timerStatus;
-      document.getElementById("form-submenu-timer-input").value = timerStatus;
-    }
-
-    // Check the timer every second
-    setInterval(() => {
-      if (formSubmenuTimerSet) {
-        let now = new Date();
-        if (now.getMinutes() === formSubmenuTimerTime.getMinutes() && now.getSeconds() === formSubmenuTimerTime.getSeconds()) {
-          alert("⏳ Timer Completed!");
-          formSubmenuTimerSet = false;
+      for (let item of items) {
+        let diff = Math.abs(item.offsetTop - box.scrollTop);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closest = item;
         }
       }
-    }, 1000);
 
-    populateScrollBox("minutes", 60);
-    populateScrollBox("seconds", 60);
+      if (closest) {
+        const value = parseInt(closest.textContent);
+        selectTime(id, closest, value);
+      }
+    });
+  }
 
+  function selectTime(id, element, value) {
+    const box = document.getElementById(id);
+    if (!box) return;
+
+    Array.from(box.children).forEach(child => child.classList.remove("selected"));
+    element.classList.add("selected");
+
+    if (id.includes("minutes")) selectedMinute = value;
+    if (id.includes("seconds")) selectedSecond = value;
+
+    console.log(`🎯 Selected ${id}: ${value}`);
+  }
+
+  function setFormSubmenuTimer() {
+    formSubmenuTimerTime = new Date();
+    formSubmenuTimerTime.setSeconds(selectedSecond);
+    formSubmenuTimerTime.setMinutes(selectedMinute);
+    formSubmenuTimerTime.setMilliseconds(0);
+    formSubmenuTimerSet = true;
+
+    const timerStatus = `Timer set for ${selectedMinute}:${selectedSecond.toString().padStart(2, '0')}`;
+    document.getElementById("form-submenu-timer-status").textContent = timerStatus;
+    document.getElementById("form-submenu-timer-input").value = timerStatus;
+  }
+
+  setInterval(() => {
+    if (formSubmenuTimerSet) {
+      const now = new Date();
+      if (
+        now.getMinutes() === formSubmenuTimerTime.getMinutes() &&
+        now.getSeconds() === formSubmenuTimerTime.getSeconds()
+      ) {
+        alert("⏳ Timer Completed!");
+        formSubmenuTimerSet = false;
+      }
+    }
+  }, 1000);
+
+  populateScrollBox("minutes", 60);
+  populateScrollBox("seconds", 60);
 
     /*scroll effect in form submenu end*/
 

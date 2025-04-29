@@ -1700,7 +1700,7 @@ function broadcastToAllClients(messageObj) {
                             return;
                         }
                     
-                        broadcastToAllClients(removalMsg);
+                        // broadcastToAllClients(removalMsg);
 
                         const { fromUserID, toUserID, totalSeconds, ELMxID } = message.msg; // <-- IMPORTANT: Add ELMxID here!
                     
