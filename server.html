@@ -382,7 +382,7 @@
 
     /* Container can be flex if you want layout control */
 
-    
+
 
 
 
@@ -729,38 +729,38 @@
 
 
     /*thirding donation section button style*/
-    
-.thirding-approval {
-  flex-wrap: wrap;
-  gap: 10px;
-}
 
-/* Hide the actual checkbox */
-.thirding-toggle-checkbox {
-  display: none;
-}
+    .thirding-approval {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-/* Label styled as button */
-.thirding-lable {
-  display: inline-block;
-  width: 140px;
-  height: 40px;
-  border-radius: 50px;
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
-  line-height: 40px;
-  color: white;
-  background-color: red;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  position: relative;
-}
+    /* Hide the actual checkbox */
+    .thirding-toggle-checkbox {
+      display: none;
+    }
 
-/* When checkbox is checked, turn button green */
-.thirding-toggle-checkbox:checked + .thirding-lable {
-  background-color: green;
-}
+    /* Label styled as button */
+    .thirding-lable {
+      display: inline-block;
+      width: 140px;
+      height: 40px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 40px;
+      color: white;
+      background-color: red;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      position: relative;
+    }
+
+    /* When checkbox is checked, turn button green */
+    .thirding-toggle-checkbox:checked+.thirding-lable {
+      background-color: green;
+    }
 
 
 
@@ -1439,11 +1439,37 @@
     }
 
 
+    // function displayDonationMessageOnHTML(message, isTemporary = false, isRepeated = false) {
+    //   const output = document.getElementById("donationConsoleOutput");
+    //   if (output) {
+    //     const li = document.createElement("li");
+    //     li.textContent = message;
+
+    //     if (isRepeated) {
+    //       li.style.backgroundColor = "#ffcccc"; // Light red background
+    //       li.style.padding = "5px";
+    //       li.style.borderRadius = "4px";
+    //     }
+
+    //     output.appendChild(li);
+
+    //     if (isTemporary) {
+    //       setTimeout(() => {
+    //         output.removeChild(li);
+    //       }, 3000);
+    //     }
+    //   }
+    // }
+
     function displayDonationMessageOnHTML(message, isTemporary = false, isRepeated = false) {
       const output = document.getElementById("donationConsoleOutput");
       if (output) {
+        // Determine the current number of <li> items already in the list
+        const currentCount = output.querySelectorAll("li").length;
+        const numberedMessage = `${currentCount + 1}. ${message}`;
+
         const li = document.createElement("li");
-        li.textContent = message;
+        li.textContent = numberedMessage;
 
         if (isRepeated) {
           li.style.backgroundColor = "#ffcccc"; // Light red background
@@ -1460,6 +1486,8 @@
         }
       }
     }
+
+
 
 
 
@@ -1988,26 +2016,26 @@
     // }
 
     function showdonationhistory() {
-  let timerServerID = "yourTimerID";
+      let timerServerID = "yourTimerID";
 
-  let donationHistoryRequest = {
-    cmd: "getDonationMessages",
-    msg: {
-      ELMxID: 0,
-      timerServerID: timerServerID,
+      let donationHistoryRequest = {
+        cmd: "getDonationMessages",
+        msg: {
+          ELMxID: 0,
+          timerServerID: timerServerID,
+        }
+      };
+
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(donationHistoryRequest));
+        console.log("📤 Sent getDonationMessages request immediately");
+      } else {
+        socket.addEventListener("open", function () {
+          socket.send(JSON.stringify(donationHistoryRequest));
+          console.log("📤 Sent getDonationMessages request after socket opened");
+        }, { once: true });
+      }
     }
-  };
-
-  if (socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify(donationHistoryRequest));
-    console.log("📤 Sent getDonationMessages request immediately");
-  } else {
-    socket.addEventListener("open", function () {
-      socket.send(JSON.stringify(donationHistoryRequest));
-      console.log("📤 Sent getDonationMessages request after socket opened");
-    }, { once: true });
-  }
-}
 
 
 
@@ -2032,28 +2060,28 @@
 
 
     function showSelectedTimers() {
-  let timerServerID = "yourTimerID";
-  let ELMxID = 0;
+      let timerServerID = "yourTimerID";
+      let ELMxID = 0;
 
-  const selectedTimersRequest = {
-    cmd: "getSelectedTimersState",
-    msg: {
-      ELMxID: ELMxID,
-      timerServerID: timerServerID
+      const selectedTimersRequest = {
+        cmd: "getSelectedTimersState",
+        msg: {
+          ELMxID: ELMxID,
+          timerServerID: timerServerID
+        }
+      };
+
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(selectedTimersRequest));
+        console.log("📤 Sent getSelectedTimersState request immediately");
+      } else {
+        // Wait until socket is ready
+        socket.addEventListener("open", function () {
+          socket.send(JSON.stringify(selectedTimersRequest));
+          console.log("📤 Sent getSelectedTimersState request after socket opened");
+        }, { once: true }); // Only run once
+      }
     }
-  };
-
-  if (socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify(selectedTimersRequest));
-    console.log("📤 Sent getSelectedTimersState request immediately");
-  } else {
-    // Wait until socket is ready
-    socket.addEventListener("open", function () {
-      socket.send(JSON.stringify(selectedTimersRequest));
-      console.log("📤 Sent getSelectedTimersState request after socket opened");
-    }, { once: true }); // Only run once
-  }
-}
 
 
     // HTML button to trigger the function
@@ -2316,166 +2344,166 @@
 
 
 
-//   function showThirdingApprovalUI(data) {
-//   console.log("📋 showThirdingApprovalUI called with data:", data);
+    //   function showThirdingApprovalUI(data) {
+    //   console.log("📋 showThirdingApprovalUI called with data:", data);
 
-//   if (
-//     typeof data.ELMxID === "undefined" ||
-//     typeof data.fromUserID === "undefined" ||
-//     typeof data.toUserID === "undefined" ||
-//     typeof data.totalSeconds === "undefined"
-//   ) {
-//     console.error("❌ Missing required data fields:", data);
-//     return;
-//   }
+    //   if (
+    //     typeof data.ELMxID === "undefined" ||
+    //     typeof data.fromUserID === "undefined" ||
+    //     typeof data.toUserID === "undefined" ||
+    //     typeof data.totalSeconds === "undefined"
+    //   ) {
+    //     console.error("❌ Missing required data fields:", data);
+    //     return;
+    //   }
 
-//   const uniqueApprovalID = `thirding-approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-//   if (document.getElementById(uniqueApprovalID)) {
-//     console.log("⛔ Thirding approval UI already exists, skipping.");
-//     return;
-//   }
+    //   const uniqueApprovalID = `thirding-approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+    //   if (document.getElementById(uniqueApprovalID)) {
+    //     console.log("⛔ Thirding approval UI already exists, skipping.");
+    //     return;
+    //   }
 
-//   const fromUserIDStr = String(data.fromUserID);
-//   const toUserIDStr = String(data.toUserID);
-//   const fromName = getUsernameByID(data.fromUserID) || "Unknown";
-//   const toName = getUsernameByID(data.toUserID) || "Unknown";
+    //   const fromUserIDStr = String(data.fromUserID);
+    //   const toUserIDStr = String(data.toUserID);
+    //   const fromName = getUsernameByID(data.fromUserID) || "Unknown";
+    //   const toName = getUsernameByID(data.toUserID) || "Unknown";
 
-//   const selectedTimers = Array.isArray(data.selectedTimers) ? data.selectedTimers : [];
+    //   const selectedTimers = Array.isArray(data.selectedTimers) ? data.selectedTimers : [];
 
-//   const selectedListHTML = selectedTimers.length > 0
-//     ? selectedTimers.map((title, index) => {
-//         const checkboxId = `checkbox-${data.ELMxID}-${index}`;
-//         return `
-//           <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
-//     name="thirding-selected-${fromUserIDStr}" value="${title}" />
-//   <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
-//          `;
-//       }).join("")
-//     : "<p><em>No timers selected.</em></p>";
+    //   const selectedListHTML = selectedTimers.length > 0
+    //     ? selectedTimers.map((title, index) => {
+    //         const checkboxId = `checkbox-${data.ELMxID}-${index}`;
+    //         return `
+    //           <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
+    //     name="thirding-selected-${fromUserIDStr}" value="${title}" />
+    //   <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
+    //          `;
+    //       }).join("")
+    //     : "<p><em>No timers selected.</em></p>";
 
-//   const minutes = data.minutes ?? 0;
-//   const seconds = data.seconds ?? 0;
-//   const note = data.note ?? "";
+    //   const minutes = data.minutes ?? 0;
+    //   const seconds = data.seconds ?? 0;
+    //   const note = data.note ?? "";
 
-//   const container = document.createElement("div");
-//   container.id = uniqueApprovalID;
+    //   const container = document.createElement("div");
+    //   container.id = uniqueApprovalID;
 
-//   container.innerHTML = `
-//     <div class="pending-approval thirding-approval"
-//       style="border: 1px solid #ccc; padding: 10px; margin-bottom: 12px; background-color: #f9f9f9;">
-//       <p><strong>🔐 Third+ Approval:</strong> ${fromName} ➜ ${toName} (${minutes} min ${seconds} sec)</p>
-//       <p><em>${note}</em></p>
+    //   container.innerHTML = `
+    //     <div class="pending-approval thirding-approval"
+    //       style="border: 1px solid #ccc; padding: 10px; margin-bottom: 12px; background-color: #f9f9f9;">
+    //       <p><strong>🔐 Third+ Approval:</strong> ${fromName} ➜ ${toName} (${minutes} min ${seconds} sec)</p>
+    //       <p><em>${note}</em></p>
 
-//       <div style="margin: 8px 0;">
-//         <strong>Selected Timers:</strong>
-//         ${selectedListHTML}
-//       </div>
+    //       <div style="margin: 8px 0;">
+    //         <strong>Selected Timers:</strong>
+    //         ${selectedListHTML}
+    //       </div>
 
-//       <button class="approve-btn">Approve</button> 
-//       <button class="remove-btn" style="margin-left: 6px;">Remove</button>
-//     </div>
-//   `;
+    //       <button class="approve-btn">Approve</button> 
+    //       <button class="remove-btn" style="margin-left: 6px;">Remove</button>
+    //     </div>
+    //   `;
 
-//   container.querySelector(".approve-btn").addEventListener("click", () => {
-//     const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
-//     const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
-//     if (!allChecked) {
-//       alert("Please ensure all timer checkboxes are selected before approving.");
-//       return;
-//     }
+    //   container.querySelector(".approve-btn").addEventListener("click", () => {
+    //     const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
+    //     const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
+    //     if (!allChecked) {
+    //       alert("Please ensure all timer checkboxes are selected before approving.");
+    //       return;
+    //     }
 
-//     sendDonation(data);
-//     container.remove();
+    //     sendDonation(data);
+    //     container.remove();
 
-//     donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
+    //     donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
 
-//     socket.send(JSON.stringify({
-//       cmd: "sendingThirdingremoveApprovalUI",
-//       msg: {
-//         ELMxID: data.ELMxID,
-//         fromUserID: data.fromUserID,
-//         toUserID: data.toUserID,
-//         totalSeconds: data.totalSeconds
-//       }
-//     }));
-//   });
+    //     socket.send(JSON.stringify({
+    //       cmd: "sendingThirdingremoveApprovalUI",
+    //       msg: {
+    //         ELMxID: data.ELMxID,
+    //         fromUserID: data.fromUserID,
+    //         toUserID: data.toUserID,
+    //         totalSeconds: data.totalSeconds
+    //       }
+    //     }));
+    //   });
 
-//   container.querySelector(".remove-btn").addEventListener("click", () => {
-//     if (confirm("Are you sure you want to remove this thirding approval?")) {
-//       container.remove();
+    //   container.querySelector(".remove-btn").addEventListener("click", () => {
+    //     if (confirm("Are you sure you want to remove this thirding approval?")) {
+    //       container.remove();
 
-//       socket.send(JSON.stringify({
-//         cmd: "removeThirdingApprovedDonation",
-//         msg: {
-//           ELMxID: data.ELMxID,
-//           fromUserID: data.fromUserID,
-//           toUserID: data.toUserID,
-//           totalSeconds: data.totalSeconds
-//         }
-//       }));
+    //       socket.send(JSON.stringify({
+    //         cmd: "removeThirdingApprovedDonation",
+    //         msg: {
+    //           ELMxID: data.ELMxID,
+    //           fromUserID: data.fromUserID,
+    //           toUserID: data.toUserID,
+    //           totalSeconds: data.totalSeconds
+    //         }
+    //       }));
 
-//       socket.send(JSON.stringify({
-//         cmd: "sendingThirdingremoveApprovalUI",
-//         msg: {
-//           ELMxID: data.ELMxID,
-//           fromUserID: data.fromUserID,
-//           toUserID: data.toUserID,
-//           totalSeconds: data.totalSeconds
-//         }
-//       }));
-//     }
-//   });
+    //       socket.send(JSON.stringify({
+    //         cmd: "sendingThirdingremoveApprovalUI",
+    //         msg: {
+    //           ELMxID: data.ELMxID,
+    //           fromUserID: data.fromUserID,
+    //           toUserID: data.toUserID,
+    //           totalSeconds: data.totalSeconds
+    //         }
+    //       }));
+    //     }
+    //   });
 
-//   document.getElementById("unapprovedItems").appendChild(container);
-// }
+    //   document.getElementById("unapprovedItems").appendChild(container);
+    // }
 
-function showThirdingApprovalUI(data) {
-  console.log("📋 showThirdingApprovalUI called with data:", data);
+    function showThirdingApprovalUI(data) {
+      console.log("📋 showThirdingApprovalUI called with data:", data);
 
-  if (
-    typeof data.ELMxID === "undefined" ||
-    typeof data.fromUserID === "undefined" ||
-    typeof data.toUserID === "undefined" ||
-    typeof data.totalSeconds === "undefined"
-  ) {
-    console.error("❌ Missing required data fields:", data);
-    return;
-  }
+      if (
+        typeof data.ELMxID === "undefined" ||
+        typeof data.fromUserID === "undefined" ||
+        typeof data.toUserID === "undefined" ||
+        typeof data.totalSeconds === "undefined"
+      ) {
+        console.error("❌ Missing required data fields:", data);
+        return;
+      }
 
-  const uniqueApprovalID = `thirding-approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-  if (document.getElementById(uniqueApprovalID)) {
-    console.log("⛔ Thirding approval UI already exists, skipping.");
-    return;
-  }
+      const uniqueApprovalID = `thirding-approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+      if (document.getElementById(uniqueApprovalID)) {
+        console.log("⛔ Thirding approval UI already exists, skipping.");
+        return;
+      }
 
-  const fromUserIDStr = String(data.fromUserID);
-  const toUserIDStr = String(data.toUserID);
-  const fromName = getUsernameByID(data.fromUserID) || "Unknown";
-  const toName = getUsernameByID(data.toUserID) || "Unknown";
+      const fromUserIDStr = String(data.fromUserID);
+      const toUserIDStr = String(data.toUserID);
+      const fromName = getUsernameByID(data.fromUserID) || "Unknown";
+      const toName = getUsernameByID(data.toUserID) || "Unknown";
 
-  const selectedTimers = Array.isArray(data.selectedTimers) ? data.selectedTimers : [];
+      const selectedTimers = Array.isArray(data.selectedTimers) ? data.selectedTimers : [];
 
-  const selectedListHTML = selectedTimers.length > 0
-    ? selectedTimers.map((title, index) => {
-        // const checkboxId = `checkbox-${data.ELMxID}-${index}`;
-        const checkboxId = `checkbox-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}-${index}`;
-        return `
+      const selectedListHTML = selectedTimers.length > 0
+        ? selectedTimers.map((title, index) => {
+          // const checkboxId = `checkbox-${data.ELMxID}-${index}`;
+          const checkboxId = `checkbox-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}-${index}`;
+          return `
           <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
             name="thirding-selected-${fromUserIDStr}" value="${title}" data-elmxid="${data.ELMxID}"
             data-fromuserid="${data.fromUserID}" data-checkboxindex="${index}" />
           <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
         `;
-      }).join("")
-    : "<p><em>No timers selected.</em></p>";
+        }).join("")
+        : "<p><em>No timers selected.</em></p>";
 
-  const minutes = data.minutes ?? 0;
-  const seconds = data.seconds ?? 0;
-  const note = data.note ?? "";
+      const minutes = data.minutes ?? 0;
+      const seconds = data.seconds ?? 0;
+      const note = data.note ?? "";
 
-  const container = document.createElement("div");
-  container.id = uniqueApprovalID;
+      const container = document.createElement("div");
+      container.id = uniqueApprovalID;
 
-  container.innerHTML = `
+      container.innerHTML = `
     <div class="pending-approval thirding-approval"
       style="border: 1px solid #ccc; padding: 10px; margin-bottom: 12px; background-color: #f9f9f9;">
       <p><strong>🔐 Third+ Approval:</strong> ${fromName} ➜ ${toName} (${minutes} min ${seconds} sec)</p>
@@ -2491,79 +2519,79 @@ function showThirdingApprovalUI(data) {
     </div>
   `;
 
-  container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", () => {
-      const checkboxId = checkbox.id;
-      const checked = checkbox.checked;
-      const ELMxID = checkbox.getAttribute("data-elmxid");
-      const fromUserID = checkbox.getAttribute("data-fromuserid");
-      const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
+      container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+          const checkboxId = checkbox.id;
+          const checked = checkbox.checked;
+          const ELMxID = checkbox.getAttribute("data-elmxid");
+          const fromUserID = checkbox.getAttribute("data-fromuserid");
+          const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
 
-      socket.send(JSON.stringify({
-        cmd: "updateThirdingCheckbox",
-        msg: {
-          ELMxID,
-          fromUserID,
-          checkboxId,
-          checked,
-          checkboxIndex
+          socket.send(JSON.stringify({
+            cmd: "updateThirdingCheckbox",
+            msg: {
+              ELMxID,
+              fromUserID,
+              checkboxId,
+              checked,
+              checkboxIndex
+            }
+          }));
+        });
+      });
+
+      container.querySelector(".approve-btn").addEventListener("click", () => {
+        const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
+        const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
+        if (!allChecked) {
+          alert("Please ensure all timer checkboxes are selected before approving.");
+          return;
         }
-      }));
-    });
-  });
 
-  container.querySelector(".approve-btn").addEventListener("click", () => {
-    const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
-    const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
-    if (!allChecked) {
-      alert("Please ensure all timer checkboxes are selected before approving.");
-      return;
+        sendDonation(data);
+        container.remove();
+
+        donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
+
+        socket.send(JSON.stringify({
+          cmd: "sendingThirdingremoveApprovalUI",
+          msg: {
+            ELMxID: data.ELMxID,
+            fromUserID: data.fromUserID,
+            toUserID: data.toUserID,
+            totalSeconds: data.totalSeconds
+          }
+        }));
+      });
+
+      container.querySelector(".remove-btn").addEventListener("click", () => {
+        if (confirm("Are you sure you want to remove this thirding approval?")) {
+          container.remove();
+
+          socket.send(JSON.stringify({
+            cmd: "removeThirdingApprovedDonation",
+            msg: {
+              ELMxID: data.ELMxID,
+              fromUserID: data.fromUserID,
+              toUserID: data.toUserID,
+              totalSeconds: data.totalSeconds
+            }
+          }));
+
+          socket.send(JSON.stringify({
+            cmd: "sendingThirdingremoveApprovalUI",
+            msg: {
+              ELMxID: data.ELMxID,
+              fromUserID: data.fromUserID,
+              toUserID: data.toUserID,
+              totalSeconds: data.totalSeconds
+            }
+          }));
+        }
+      });
+
+      document.getElementById("unapprovedItems").appendChild(container);
     }
-
-    sendDonation(data);
-    container.remove();
-
-    donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
-
-    socket.send(JSON.stringify({
-      cmd: "sendingThirdingremoveApprovalUI",
-      msg: {
-        ELMxID: data.ELMxID,
-        fromUserID: data.fromUserID,
-        toUserID: data.toUserID,
-        totalSeconds: data.totalSeconds
-      }
-    }));
-  });
-
-  container.querySelector(".remove-btn").addEventListener("click", () => {
-    if (confirm("Are you sure you want to remove this thirding approval?")) {
-      container.remove();
-
-      socket.send(JSON.stringify({
-        cmd: "removeThirdingApprovedDonation",
-        msg: {
-          ELMxID: data.ELMxID,
-          fromUserID: data.fromUserID,
-          toUserID: data.toUserID,
-          totalSeconds: data.totalSeconds
-        }
-      }));
-
-      socket.send(JSON.stringify({
-        cmd: "sendingThirdingremoveApprovalUI",
-        msg: {
-          ELMxID: data.ELMxID,
-          fromUserID: data.fromUserID,
-          toUserID: data.toUserID,
-          totalSeconds: data.totalSeconds
-        }
-      }));
-    }
-  });
-
-  document.getElementById("unapprovedItems").appendChild(container);
-}
 
 
     // Get username by ID
@@ -2645,9 +2673,14 @@ function showThirdingApprovalUI(data) {
         } = entry;
 
         let messageText = `${timerName || "Timer"} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
-        if (donationCount) {
+        // if (donationCount) {
+        //   messageText += ` (Donated ${donationCount} ${donationCount === 1 ? "time" : "times"})`;
+        // }
+
+        if (donationCount > 1) {
           messageText += ` (Donated ${donationCount} ${donationCount === 1 ? "time" : "times"})`;
-        }
+          }
+
         if (approvedByName) {
           messageText += ` ✅ Approved by ${approvedByName}`;
         }
@@ -3113,9 +3146,9 @@ function showThirdingApprovalUI(data) {
 
 
         case "returnUpdatedThirdingCheckbox":
-        console.log("📩 Received returnUpdatedThirdingCheckbox message:", data);
+          console.log("📩 Received returnUpdatedThirdingCheckbox message:", data);
 
-        break;
+          break;
 
 
         case "returnShowApproval":
@@ -3137,7 +3170,7 @@ function showThirdingApprovalUI(data) {
           // handleShowApproval(remapped);
           break;
 
-          
+
 
 
         // case "returnShowThirdingApproval":
@@ -3172,7 +3205,7 @@ function showThirdingApprovalUI(data) {
 
 
 
-      
+
 
         case "broadcastRemoveTimer":
           console.log("Received broadcastRemoveTimer:", data);
@@ -3293,7 +3326,36 @@ function showThirdingApprovalUI(data) {
         //     .join('');
         // }
         // break;
-        case 'returnselectedTimersUpdate':
+        // case 'returnselectedTimersUpdate':
+        //   const selectedTimers = data.msg.selectedTimers;
+        //   console.log("selectedTimers", selectedTimers);
+
+        //   // Uncheck all checkboxes first
+        //   const allCheckboxes = document.querySelectorAll('.timer-checkbox');
+        //   allCheckboxes.forEach((checkbox) => {
+        //     checkbox.checked = false; // Ensure all checkboxes are unchecked initially
+        //   });
+
+        //   // Check the checkboxes corresponding to the selectedTimers
+        //   selectedTimers.forEach((timer) => {
+        //     const checkbox = document.querySelector(`input[data-id="${timer.newTimerID}-14"]`);
+        //     if (checkbox) {
+        //       checkbox.checked = true; // Re-check the checkboxes for selected timers
+        //     }
+        //   });
+
+        //   // Optionally, update the output display to show selected timer titles
+        //   const outputDiv = document.getElementById('selected-timers-output');
+        //   if (outputDiv) {
+        //     outputDiv.innerHTML = selectedTimers
+        //       .map(timer => `<div>${timer.title}</div>`)
+        //       .join(''); // Update output with titles of selected timers
+        //   }
+
+        //   break;
+
+
+        case 'returnselectedTimersUpdate': {
           const selectedTimers = data.msg.selectedTimers;
           console.log("selectedTimers", selectedTimers);
 
@@ -3311,15 +3373,17 @@ function showThirdingApprovalUI(data) {
             }
           });
 
-          // Optionally, update the output display to show selected timer titles
+          // Update the output display to show numbered selected timer titles
           const outputDiv = document.getElementById('selected-timers-output');
           if (outputDiv) {
             outputDiv.innerHTML = selectedTimers
-              .map(timer => `<div>${timer.title}</div>`)
-              .join(''); // Update output with titles of selected timers
+              .map((timer, index) => `<div>${index + 1}. ${timer.title}</div>`)
+              .join(''); // Display numbered list of selected timers
           }
 
           break;
+        }
+
 
 
 
@@ -3694,7 +3758,60 @@ function showThirdingApprovalUI(data) {
 
 
 
-        case "donateTimeResult":
+        // case "donateTimeResult":
+        //   const {
+        //     fromUserID,
+        //     toUserID,
+        //     timerName,
+        //     donatedMinutes,
+        //     donatedSeconds,
+        //     totalSeconds,
+        //     donorNewTime,
+        //     recipientNewTime,
+        //     recipientName,
+        //     donorName,
+        //     approvedByID,
+        //     approvedByName,
+        //     donationCount // 👈 Get the count directly from server response
+        //   } = data.msg;
+
+        //   // ⛔ Prevent self-donation
+        //   if (fromUserID === toUserID) {
+        //     const errorMsg = `❌ Invalid donation: You cannot donate time to yourself (${donorName || fromUserID}).`;
+        //     console.warn(errorMsg);
+        //     displayDonationMessageOnHTML(errorMsg, true);
+        //     break;
+        //   }
+
+        //   const isRepeated = donationCount > 1; // ✅ Use count from backend
+
+        //   // 🧾 Build donation message
+        //   let donationMessage = `${timerName || "Timer"} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
+
+        //   if (donationCount > 1) {
+        //     donationMessage += ` (Donated ${donationCount} ${donationCount === 1 ? "time" : "times"})`;
+        //   }
+
+        //   // ✅ If there's an approver, append their info
+        //   if (approvedByID && approvedByName) {
+        //     donationMessage += ` ✅ Approved by ${approvedByName}`;
+        //   }
+
+        //   // Loop iteration for the messages (Add a counter here)
+        //   const donationIndex = donationCount; // You can replace this with the iteration variable if needed
+
+        //   console.log(`Entry ${donationIndex}: ${donationMessage}`);
+        //   displayDonationMessageOnHTML(`${donationIndex}. ${donationMessage}`, false, isRepeated);
+
+        //   // ⏱️ Update timers
+        //   updateTimerDisplay(fromUserID, donorNewTime);
+        //   updateTimerDisplay(toUserID, recipientNewTime);
+
+        //   break;
+
+
+
+        case "donateTimeResult": {
           const {
             fromUserID,
             toUserID,
@@ -3733,18 +3850,16 @@ function showThirdingApprovalUI(data) {
             donationMessage += ` ✅ Approved by ${approvedByName}`;
           }
 
-          // Loop iteration for the messages (Add a counter here)
-          const donationIndex = donationCount; // You can replace this with the iteration variable if needed
-
-          console.log(`Entry ${donationIndex}: ${donationMessage}`);
-          displayDonationMessageOnHTML(`${donationIndex}. ${donationMessage}`, false, isRepeated);
+          // ✅ Display message without count prefix — handled by displayDonationMessageOnHTML
+          console.log("Donation Message:", donationMessage);
+          displayDonationMessageOnHTML(donationMessage, false, isRepeated);
 
           // ⏱️ Update timers
           updateTimerDisplay(fromUserID, donorNewTime);
           updateTimerDisplay(toUserID, recipientNewTime);
 
           break;
-
+        }
 
 
 
@@ -3894,7 +4009,7 @@ function showThirdingApprovalUI(data) {
 
     }//end setGlobalVariablesOnceDOMContentLoaded
 
-      
+
     function synchronizeScreenDraw() {
       //this function is called once DOMContentLoaded loads to go to server and then draw all DOM elemtns and timers.
       //we must wait to call this because the websocket starts before DOM is loaded and will give error. 
@@ -3936,7 +4051,7 @@ function showThirdingApprovalUI(data) {
     };//end  synchronizeScreenDraw();
 
 
-    
+
 
 
     let resetCycleCompleted = false; // Tracks if the first reset cycle has been completed
@@ -6403,7 +6518,7 @@ function showThirdingApprovalUI(data) {
       //       seconds: donateSeconds,
       //       totalSeconds,
       //       selectedTimers: selectedTitles,
-            
+
       //       note: "Third+ donation – full approval"
       //     };
 
@@ -6437,101 +6552,101 @@ function showThirdingApprovalUI(data) {
 
       const donationInProgress = {};
 
-function attachDonateButton(cardElement, fromUserID, timerName) {
-  const donateBtn = cardElement.querySelector(".donate-btn");
+      function attachDonateButton(cardElement, fromUserID, timerName) {
+        const donateBtn = cardElement.querySelector(".donate-btn");
 
-  // Prevent multiple listeners
-  if (donateBtn.dataset.listenerAttached === "true") return;
-  donateBtn.dataset.listenerAttached = "true";
+        // Prevent multiple listeners
+        if (donateBtn.dataset.listenerAttached === "true") return;
+        donateBtn.dataset.listenerAttached = "true";
 
-  donateBtn.addEventListener("click", async () => {
-    const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
-    const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
-    const recipientSelect = cardElement.querySelector("select");
+        donateBtn.addEventListener("click", async () => {
+          const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
+          const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
+          const recipientSelect = cardElement.querySelector("select");
 
-    const donateMinutes = parseInt(minutesInput?.value || "0");
-    const donateSeconds = parseInt(secondsInput?.value || "0");
-    const toUserID = parseInt(recipientSelect?.value);
-    const totalSeconds = donateMinutes * 60 + donateSeconds;
+          const donateMinutes = parseInt(minutesInput?.value || "0");
+          const donateSeconds = parseInt(secondsInput?.value || "0");
+          const toUserID = parseInt(recipientSelect?.value);
+          const totalSeconds = donateMinutes * 60 + donateSeconds;
 
-    if (!toUserID || totalSeconds <= 1) {
-      alert("Please select a recipient and enter valid time to donate.");
-      return;
-    }
+          if (!toUserID || totalSeconds <= 1) {
+            alert("Please select a recipient and enter valid time to donate.");
+            return;
+          }
 
-    // Build list of selected checkbox titles (checkboxes with .timer-checkbox class)
-    const selectedTitles = [];
-    const selectedTimerIDs = []; // <== To collect newTimerID values
+          // Build list of selected checkbox titles (checkboxes with .timer-checkbox class)
+          const selectedTitles = [];
+          const selectedTimerIDs = []; // <== To collect newTimerID values
 
-    const timerComponents = document.querySelectorAll('.timer-checkbox');
+          const timerComponents = document.querySelectorAll('.timer-checkbox');
 
-    timerComponents.forEach((checkbox) => {
-      if (checkbox.checked) {
-        const timerComponent = checkbox.closest('div');
-        const titleInput = timerComponent.querySelector('.timer-title');
-        let title = titleInput?.value.trim();
+          timerComponents.forEach((checkbox) => {
+            if (checkbox.checked) {
+              const timerComponent = checkbox.closest('div');
+              const titleInput = timerComponent.querySelector('.timer-title');
+              let title = titleInput?.value.trim();
 
-        const dataId = titleInput?.getAttribute('data-id') || '';
-        const newTimerID = dataId.split('-')[0];
+              const dataId = titleInput?.getAttribute('data-id') || '';
+              const newTimerID = dataId.split('-')[0];
 
-        if (!title) {
-          title = `User-${newTimerID}`;
-        }
+              if (!title) {
+                title = `User-${newTimerID}`;
+              }
 
-        selectedTitles.push(title);
-        selectedTimerIDs.push(newTimerID); // <== Store ID
+              selectedTitles.push(title);
+              selectedTimerIDs.push(newTimerID); // <== Store ID
+            }
+          });
+
+          // Main donation payload
+          const donationData = {
+            fromUserID,
+            toUserID,
+            timerName,
+            minutes: donateMinutes,
+            seconds: donateSeconds,
+            totalSeconds
+          };
+
+          // Third+ donation full approval payload
+          const thirdingDataDonation = {
+            fromUserID,
+            toUserID,
+            timerName,
+            minutes: donateMinutes,
+            seconds: donateSeconds,
+            totalSeconds,
+            selectedTimers: selectedTitles,
+            selectedTimerIDs, // <== Include it here
+            note: "Third+ donation – full approval"
+          };
+
+          // Track donation in progress
+          donationInProgress[`${fromUserID}-${toUserID}`] = true;
+
+          try {
+            const previousDonationCount = await checkDonationCount(fromUserID, toUserID);
+            console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
+
+            if (previousDonationCount === 1) {
+              // 🟡 Second donation — send for approval
+              console.log("🛡️ Second donation detected, sending showApproval");
+              socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
+            } else if (previousDonationCount >= 2) {
+              // 🔒 Third+ donation — full approval with extra data
+              console.log("🔐 Third+ donation, sending showThirdingApproval:", thirdingDataDonation);
+              socket.send(JSON.stringify({ cmd: "showThirdingApproval", msg: thirdingDataDonation }));
+            } else {
+              // ✅ First donation — send directly
+              console.log("🚀 First donation, sending directly:", donationData);
+              sendDonation(donationData);
+            }
+          } catch (err) {
+            console.error("❌ Failed to check donation count:", err);
+            donationInProgress[`${fromUserID}-${toUserID}`] = false; // Reset on error
+          }
+        });
       }
-    });
-
-    // Main donation payload
-    const donationData = {
-      fromUserID,
-      toUserID,
-      timerName,
-      minutes: donateMinutes,
-      seconds: donateSeconds,
-      totalSeconds
-    };
-
-    // Third+ donation full approval payload
-    const thirdingDataDonation = {
-      fromUserID,
-      toUserID,
-      timerName,
-      minutes: donateMinutes,
-      seconds: donateSeconds,
-      totalSeconds,
-      selectedTimers: selectedTitles,
-      selectedTimerIDs, // <== Include it here
-      note: "Third+ donation – full approval"
-    };
-
-    // Track donation in progress
-    donationInProgress[`${fromUserID}-${toUserID}`] = true;
-
-    try {
-      const previousDonationCount = await checkDonationCount(fromUserID, toUserID);
-      console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
-
-      if (previousDonationCount === 1) {
-        // 🟡 Second donation — send for approval
-        console.log("🛡️ Second donation detected, sending showApproval");
-        socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
-      } else if (previousDonationCount >= 2) {
-        // 🔒 Third+ donation — full approval with extra data
-        console.log("🔐 Third+ donation, sending showThirdingApproval:", thirdingDataDonation);
-        socket.send(JSON.stringify({ cmd: "showThirdingApproval", msg: thirdingDataDonation }));
-      } else {
-        // ✅ First donation — send directly
-        console.log("🚀 First donation, sending directly:", donationData);
-        sendDonation(donationData);
-      }
-    } catch (err) {
-      console.error("❌ Failed to check donation count:", err);
-      donationInProgress[`${fromUserID}-${toUserID}`] = false; // Reset on error
-    }
-  });
-}
 
 
 
@@ -6900,8 +7015,8 @@ function attachDonateButton(cardElement, fromUserID, timerName) {
       //Mark/Nabin, where you left off: comment out these const variables and put them in setGlobalVariableOnceDOMContentLoaded and call global versions of these from within the function and set them to the new DOM elements created
       setGlobalVariablesOnceDOMContentLoaded();
       synchronizeScreenDraw();
-            showSelectedTimers();
-            showdonationhistory();
+      showSelectedTimers();
+      showdonationhistory();
 
       const timerList = document.getElementById("timerList");
       const addTimerBtn = document.getElementById("addTimerBtn");
