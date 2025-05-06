@@ -380,6 +380,11 @@
       padding: 5px 10px;
     }
 
+    /* Container can be flex if you want layout control */
+
+    
+
+
 
 
 
@@ -720,6 +725,42 @@
       transform: translateY(0);
       width: 50%;
     }
+
+
+
+    /*thirding donation section button style*/
+    
+.thirding-approval {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Hide the actual checkbox */
+.thirding-toggle-checkbox {
+  display: none;
+}
+
+/* Label styled as button */
+.thirding-lable {
+  display: inline-block;
+  width: 140px;
+  height: 40px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 40px;
+  color: white;
+  background-color: red;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  position: relative;
+}
+
+/* When checkbox is checked, turn button green */
+.thirding-toggle-checkbox:checked + .thirding-lable {
+  background-color: green;
+}
 
 
 
@@ -1422,53 +1463,278 @@
 
 
 
+    // function updateSelectedTimersOutput() {
+    //   const selectedTitles = [];
+    //   const timerComponents = document.querySelectorAll('.timer-checkbox');
+
+    //   timerComponents.forEach((checkbox) => {
+    //     if (checkbox.checked) {
+    //       const timerComponent = checkbox.closest('div'); // Adjust if needed
+    //       const titleInput = timerComponent.querySelector('.timer-title');
+
+    //       let title = titleInput?.value.trim();
+
+    //       if (!title) {
+    //         // Get data-id from the title input or fallback to any available input
+    //         const dataId = titleInput?.getAttribute('data-id') || '';
+    //         const newTimerID = dataId.split('-')[0];
+    //         title = `User-${newTimerID}`;
+    //       }
+
+    //       selectedTitles.push(title);
+    //     }
+    //   });
+
+    //   // Display selected timer titles
+    //   const outputDiv = document.getElementById('selected-timers-output');
+    //   outputDiv.innerHTML = selectedTitles.map(title => `<div>${title}</div>`).join('');
+    // }
+
+
+    //     function updateSelectedTimersOutput() {
+    //   const selectedTitles = [];
+    //   const timerComponents = document.querySelectorAll('.timer-checkbox');
+
+    //   timerComponents.forEach((checkbox) => {
+    //     if (checkbox.checked) {
+    //       const timerComponent = checkbox.closest('div');
+    //       const titleInput = timerComponent?.querySelector('.timer-title');
+
+    //       let title = titleInput?.value?.trim();
+
+    //       // Add the "User-" prefix if necessary
+    //       if (!title) {
+    //         const dataId = titleInput?.getAttribute('data-id') || '';
+    //         const newTimerID = dataId.split('-')[0];
+    //         title = `User-${newTimerID}`;
+    //       }
+
+    //       selectedTitles.push(title);
+    //     }
+    //   });
+
+    //   // Display selected timer titles
+    //   const outputDiv = document.getElementById('selected-timers-output');
+    //   outputDiv.innerHTML = selectedTitles.map(title => `<div>${title}</div>`).join('');
+    // }
+
+
+
+
+    // function updateSelectedTimersOutput() {
+
+    //   const selectedTitles = [];
+    //   const checkboxes = document.querySelectorAll('.timer-checkbox');
+
+    //   checkboxes.forEach((checkbox) => {
+    //     if (checkbox.checked) {
+    //       const timerComponent = checkbox.closest('div');
+    //       const titleInput = timerComponent?.querySelector('.timer-title');
+
+    //       let title = titleInput?.value?.trim();
+
+    //       // Add the "User-" prefix if necessary
+    //       if (!title) {
+    //         const dataId = titleInput?.getAttribute('data-id') || '';
+    //         const newTimerID = dataId.split('-')[0];
+    //         title = `User-${newTimerID}`;
+    //       }
+
+    //       selectedTitles.push(title);
+    //     }
+    //   });
+
+    //   // Display selected timer titles
+    //   const outputDiv = document.getElementById('selected-timers-output');
+    //   if (outputDiv) {
+    //     outputDiv.innerHTML = selectedTitles.map(title => `<div>${title}</div>`).join('');
+    //   }
+
+    //   // Send selected titles to the server via WebSocket
+    //   if (socket.readyState === WebSocket.OPEN) {
+    //     const message = {
+    //       cmd: "selectedTimersUpdate",
+    //       msg: {
+    //         selectedTitles: selectedTitles
+    //       }
+    //     };
+    //     console.warn("sending selected timers.");
+
+    //     socket.send(JSON.stringify(message));
+    //   } else {
+    //     console.warn("WebSocket is not open. Unable to send selected timers.");
+    //   }
+    // }
+
+
+    // function updateSelectedTimersOutput() {
+    //   const selectedTimers = [];
+    //   const checkboxes = document.querySelectorAll('.timer-checkbox');
+
+    //   checkboxes.forEach((checkbox) => {
+    //     if (checkbox.checked) {
+    //       const timerComponent = checkbox.closest('div');
+    //       const titleInput = timerComponent?.querySelector('.timer-title');
+
+    //       let title = titleInput?.value?.trim();
+    //       let newTimerID = '';
+
+    //       // Extract newTimerID from the data-id attribute
+    //       const dataId = checkbox.getAttribute('data-id') || '';
+    //       newTimerID = dataId.split('-')[0];
+
+    //       // Add the "User-" prefix if title is empty
+    //       if (!title) {
+    //         title = `User-${newTimerID}`;
+    //       }
+
+    //       selectedTimers.push({ title, newTimerID });
+    //     }
+    //   });
+
+    //   // Display selected timer titles
+    //   const outputDiv = document.getElementById('selected-timers-output');
+    //   if (outputDiv) {
+    //     outputDiv.innerHTML = selectedTimers
+    //       .map(timer => `<div>${timer.title}</div>`)
+    //       .join('');
+    //   }
+
+    //   // Send selected titles and IDs to the server via WebSocket
+    //   if (socket.readyState === WebSocket.OPEN) {
+    //     const message = {
+    //       cmd: "selectedTimersUpdate",
+    //       msg: {
+    //         selectedTimers: selectedTimers
+    //       }
+    //     };
+    //     console.warn("Sending selected timers:", message);
+    //     socket.send(JSON.stringify(message));
+    //   } else {
+    //     console.warn("WebSocket is not open. Unable to send selected timers.");
+    //   }
+    // }
+
+
+    //     function updateSelectedTimersOutput() {
+    //   const selectedTimers = [];
+    //   const checkboxes = document.querySelectorAll('.timer-checkbox');
+
+    //   checkboxes.forEach((checkbox) => {
+    //     if (checkbox.checked) {
+    //       const timerComponent = checkbox.closest('div');
+    //       const titleInput = timerComponent?.querySelector('.timer-title');
+
+    //       let title = titleInput?.value?.trim();
+    //       let newTimerID = '';
+
+    //       // Extract newTimerID from the data-id attribute
+    //       const dataId = checkbox.getAttribute('data-id') || '';
+    //       newTimerID = dataId.split('-')[0];
+
+    //       // Add the "User-" prefix if title is empty
+    //       if (!title) {
+    //         title = `User-${newTimerID}`;
+    //       }
+
+    //       selectedTimers.push({ title, newTimerID });
+    //     }
+    //   });
+
+    //   // Display selected timer titles
+    //   const outputDiv = document.getElementById('selected-timers-output');
+    //   if (outputDiv) {
+    //     outputDiv.innerHTML = selectedTimers
+    //       .map(timer => `<div>${timer.title}</div>`)
+    //       .join('');
+    //   }
+
+    //   // Send selected titles and IDs to the server via WebSocket
+    //   if (socket.readyState === WebSocket.OPEN) {
+    //     const message = {
+    //       cmd: "selectedTimersUpdate",
+    //       msg: {
+    //         selectedTimers: selectedTimers
+    //       }
+    //     };
+    //     console.warn("Sending selected timers:", message);
+    //     socket.send(JSON.stringify(message));
+    //   } else {
+    //     console.warn("WebSocket is not open. Unable to send selected timers.");
+    //   }
+    // }
+
     function updateSelectedTimersOutput() {
-  const selectedTitles = [];
-  const timerComponents = document.querySelectorAll('.timer-checkbox');
+      const selectedTimers = [];
+      const checkboxes = document.querySelectorAll('.timer-checkbox');
 
-  timerComponents.forEach((checkbox) => {
-    if (checkbox.checked) {
-      const timerComponent = checkbox.closest('div'); // Adjust if needed
-      const titleInput = timerComponent.querySelector('.timer-title');
+      checkboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+          const timerComponent = checkbox.closest('div');
+          const titleInput = timerComponent?.querySelector('.timer-title');
 
-      let title = titleInput?.value.trim();
+          let title = titleInput?.value?.trim();
+          let newTimerID = '';
 
-      if (!title) {
-        // Get data-id from the title input or fallback to any available input
-        const dataId = titleInput?.getAttribute('data-id') || '';
-        const newTimerID = dataId.split('-')[0];
-        title = `User-${newTimerID}`;
+          // Extract newTimerID from the data-id attribute
+          const dataId = checkbox.getAttribute('data-id') || '';
+          newTimerID = dataId.split('-')[0];
+
+          // Add the "User-" prefix if title is empty
+          if (!title) {
+            title = `User-${newTimerID}`;
+          }
+
+          selectedTimers.push({ title, newTimerID });
+        }
+      });
+
+      // Display selected timer titles
+      const outputDiv = document.getElementById('selected-timers-output');
+      if (outputDiv) {
+        outputDiv.innerHTML = selectedTimers
+          .map(timer => `<div>${timer.title}</div>`)
+          .join('');
       }
 
-      selectedTitles.push(title);
+      // Send selected titles and IDs to the server via WebSocket
+      if (socket.readyState === WebSocket.OPEN) {
+        const message = {
+          cmd: "selectedTimersUpdate",
+          msg: {
+            ELMxID: 0,  // Pass the meeting ID here
+            selectedTimers: selectedTimers
+          }
+        };
+        console.warn("Sending selected timers:", message);
+        socket.send(JSON.stringify(message));
+      } else {
+        console.warn("WebSocket is not open. Unable to send selected timers.");
+      }
     }
-  });
-
-  // Display selected timer titles
-  const outputDiv = document.getElementById('selected-timers-output');
-  outputDiv.innerHTML = selectedTitles.map(title => `<div>${title}</div>`).join('');
-}
 
 
 
 
 
-//     function showSelectedTimers() {
-//   const checkboxes = document.querySelectorAll('.timer-checkbox');
-//   const outputDiv = document.getElementById('selected-timers-output');
-//   let outputHTML = '<ul>';
 
-//   checkboxes.forEach(checkbox => {
-//     if (checkbox.checked) {
-//       const timerDiv = checkbox.closest('.timer');
-//       const timerTitleInput = timerDiv.querySelector('.timer-title');
-//       outputHTML += `<li>${timerTitleInput.value}</li>`;
-//     }
-//   });
 
-//   outputHTML += '</ul>';
-//   outputDiv.innerHTML = outputHTML;
-// }
+    //     function showSelectedTimers() {
+    //   const checkboxes = document.querySelectorAll('.timer-checkbox');
+    //   const outputDiv = document.getElementById('selected-timers-output');
+    //   let outputHTML = '<ul>';
+
+    //   checkboxes.forEach(checkbox => {
+    //     if (checkbox.checked) {
+    //       const timerDiv = checkbox.closest('.timer');
+    //       const timerTitleInput = timerDiv.querySelector('.timer-title');
+    //       outputHTML += `<li>${timerTitleInput.value}</li>`;
+    //     }
+    //   });
+
+    //   outputHTML += '</ul>';
+    //   outputDiv.innerHTML = outputHTML;
+    // }
 
 
 
@@ -1697,54 +1963,104 @@
     // Event listener to update the timer when input loses focus
     document.getElementById("mainTimer").addEventListener("blur", updateMainTimerFromInput);
 
-    // Initialize display
+    // Initialize dis play
     updateMainTimerDisplay();
-
 
 
 
     // function showdonationhistory() {
     //   let timerServerID = "yourTimerID"; // Define this somewhere if needed
 
-    //   let responseObject = {
+    //   // Request donation history (messages + unapprovalmessage)
+    //   let donationHistoryRequest = {
     //     cmd: "getDonationMessages",
     //     msg: {
-    //       ELMxID: 0, // Hardcoded, update dynamically as needed
+    //       ELMxID: 0, // Update dynamically if needed
+    //       timerServerID: timerServerID,
+    //     }
+    //   };
+
+    //   // Send both requests to the server
+    //   socket.send(JSON.stringify(donationHistoryRequest));
+    //   // socket.send(JSON.stringify(approvedDonationsRequest));
+
+    //   console.log("📤 Sent getDonationMessages and getApprovedDonations requests");
+    // }
+
+    function showdonationhistory() {
+  let timerServerID = "yourTimerID";
+
+  let donationHistoryRequest = {
+    cmd: "getDonationMessages",
+    msg: {
+      ELMxID: 0,
+      timerServerID: timerServerID,
+    }
+  };
+
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(donationHistoryRequest));
+    console.log("📤 Sent getDonationMessages request immediately");
+  } else {
+    socket.addEventListener("open", function () {
+      socket.send(JSON.stringify(donationHistoryRequest));
+      console.log("📤 Sent getDonationMessages request after socket opened");
+    }, { once: true });
+  }
+}
+
+
+
+    // function showSelectedTimers() {
+    //   let timerServerID = "yourTimerID"; // Define this somewhere if needed
+    //   let ELMxID = 0; // Update this dynamically based on the meeting or user
+
+    //   // Request selected timers data from the server
+    //   let selectedTimersRequest = {
+    //     cmd: "getSelectedTimersState",
+    //     msg: {
+    //       ELMxID: ELMxID, // Provide the ELMxID dynamically if needed
     //       timerServerID: timerServerID,
     //     }
     //   };
 
     //   // Send the request to the server
-    //   socket.send(JSON.stringify(responseObject));
+    //   socket.send(JSON.stringify(selectedTimersRequest));
+
+    //   console.log("📤 Sent getSelectedTimersState request");
     // }
 
 
-    function showdonationhistory() {
-      let timerServerID = "yourTimerID"; // Define this somewhere if needed
+    function showSelectedTimers() {
+  let timerServerID = "yourTimerID";
+  let ELMxID = 0;
 
-      // Request donation history (messages + unapprovalmessage)
-      let donationHistoryRequest = {
-        cmd: "getDonationMessages",
-        msg: {
-          ELMxID: 0, // Update dynamically if needed
-          timerServerID: timerServerID,
-        }
-      };
-
-      // Request approved donations separately
-      // let approvedDonationsRequest = {
-      //   cmd: "getApprovedDonations",
-      //   msg: {
-      //     ELMxID: 0, // Same ELMxID
-      //   }
-      // };
-
-      // Send both requests to the server
-      socket.send(JSON.stringify(donationHistoryRequest));
-      // socket.send(JSON.stringify(approvedDonationsRequest));
-
-      console.log("📤 Sent getDonationMessages and getApprovedDonations requests");
+  const selectedTimersRequest = {
+    cmd: "getSelectedTimersState",
+    msg: {
+      ELMxID: ELMxID,
+      timerServerID: timerServerID
     }
+  };
+
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(selectedTimersRequest));
+    console.log("📤 Sent getSelectedTimersState request immediately");
+  } else {
+    // Wait until socket is ready
+    socket.addEventListener("open", function () {
+      socket.send(JSON.stringify(selectedTimersRequest));
+      console.log("📤 Sent getSelectedTimersState request after socket opened");
+    }, { once: true }); // Only run once
+  }
+}
+
+
+    // HTML button to trigger the function
+    // <button onclick="showSelectedTimers()">Show Selected Timers</button>
+
+
+
 
 
 
@@ -1828,18 +2144,108 @@
 
 
     // Show pending approval
+    //   function showPendingApproval(data) {
+    //     console.log("show pending approval check data ", data);
+
+    //     const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
+
+    //     const fromName = getUsernameByID(data.fromUserID);
+    //     const toName = getUsernameByID(data.toUserID);
+
+    //     const container = document.createElement("div");
+
+    //     // Make the ID truly unique
+    //     const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+    //     container.id = uniqueApprovalID;
+
+    //     container.innerHTML = `
+    //   <div class="pending-approval">
+    //     <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
+    //     <select class="approver-dropdown">${approverOptions}</select>
+    //     <button class="approve-btn">Approve</button>
+    //     <button class="remove-btn">Remove</button> 
+    //   </div>
+    // `;
+
+    //     // Approve button click
+    //     container.querySelector(".approve-btn").addEventListener("click", () => {
+    //       const approverID = container.querySelector(".approver-dropdown").value;
+    //       if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
+    //         alert("Invalid approver.");
+    //         return;
+    //       }
+
+    //       sendDonation(data, parseInt(approverID));
+
+    //       container.remove(); // Remove this box locally
+
+    //       // Notify other browsers to remove it too
+    //       socket.send(JSON.stringify({
+    //         cmd: "sendingremoveApprovalUI",
+    //         msg: {
+    //           ELMxID: data.ELMxID,
+    //           fromUserID: data.fromUserID,
+    //           toUserID: data.toUserID,
+    //           totalSeconds: data.totalSeconds
+    //         }
+    //       }));
+    //     });
+
+    //     // Remove button click
+    //     container.querySelector(".remove-btn").addEventListener("click", () => {
+    //       if (confirm("Are you sure you want to remove this pending approval?")) {
+    //         container.remove(); // Remove this box locally
+
+    //         // First: Tell server to **remove from memory** (VERY IMPORTANT)
+    //         socket.send(JSON.stringify({
+    //           cmd: "removeApprovedDonation",
+    //           msg: {
+    //             ELMxID: data.ELMxID,
+    //             fromUserID: data.fromUserID,
+    //             toUserID: data.toUserID,
+    //             totalSeconds: data.totalSeconds
+    //           }
+    //         }));
+
+    //         console.log("❌ Manual removal of approval sent to server:", {
+    //           ELMxID: data.ELMxID,
+    //           fromUserID: data.fromUserID,
+    //           toUserID: data.toUserID,
+    //           totalSeconds: data.totalSeconds
+    //         });
+
+    //         // Second: Also notify other browsers to remove from their UI
+    //         socket.send(JSON.stringify({
+    //           cmd: "sendingremoveApprovalUI",
+    //           msg: {
+    //             ELMxID: data.ELMxID,
+    //             fromUserID: data.fromUserID,
+    //             toUserID: data.toUserID,
+    //             totalSeconds: data.totalSeconds
+    //           }
+    //         }));
+    //       }
+    //     });
+
+    //     document.getElementById("unapprovedItems").appendChild(container);
+    //   }
+
     function showPendingApproval(data) {
       console.log("show pending approval check data ", data);
 
-      const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
+      const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
 
+      // Prevent duplicate UI elements
+      if (document.getElementById(uniqueApprovalID)) {
+        console.log("⛔ Approval UI already shown, skipping duplicate.");
+        return;
+      }
+
+      const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
       const fromName = getUsernameByID(data.fromUserID);
       const toName = getUsernameByID(data.toUserID);
 
       const container = document.createElement("div");
-
-      // Make the ID truly unique
-      const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
       container.id = uniqueApprovalID;
 
       container.innerHTML = `
@@ -1847,11 +2253,11 @@
       <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
       <select class="approver-dropdown">${approverOptions}</select>
       <button class="approve-btn">Approve</button>
-      <button class="remove-btn">Remove</button>
+      <button class="remove-btn">Remove</button> 
     </div>
   `;
 
-      // Approve button click
+      // Approve button
       container.querySelector(".approve-btn").addEventListener("click", () => {
         const approverID = container.querySelector(".approver-dropdown").value;
         if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
@@ -1860,10 +2266,11 @@
         }
 
         sendDonation(data, parseInt(approverID));
+        container.remove();
 
-        container.remove(); // Remove this box locally
+        // Reset the donation in progress flag
+        donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
 
-        // Notify other browsers to remove it too
         socket.send(JSON.stringify({
           cmd: "sendingremoveApprovalUI",
           msg: {
@@ -1875,12 +2282,11 @@
         }));
       });
 
-      // Remove button click
+      // Remove button
       container.querySelector(".remove-btn").addEventListener("click", () => {
         if (confirm("Are you sure you want to remove this pending approval?")) {
-          container.remove(); // Remove this box locally
+          container.remove();
 
-          // First: Tell server to **remove from memory** (VERY IMPORTANT)
           socket.send(JSON.stringify({
             cmd: "removeApprovedDonation",
             msg: {
@@ -1891,14 +2297,6 @@
             }
           }));
 
-          console.log("❌ Manual removal of approval sent to server:", {
-            ELMxID: data.ELMxID,
-            fromUserID: data.fromUserID,
-            toUserID: data.toUserID,
-            totalSeconds: data.totalSeconds
-          });
-
-          // Second: Also notify other browsers to remove from their UI
           socket.send(JSON.stringify({
             cmd: "sendingremoveApprovalUI",
             msg: {
@@ -1913,6 +2311,259 @@
 
       document.getElementById("unapprovedItems").appendChild(container);
     }
+
+
+
+
+
+//   function showThirdingApprovalUI(data) {
+//   console.log("📋 showThirdingApprovalUI called with data:", data);
+
+//   if (
+//     typeof data.ELMxID === "undefined" ||
+//     typeof data.fromUserID === "undefined" ||
+//     typeof data.toUserID === "undefined" ||
+//     typeof data.totalSeconds === "undefined"
+//   ) {
+//     console.error("❌ Missing required data fields:", data);
+//     return;
+//   }
+
+//   const uniqueApprovalID = `thirding-approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+//   if (document.getElementById(uniqueApprovalID)) {
+//     console.log("⛔ Thirding approval UI already exists, skipping.");
+//     return;
+//   }
+
+//   const fromUserIDStr = String(data.fromUserID);
+//   const toUserIDStr = String(data.toUserID);
+//   const fromName = getUsernameByID(data.fromUserID) || "Unknown";
+//   const toName = getUsernameByID(data.toUserID) || "Unknown";
+
+//   const selectedTimers = Array.isArray(data.selectedTimers) ? data.selectedTimers : [];
+
+//   const selectedListHTML = selectedTimers.length > 0
+//     ? selectedTimers.map((title, index) => {
+//         const checkboxId = `checkbox-${data.ELMxID}-${index}`;
+//         return `
+//           <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
+//     name="thirding-selected-${fromUserIDStr}" value="${title}" />
+//   <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
+//          `;
+//       }).join("")
+//     : "<p><em>No timers selected.</em></p>";
+
+//   const minutes = data.minutes ?? 0;
+//   const seconds = data.seconds ?? 0;
+//   const note = data.note ?? "";
+
+//   const container = document.createElement("div");
+//   container.id = uniqueApprovalID;
+
+//   container.innerHTML = `
+//     <div class="pending-approval thirding-approval"
+//       style="border: 1px solid #ccc; padding: 10px; margin-bottom: 12px; background-color: #f9f9f9;">
+//       <p><strong>🔐 Third+ Approval:</strong> ${fromName} ➜ ${toName} (${minutes} min ${seconds} sec)</p>
+//       <p><em>${note}</em></p>
+
+//       <div style="margin: 8px 0;">
+//         <strong>Selected Timers:</strong>
+//         ${selectedListHTML}
+//       </div>
+
+//       <button class="approve-btn">Approve</button> 
+//       <button class="remove-btn" style="margin-left: 6px;">Remove</button>
+//     </div>
+//   `;
+
+//   container.querySelector(".approve-btn").addEventListener("click", () => {
+//     const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
+//     const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
+//     if (!allChecked) {
+//       alert("Please ensure all timer checkboxes are selected before approving.");
+//       return;
+//     }
+
+//     sendDonation(data);
+//     container.remove();
+
+//     donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
+
+//     socket.send(JSON.stringify({
+//       cmd: "sendingThirdingremoveApprovalUI",
+//       msg: {
+//         ELMxID: data.ELMxID,
+//         fromUserID: data.fromUserID,
+//         toUserID: data.toUserID,
+//         totalSeconds: data.totalSeconds
+//       }
+//     }));
+//   });
+
+//   container.querySelector(".remove-btn").addEventListener("click", () => {
+//     if (confirm("Are you sure you want to remove this thirding approval?")) {
+//       container.remove();
+
+//       socket.send(JSON.stringify({
+//         cmd: "removeThirdingApprovedDonation",
+//         msg: {
+//           ELMxID: data.ELMxID,
+//           fromUserID: data.fromUserID,
+//           toUserID: data.toUserID,
+//           totalSeconds: data.totalSeconds
+//         }
+//       }));
+
+//       socket.send(JSON.stringify({
+//         cmd: "sendingThirdingremoveApprovalUI",
+//         msg: {
+//           ELMxID: data.ELMxID,
+//           fromUserID: data.fromUserID,
+//           toUserID: data.toUserID,
+//           totalSeconds: data.totalSeconds
+//         }
+//       }));
+//     }
+//   });
+
+//   document.getElementById("unapprovedItems").appendChild(container);
+// }
+
+function showThirdingApprovalUI(data) {
+  console.log("📋 showThirdingApprovalUI called with data:", data);
+
+  if (
+    typeof data.ELMxID === "undefined" ||
+    typeof data.fromUserID === "undefined" ||
+    typeof data.toUserID === "undefined" ||
+    typeof data.totalSeconds === "undefined"
+  ) {
+    console.error("❌ Missing required data fields:", data);
+    return;
+  }
+
+  const uniqueApprovalID = `thirding-approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+  if (document.getElementById(uniqueApprovalID)) {
+    console.log("⛔ Thirding approval UI already exists, skipping.");
+    return;
+  }
+
+  const fromUserIDStr = String(data.fromUserID);
+  const toUserIDStr = String(data.toUserID);
+  const fromName = getUsernameByID(data.fromUserID) || "Unknown";
+  const toName = getUsernameByID(data.toUserID) || "Unknown";
+
+  const selectedTimers = Array.isArray(data.selectedTimers) ? data.selectedTimers : [];
+
+  const selectedListHTML = selectedTimers.length > 0
+    ? selectedTimers.map((title, index) => {
+        // const checkboxId = `checkbox-${data.ELMxID}-${index}`;
+        const checkboxId = `checkbox-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}-${index}`;
+        return `
+          <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
+            name="thirding-selected-${fromUserIDStr}" value="${title}" data-elmxid="${data.ELMxID}"
+            data-fromuserid="${data.fromUserID}" data-checkboxindex="${index}" />
+          <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
+        `;
+      }).join("")
+    : "<p><em>No timers selected.</em></p>";
+
+  const minutes = data.minutes ?? 0;
+  const seconds = data.seconds ?? 0;
+  const note = data.note ?? "";
+
+  const container = document.createElement("div");
+  container.id = uniqueApprovalID;
+
+  container.innerHTML = `
+    <div class="pending-approval thirding-approval"
+      style="border: 1px solid #ccc; padding: 10px; margin-bottom: 12px; background-color: #f9f9f9;">
+      <p><strong>🔐 Third+ Approval:</strong> ${fromName} ➜ ${toName} (${minutes} min ${seconds} sec)</p>
+      <p><em>${note}</em></p>
+
+      <div style="margin: 8px 0;">
+        <strong>Selected Timers:</strong>
+        ${selectedListHTML}
+      </div>
+
+      <button class="approve-btn">Approve</button>
+      <button class="remove-btn" style="margin-left: 6px;">Remove</button>
+    </div>
+  `;
+
+  container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      const checkboxId = checkbox.id;
+      const checked = checkbox.checked;
+      const ELMxID = checkbox.getAttribute("data-elmxid");
+      const fromUserID = checkbox.getAttribute("data-fromuserid");
+      const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
+
+      socket.send(JSON.stringify({
+        cmd: "updateThirdingCheckbox",
+        msg: {
+          ELMxID,
+          fromUserID,
+          checkboxId,
+          checked,
+          checkboxIndex
+        }
+      }));
+    });
+  });
+
+  container.querySelector(".approve-btn").addEventListener("click", () => {
+    const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
+    const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
+    if (!allChecked) {
+      alert("Please ensure all timer checkboxes are selected before approving.");
+      return;
+    }
+
+    sendDonation(data);
+    container.remove();
+
+    donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
+
+    socket.send(JSON.stringify({
+      cmd: "sendingThirdingremoveApprovalUI",
+      msg: {
+        ELMxID: data.ELMxID,
+        fromUserID: data.fromUserID,
+        toUserID: data.toUserID,
+        totalSeconds: data.totalSeconds
+      }
+    }));
+  });
+
+  container.querySelector(".remove-btn").addEventListener("click", () => {
+    if (confirm("Are you sure you want to remove this thirding approval?")) {
+      container.remove();
+
+      socket.send(JSON.stringify({
+        cmd: "removeThirdingApprovedDonation",
+        msg: {
+          ELMxID: data.ELMxID,
+          fromUserID: data.fromUserID,
+          toUserID: data.toUserID,
+          totalSeconds: data.totalSeconds
+        }
+      }));
+
+      socket.send(JSON.stringify({
+        cmd: "sendingThirdingremoveApprovalUI",
+        msg: {
+          ELMxID: data.ELMxID,
+          fromUserID: data.fromUserID,
+          toUserID: data.toUserID,
+          totalSeconds: data.totalSeconds
+        }
+      }));
+    }
+  });
+
+  document.getElementById("unapprovedItems").appendChild(container);
+}
 
 
     // Get username by ID
@@ -2000,6 +2651,7 @@
         if (approvedByName) {
           messageText += ` ✅ Approved by ${approvedByName}`;
         }
+
 
         const li = document.createElement("li");
         li.textContent = `${index + 1}. ${messageText}`;
@@ -2460,6 +3112,10 @@
           break;
 
 
+        case "returnUpdatedThirdingCheckbox":
+        console.log("📩 Received returnUpdatedThirdingCheckbox message:", data);
+
+        break;
 
 
         case "returnShowApproval":
@@ -2478,13 +3134,45 @@
 
 
           showPendingApproval(remapped);
+          // handleShowApproval(remapped);
+          break;
 
+          
+
+
+        // case "returnShowThirdingApproval":
+        //   const originalThird = data.msg;
+        //   const remappedThird = {
+        //     fromUserID: originalThird.fromUserID_Approval,
+        //     toUserID: originalThird.toUserID_Approval,
+        //     minutes: originalThird.minutes_Approval,
+        //     seconds: originalThird.seconds_Approval,
+        //     totalSeconds: originalThird.totalSeconds_Approval,
+        //     timerName: originalThird.timerName_Approval,
+        //     selectedTimers: originalThird.selectedTimers_Approval || [],
+        //     note: originalThird.note_Approval || "",
+        //     ELMxID: originalThird.ELMxID_Approval
+        //   };
+
+        //   console.log("📥 Showing Thirding Approval UI:", remappedThird);
+        //   showThirdingApprovalUI(remappedThird);
+        //   break;
+
+
+
+
+
+
+
+        case "returnShowThirdingApproval":
+          console.log("📥 Showing Thirding Approval UI:", data.msg);
+          showThirdingApprovalUI(data.msg);
           break;
 
 
 
 
-
+      
 
         case "broadcastRemoveTimer":
           console.log("Received broadcastRemoveTimer:", data);
@@ -2550,6 +3238,90 @@
           }
 
           break;
+
+
+        // case "returnselectedTimersUpdate":
+
+        //   const selectedTimers = data.msg.selectedTimers;
+        //   console.log("selectedTimers", selectedTimers);
+        //   // Uncheck all checkboxes first
+        //   const allCheckboxes = document.querySelectorAll('.timer-checkbox');
+        //   allCheckboxes.forEach((checkbox) => {
+        //     checkbox.checked = false;
+        //   });
+
+        //   // Check the checkboxes corresponding to the selectedTimers
+        //   selectedTimers.forEach((timer) => {
+        //     const checkbox = document.querySelector(`input[data-id="${timer.newTimerID}-14"]`);
+        //     if (checkbox) {
+        //       checkbox.checked = true;
+        //     }
+        //   });
+
+        //   // Optionally, update the output display
+        //   const outputDiv = document.getElementById('selected-timers-output');
+        //   if (outputDiv) {
+        //     outputDiv.innerHTML = selectedTimers
+        //       .map(timer => `<div>${timer.title}</div>`)
+        //       .join('');
+        //   }
+        //   break;
+
+        // case 'returnselectedTimersUpdate':
+        // const selectedTimers = data.msg.selectedTimers;
+        // console.log("selectedTimers", selectedTimers);
+
+        // // Uncheck all checkboxes first
+        // const allCheckboxes = document.querySelectorAll('.timer-checkbox');
+        // allCheckboxes.forEach((checkbox) => {
+        //   checkbox.checked = false;
+        // });
+
+        // // Check the checkboxes corresponding to the selectedTimers
+        // selectedTimers.forEach((timer) => {
+        //   const checkbox = document.querySelector(`input[data-id="${timer.newTimerID}-14"]`);
+        //   if (checkbox) {
+        //     checkbox.checked = true;
+        //   }
+        // });
+
+        // // Optionally, update the output display
+        // const outputDiv = document.getElementById('selected-timers-output');
+        // if (outputDiv) {
+        //   outputDiv.innerHTML = selectedTimers
+        //     .map(timer => `<div>${timer.title}</div>`)
+        //     .join('');
+        // }
+        // break;
+        case 'returnselectedTimersUpdate':
+          const selectedTimers = data.msg.selectedTimers;
+          console.log("selectedTimers", selectedTimers);
+
+          // Uncheck all checkboxes first
+          const allCheckboxes = document.querySelectorAll('.timer-checkbox');
+          allCheckboxes.forEach((checkbox) => {
+            checkbox.checked = false; // Ensure all checkboxes are unchecked initially
+          });
+
+          // Check the checkboxes corresponding to the selectedTimers
+          selectedTimers.forEach((timer) => {
+            const checkbox = document.querySelector(`input[data-id="${timer.newTimerID}-14"]`);
+            if (checkbox) {
+              checkbox.checked = true; // Re-check the checkboxes for selected timers
+            }
+          });
+
+          // Optionally, update the output display to show selected timer titles
+          const outputDiv = document.getElementById('selected-timers-output');
+          if (outputDiv) {
+            outputDiv.innerHTML = selectedTimers
+              .map(timer => `<div>${timer.title}</div>`)
+              .join(''); // Update output with titles of selected timers
+          }
+
+          break;
+
+
 
         case "returnedFromServerResetVetoName":
           // input msg: { ELMxID: 0, vetoNewTitleID: '', vetoNewName: 'Veto Mark' }
@@ -3122,6 +3894,7 @@
 
     }//end setGlobalVariablesOnceDOMContentLoaded
 
+      
     function synchronizeScreenDraw() {
       //this function is called once DOMContentLoaded loads to go to server and then draw all DOM elemtns and timers.
       //we must wait to call this because the websocket starts before DOM is loaded and will give error. 
@@ -3136,6 +3909,8 @@
       const contentDisplayContainer = document.getElementById("contentDisplayContainer");
       console.log("DOMContentLoaded: timerList:" + JSON.stringify(timerList));
 
+      //working 1
+      // showSelectedTimers();
 
 
       let totalVotes = 0; // Global vote count to track total votes
@@ -3161,6 +3936,7 @@
     };//end  synchronizeScreenDraw();
 
 
+    
 
 
     let resetCycleCompleted = false; // Tracks if the first reset cycle has been completed
@@ -3454,6 +4230,7 @@
 
     //   console.log("✅ Veto value update process complete.");
     // }
+
 
 
     let vetoClickCountMap = {}; // Store click count for each timerID
@@ -4692,7 +5469,7 @@
       //timerComponent.appendChild(timerTitleInput);
 
       timerComponent.innerHTML = `
-<input type="checkbox" class="timer-checkbox"/>
+        <input data-id="${newTimerID}-14" type="checkbox" class="timer-checkbox"/>
         <input data-id="${newTimerID}-1" type="text" value="${timerTitle}" placeholder="Timer Title" class="timer-title"/>
         <input data-id="${newTimerID}-2" type="text" value="${defaultTime}" class="timer-value"/> 
         <input data-id="${newTimerID}-3" type="text" value="${formattedTime}" class="timer-asc"/>
@@ -5386,48 +6163,381 @@
 
 
 
-      function attachDonateButton(cardElement, fromUserID, timerName) {
-        const donateBtn = cardElement.querySelector(".donate-btn");
-        donateBtn?.addEventListener("click", async () => {
-          const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
-          const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
-          const recipientSelect = cardElement.querySelector("select");
+      // function attachDonateButton(cardElement, fromUserID, timerName) {
+      //   const donateBtn = cardElement.querySelector(".donate-btn");
+      //   donateBtn?.addEventListener("click", async () => {
+      //     const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
+      //     const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
+      //     const recipientSelect = cardElement.querySelector("select");
 
-          const donateMinutes = parseInt(minutesInput?.value || "0");
-          const donateSeconds = parseInt(secondsInput?.value || "0");
-          const toUserID = parseInt(recipientSelect?.value);
-          const totalSeconds = donateMinutes * 60 + donateSeconds;
+      //     const donateMinutes = parseInt(minutesInput?.value || "0");
+      //     const donateSeconds = parseInt(secondsInput?.value || "0");
+      //     const toUserID = parseInt(recipientSelect?.value);
+      //     const totalSeconds = donateMinutes * 60 + donateSeconds;
 
-          if (!toUserID || totalSeconds <= 0) {
-            alert("Please select a recipient and enter valid time to donate.");
-            return;
-          }
+      //     if (!toUserID || totalSeconds <= 0) {
+      //       alert("Please select a recipient and enter valid time to donate.");
+      //       return;
+      //     }
 
-          const donationData = {
-            fromUserID,
-            toUserID,
-            timerName,
-            minutes: donateMinutes,
-            seconds: donateSeconds,
-            totalSeconds
-          };
+      //     const donationData = {
+      //       fromUserID,
+      //       toUserID,
+      //       timerName,
+      //       minutes: donateMinutes,
+      //       seconds: donateSeconds,
+      //       totalSeconds
+      //     };
 
-          // 🛑 NEW: Ask server about previous donation count
-          checkDonationCount(fromUserID, toUserID).then((previousDonationCount) => {
-            console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
+      //     // 🛑 NEW: Ask server about previous donation count
+      //     checkDonationCount(fromUserID, toUserID).then((previousDonationCount) => {
+      //       console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
 
-            if (previousDonationCount >= 1) {
-              console.log("🛡️ Approval required before donating again:", donationData);
-              socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
-            } else {
-              console.log("🚀 First donation, sending directly:", donationData);
-              sendDonation(donationData);
-            }
-          }).catch((err) => {
-            console.error("❌ Failed to check donation count:", err);
-          });
-        });
+      //       if (previousDonationCount >= 1) {
+      //         console.log("🛡️ Approval required before donating again:", donationData);
+      //         socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
+      //       } else {
+      //         console.log("🚀 First donation, sending directly:", donationData);
+      //         sendDonation(donationData);
+      //       }
+
+
+      //     }).catch((err) => {
+      //       console.error("❌ Failed to check donation count:", err);
+      //     });
+      //   });
+      // }
+
+      //       function attachDonateButton(cardElement, fromUserID, timerName) {
+      //   const donateBtn = cardElement.querySelector(".donate-btn");
+
+      //   // Prevent multiple listeners
+      //   if (donateBtn.dataset.listenerAttached === "true") return;
+      //   donateBtn.dataset.listenerAttached = "true";
+
+      //   donateBtn.addEventListener("click", async () => {
+      //     const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
+      //     const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
+      //     const recipientSelect = cardElement.querySelector("select");
+
+      //     const donateMinutes = parseInt(minutesInput?.value || "0");
+      //     const donateSeconds = parseInt(secondsInput?.value || "0");
+      //     const toUserID = parseInt(recipientSelect?.value);
+      //     const totalSeconds = donateMinutes * 60 + donateSeconds;
+
+      //     if (!toUserID || totalSeconds <= 0) {
+      //       alert("Please select a recipient and enter valid time to donate.");
+      //       return;
+      //     }
+
+      //     const donationData = {
+      //       fromUserID,
+      //       toUserID,
+      //       timerName,
+      //       minutes: donateMinutes,
+      //       seconds: donateSeconds,
+      //       totalSeconds
+      //     };
+
+      //     // Ask server about previous donation count
+      //     try {
+      //       const previousDonationCount = await checkDonationCount(fromUserID, toUserID);
+      //       console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
+
+      //       if (previousDonationCount >= 1) {
+      //         console.log("🛡️ Approval required before donating again:", donationData);
+      //         socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
+      //       } else {
+      //         console.log("🚀 First donation, sending directly:", donationData);
+      //         sendDonation(donationData);
+      //       }
+      //     } catch (err) {
+      //       console.error("❌ Failed to check donation count:", err);
+      //     }
+      //   });
+      // }
+
+
+
+      // // Track donation in progress to prevent multiple approvals
+      // const donationInProgress = {};
+
+      // function attachDonateButton(cardElement, fromUserID, timerName) {
+      //   const donateBtn = cardElement.querySelector(".donate-btn");
+
+      //   // Prevent multiple listeners
+      //   if (donateBtn.dataset.listenerAttached === "true") return;
+      //   donateBtn.dataset.listenerAttached = "true";
+
+      //   donateBtn.addEventListener("click", async () => {
+      //     const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
+      //     const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
+      //     const recipientSelect = cardElement.querySelector("select");
+
+      //     const donateMinutes = parseInt(minutesInput?.value || "0");
+      //     const donateSeconds = parseInt(secondsInput?.value || "0");
+      //     const toUserID = parseInt(recipientSelect?.value);
+      //     const totalSeconds = donateMinutes * 60 + donateSeconds;
+
+      //     if (!toUserID || totalSeconds <= 1) {
+      //       alert("Please select a recipient and enter valid time to donate.");
+      //       return;
+      //     }
+
+      //     // If donation is already in progress, do not show approval again
+      //     // if (donationInProgress[`${fromUserID}-${toUserID}`]) {
+      //     //   alert("Donation already in progress. Please wait for approval.");
+      //     //   return;
+      //     // }
+
+      //     const donationData = {
+      //       fromUserID,
+      //       toUserID,
+      //       timerName,
+      //       minutes: donateMinutes,
+      //       seconds: donateSeconds,
+      //       totalSeconds
+      //     };
+
+      //     const thirdingDataDonation = {
+
+      //     };
+
+      //     // Track donation in progress
+      //     donationInProgress[`${fromUserID}-${toUserID}`] = true;
+
+      //     // Ask server about previous donation count
+      //     try {
+      //       const previousDonationCount = await checkDonationCount(fromUserID, toUserID);
+      //       console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
+
+      //              if (previousDonationCount === 1) {
+      //         // 🟡 Second donation — send for approval
+      //         console.log("🛡️ Second donation detected, sending showSecendingApproval");
+      //         socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
+      //       } else if (previousDonationCount >= 2) {
+      //         // 🔒 Third+ donation — fallback to full approval
+      //         console.log("🔐 Third+ donation, sending full approval request");
+      //         socket.send(JSON.stringify({ cmd: "showThirdingApproval", msg: thirdingDataDonation }));
+      //       } else {
+      //         // ✅ First donation — send directly
+      //         console.log("🚀 First donation, sending directly:", donationData);
+      //         sendDonation(donationData);
+      //       }
+
+      //       // if (previousDonationCount >= 1) {
+      //       //   console.log("🛡️ Approval required before donating again:", donationData);
+      //       //   socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
+      //       // } else {
+      //       //   console.log("🚀 First donation, sending directly:", donationData);
+      //       //   sendDonation(donationData);
+      //       // }
+      //     } catch (err) {
+      //       console.error("❌ Failed to check donation count:", err);
+      //       donationInProgress[`${fromUserID}-${toUserID}`] = false; // Reset on error
+      //     }
+      //   });
+      // }
+
+      // Track donation in progress to prevent multiple approvals
+      // const donationInProgress = {};
+
+      // function attachDonateButton(cardElement, fromUserID, timerName) {
+      //   const donateBtn = cardElement.querySelector(".donate-btn");
+
+      //   // Prevent multiple listeners
+      //   if (donateBtn.dataset.listenerAttached === "true") return;
+      //   donateBtn.dataset.listenerAttached = "true";
+
+      //   donateBtn.addEventListener("click", async () => {
+      //     const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
+      //     const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
+      //     const recipientSelect = cardElement.querySelector("select");
+
+      //     const donateMinutes = parseInt(minutesInput?.value || "0");
+      //     const donateSeconds = parseInt(secondsInput?.value || "0");
+      //     const toUserID = parseInt(recipientSelect?.value);
+      //     const totalSeconds = donateMinutes * 60 + donateSeconds;
+
+      //     if (!toUserID || totalSeconds <= 1) {
+      //       alert("Please select a recipient and enter valid time to donate.");
+      //       return;
+      //     }
+
+      //     // Build list of selected checkbox titles (checkboxes with .timer-checkbox class)
+      //     const selectedTitles = [];
+      //     const timerComponents = document.querySelectorAll('.timer-checkbox');
+
+      //     timerComponents.forEach((checkbox) => {
+      //       if (checkbox.checked) {
+      //         const timerComponent = checkbox.closest('div');
+      //         const titleInput = timerComponent.querySelector('.timer-title');
+      //         let title = titleInput?.value.trim();
+
+      //         if (!title) {
+      //           const dataId = titleInput?.getAttribute('data-id') || '';
+      //           const newTimerID = dataId.split('-')[0];
+      //           title = `User-${newTimerID}`;
+      //         }
+
+      //         selectedTitles.push(title);
+      //       }
+      //     });
+
+      //     // Main donation payload
+      //     const donationData = {
+      //       fromUserID,
+      //       toUserID,
+      //       timerName,
+      //       minutes: donateMinutes,
+      //       seconds: donateSeconds,
+      //       totalSeconds
+      //     };
+
+      //     // Third+ donation full approval payload
+      //     const thirdingDataDonation = {
+      //       fromUserID,
+      //       toUserID,
+      //       timerName,
+      //       minutes: donateMinutes,
+      //       seconds: donateSeconds,
+      //       totalSeconds,
+      //       selectedTimers: selectedTitles,
+            
+      //       note: "Third+ donation – full approval"
+      //     };
+
+      //     // Track donation in progress
+      //     donationInProgress[`${fromUserID}-${toUserID}`] = true;
+
+      //     try {
+      //       const previousDonationCount = await checkDonationCount(fromUserID, toUserID);
+      //       console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
+
+      //       if (previousDonationCount === 1) {
+      //         // 🟡 Second donation — send for approval
+      //         console.log("🛡️ Second donation detected, sending showApproval");
+      //         socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
+      //       } else if (previousDonationCount >= 2) {
+      //         // 🔒 Third+ donation — full approval with extra data
+      //         console.log("🔐 Third+ donation, sending showThirdingApproval:", thirdingDataDonation);
+      //         socket.send(JSON.stringify({ cmd: "showThirdingApproval", msg: thirdingDataDonation }));
+      //       } else {
+      //         // ✅ First donation — send directly
+      //         console.log("🚀 First donation, sending directly:", donationData);
+      //         sendDonation(donationData);
+      //       }
+      //     } catch (err) {
+      //       console.error("❌ Failed to check donation count:", err);
+      //       donationInProgress[`${fromUserID}-${toUserID}`] = false; // Reset on error
+      //     }
+      //   });
+      // }
+
+
+      const donationInProgress = {};
+
+function attachDonateButton(cardElement, fromUserID, timerName) {
+  const donateBtn = cardElement.querySelector(".donate-btn");
+
+  // Prevent multiple listeners
+  if (donateBtn.dataset.listenerAttached === "true") return;
+  donateBtn.dataset.listenerAttached = "true";
+
+  donateBtn.addEventListener("click", async () => {
+    const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
+    const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
+    const recipientSelect = cardElement.querySelector("select");
+
+    const donateMinutes = parseInt(minutesInput?.value || "0");
+    const donateSeconds = parseInt(secondsInput?.value || "0");
+    const toUserID = parseInt(recipientSelect?.value);
+    const totalSeconds = donateMinutes * 60 + donateSeconds;
+
+    if (!toUserID || totalSeconds <= 1) {
+      alert("Please select a recipient and enter valid time to donate.");
+      return;
+    }
+
+    // Build list of selected checkbox titles (checkboxes with .timer-checkbox class)
+    const selectedTitles = [];
+    const selectedTimerIDs = []; // <== To collect newTimerID values
+
+    const timerComponents = document.querySelectorAll('.timer-checkbox');
+
+    timerComponents.forEach((checkbox) => {
+      if (checkbox.checked) {
+        const timerComponent = checkbox.closest('div');
+        const titleInput = timerComponent.querySelector('.timer-title');
+        let title = titleInput?.value.trim();
+
+        const dataId = titleInput?.getAttribute('data-id') || '';
+        const newTimerID = dataId.split('-')[0];
+
+        if (!title) {
+          title = `User-${newTimerID}`;
+        }
+
+        selectedTitles.push(title);
+        selectedTimerIDs.push(newTimerID); // <== Store ID
       }
+    });
+
+    // Main donation payload
+    const donationData = {
+      fromUserID,
+      toUserID,
+      timerName,
+      minutes: donateMinutes,
+      seconds: donateSeconds,
+      totalSeconds
+    };
+
+    // Third+ donation full approval payload
+    const thirdingDataDonation = {
+      fromUserID,
+      toUserID,
+      timerName,
+      minutes: donateMinutes,
+      seconds: donateSeconds,
+      totalSeconds,
+      selectedTimers: selectedTitles,
+      selectedTimerIDs, // <== Include it here
+      note: "Third+ donation – full approval"
+    };
+
+    // Track donation in progress
+    donationInProgress[`${fromUserID}-${toUserID}`] = true;
+
+    try {
+      const previousDonationCount = await checkDonationCount(fromUserID, toUserID);
+      console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
+
+      if (previousDonationCount === 1) {
+        // 🟡 Second donation — send for approval
+        console.log("🛡️ Second donation detected, sending showApproval");
+        socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
+      } else if (previousDonationCount >= 2) {
+        // 🔒 Third+ donation — full approval with extra data
+        console.log("🔐 Third+ donation, sending showThirdingApproval:", thirdingDataDonation);
+        socket.send(JSON.stringify({ cmd: "showThirdingApproval", msg: thirdingDataDonation }));
+      } else {
+        // ✅ First donation — send directly
+        console.log("🚀 First donation, sending directly:", donationData);
+        sendDonation(donationData);
+      }
+    } catch (err) {
+      console.error("❌ Failed to check donation count:", err);
+      donationInProgress[`${fromUserID}-${toUserID}`] = false; // Reset on error
+    }
+  });
+}
+
+
+
+
+
+
 
       // 🆕 helper function to ask server about donation count
       function checkDonationCount(fromUserID, toUserID) {
@@ -5782,14 +6892,17 @@
 
 
       document.body.addEventListener('change', function (e) {
-    if (e.target.classList.contains('timer-checkbox')) {
-      updateSelectedTimersOutput();
-    }
-  });
+        if (e.target.classList.contains('timer-checkbox')) {
+          updateSelectedTimersOutput();
+        }
+      });
 
       //Mark/Nabin, where you left off: comment out these const variables and put them in setGlobalVariableOnceDOMContentLoaded and call global versions of these from within the function and set them to the new DOM elements created
       setGlobalVariablesOnceDOMContentLoaded();
       synchronizeScreenDraw();
+            showSelectedTimers();
+            showdonationhistory();
+
       const timerList = document.getElementById("timerList");
       const addTimerBtn = document.getElementById("addTimerBtn");
       const defaultTimeInput = document.getElementById("defaultTime");
@@ -5926,107 +7039,107 @@
     // populateScrollBox("seconds", 60);
 
     let selectedMinute = 1;
-  let selectedSecond = 0;
-  let formSubmenuTimerSet = false;
-  let formSubmenuTimerTime = null;
+    let selectedSecond = 0;
+    let formSubmenuTimerSet = false;
+    let formSubmenuTimerTime = null;
 
-  function populateScrollBox(id, range) {
-    const box = document.getElementById(id);
-    if (!box) return;
+    function populateScrollBox(id, range) {
+      const box = document.getElementById(id);
+      if (!box) return;
 
-    box.innerHTML = "";
+      box.innerHTML = "";
 
-    const defaultSelection = id.includes("minutes") ? 1 : 0;
+      const defaultSelection = id.includes("minutes") ? 1 : 0;
 
-    for (let i = 0; i < range; i++) {
-      const div = document.createElement("div");
-      div.textContent = i.toString().padStart(2, '0');
-      div.classList.add("time-option");
+      for (let i = 0; i < range; i++) {
+        const div = document.createElement("div");
+        div.textContent = i.toString().padStart(2, '0');
+        div.classList.add("time-option");
 
-      if (i === defaultSelection) {
-        div.classList.add("selected");
-        if (id.includes("minutes")) selectedMinute = i;
-        else selectedSecond = i;
+        if (i === defaultSelection) {
+          div.classList.add("selected");
+          if (id.includes("minutes")) selectedMinute = i;
+          else selectedSecond = i;
+        }
+
+        div.addEventListener("click", () => {
+          selectTime(id, div, i);
+
+          // Prevent scroll handler from interfering right after a click
+          box.dataset.justClicked = "true";
+          setTimeout(() => box.dataset.justClicked = "false", 150);
+        });
+
+        box.appendChild(div);
       }
 
-      div.addEventListener("click", () => {
-        selectTime(id, div, i);
+      setTimeout(() => {
+        const defaultElement = box.children[defaultSelection];
+        if (defaultElement) box.scrollTop = defaultElement.offsetTop;
+      }, 100);
 
-        // Prevent scroll handler from interfering right after a click
-        box.dataset.justClicked = "true";
-        setTimeout(() => box.dataset.justClicked = "false", 150);
+      box.addEventListener("scroll", () => {
+        if (box.dataset.justClicked === "true") return;
+
+        let items = box.children;
+        let closest = null;
+        let minDiff = Infinity;
+
+        for (let item of items) {
+          let diff = Math.abs(item.offsetTop - box.scrollTop);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closest = item;
+          }
+        }
+
+        if (closest) {
+          const value = parseInt(closest.textContent);
+          selectTime(id, closest, value);
+        }
       });
-
-      box.appendChild(div);
     }
 
-    setTimeout(() => {
-      const defaultElement = box.children[defaultSelection];
-      if (defaultElement) box.scrollTop = defaultElement.offsetTop;
-    }, 100);
+    function selectTime(id, element, value) {
+      const box = document.getElementById(id);
+      if (!box) return;
 
-    box.addEventListener("scroll", () => {
-      if (box.dataset.justClicked === "true") return;
+      Array.from(box.children).forEach(child => child.classList.remove("selected"));
+      element.classList.add("selected");
 
-      let items = box.children;
-      let closest = null;
-      let minDiff = Infinity;
+      if (id.includes("minutes")) selectedMinute = value;
+      if (id.includes("seconds")) selectedSecond = value;
 
-      for (let item of items) {
-        let diff = Math.abs(item.offsetTop - box.scrollTop);
-        if (diff < minDiff) {
-          minDiff = diff;
-          closest = item;
+      console.log(`🎯 Selected ${id}: ${value}`);
+    }
+
+    function setFormSubmenuTimer() {
+      formSubmenuTimerTime = new Date();
+      formSubmenuTimerTime.setSeconds(selectedSecond);
+      formSubmenuTimerTime.setMinutes(selectedMinute);
+      formSubmenuTimerTime.setMilliseconds(0);
+      formSubmenuTimerSet = true;
+
+      const timerStatus = `Timer set for ${selectedMinute}:${selectedSecond.toString().padStart(2, '0')}`;
+      document.getElementById("form-submenu-timer-status").textContent = timerStatus;
+      document.getElementById("form-submenu-timer-input").value = timerStatus;
+    }
+
+    setInterval(() => {
+      if (formSubmenuTimerSet) {
+        const now = new Date();
+        if (
+          now.getMinutes() === formSubmenuTimerTime.getMinutes() &&
+          now.getSeconds() === formSubmenuTimerTime.getSeconds()
+        ) {
+          alert("⏳ Timer Completed!");
+          formSubmenuTimerSet = false;
         }
       }
+    }, 1000);
 
-      if (closest) {
-        const value = parseInt(closest.textContent);
-        selectTime(id, closest, value);
-      }
-    });
-  }
-
-  function selectTime(id, element, value) {
-    const box = document.getElementById(id);
-    if (!box) return;
-
-    Array.from(box.children).forEach(child => child.classList.remove("selected"));
-    element.classList.add("selected");
-
-    if (id.includes("minutes")) selectedMinute = value;
-    if (id.includes("seconds")) selectedSecond = value;
-
-    console.log(`🎯 Selected ${id}: ${value}`);
-  }
-
-  function setFormSubmenuTimer() {
-    formSubmenuTimerTime = new Date();
-    formSubmenuTimerTime.setSeconds(selectedSecond);
-    formSubmenuTimerTime.setMinutes(selectedMinute);
-    formSubmenuTimerTime.setMilliseconds(0);
-    formSubmenuTimerSet = true;
-
-    const timerStatus = `Timer set for ${selectedMinute}:${selectedSecond.toString().padStart(2, '0')}`;
-    document.getElementById("form-submenu-timer-status").textContent = timerStatus;
-    document.getElementById("form-submenu-timer-input").value = timerStatus;
-  }
-
-  setInterval(() => {
-    if (formSubmenuTimerSet) {
-      const now = new Date();
-      if (
-        now.getMinutes() === formSubmenuTimerTime.getMinutes() &&
-        now.getSeconds() === formSubmenuTimerTime.getSeconds()
-      ) {
-        alert("⏳ Timer Completed!");
-        formSubmenuTimerSet = false;
-      }
-    }
-  }, 1000);
-
-  populateScrollBox("minutes", 60);
-  populateScrollBox("seconds", 60);
+    populateScrollBox("minutes", 60);
+    populateScrollBox("seconds", 60);
 
     /*scroll effect in form submenu end*/
 

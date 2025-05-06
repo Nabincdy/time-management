@@ -296,6 +296,8 @@ globalELMxArray = {
         },//end voting
         "donateHistory": "History No Data Found",
         "approvedDonations": "Approval His No Data Found",
+        "realUserCheckbox": "Real User Not Found",
+        "thirdingDonationData": "thirding data",
 
     } //end ELMxID 1
 };//end globalELMxArray
@@ -347,14 +349,14 @@ wss.on("connection", (ws) => {
 
 
     // helper to broadcast to everyone
-function broadcastToAllClients(messageObj) {
-    const message = JSON.stringify(messageObj);
-    clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(message);
-        }
-    });
-}
+    function broadcastToAllClients(messageObj) {
+        const message = JSON.stringify(messageObj);
+        clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+    }
 
 
 
@@ -775,6 +777,8 @@ function broadcastToAllClients(messageObj) {
 
 
 
+
+
                 case 'resetVetoName':
                     // Input: {"cmd": "resetVetoName", "msg": {"ELMxID": 0, "vetoNewName": name}}
                     let resetVetoName_meetingID = message.msg.ELMxID;
@@ -1061,6 +1065,59 @@ function broadcastToAllClients(messageObj) {
 
                     break;
 
+
+
+                // case 'selectedTimersUpdate':
+                //     console.log("📩 Received selectedTimersUpdate message: ", JSON.stringify(message));
+
+                //     // Broadcast the message to all connected clients
+                //     const responseMessage = {
+                //       cmd: "returnselectedTimersUpdate",
+                //       msg: {
+                //         selectedTimers: message.msg.selectedTimers
+                //       }
+                //     };
+
+                //     clients.forEach(client => {
+                //       if (client.readyState === WebSocket.OPEN) {
+                //         client.send(JSON.stringify(responseMessage));
+                //       }
+                //     });
+                //     break;
+
+                case 'selectedTimersUpdate':
+                    console.log("📩 Received selectedTimersUpdate message: ", JSON.stringify(message));
+
+                    // Extract meeting ID and selectedTimers
+                    const meetingID_selectedTimers = message.msg.ELMxID;  // Make sure your frontend sends this
+                    const selectedTimersData = message.msg.selectedTimers;
+
+                    // Ensure the meeting exists
+                    if (!globalELMxArray[meetingID_selectedTimers]) {
+                        console.error(`Meeting ID ${meetingID_selectedTimers} not found in globalELMxArray.`);
+                        break;
+                    }
+
+                    // Store selectedTimers in globalELMxArray under a new or existing field
+                    globalELMxArray[meetingID_selectedTimers].selectedTimersState = selectedTimersData;
+
+                    // Prepare response message
+                    const responseMessage = {
+                        cmd: "returnselectedTimersUpdate",
+                        msg: {
+                            selectedTimers: selectedTimersData,
+                            ELMxID: meetingID_selectedTimers
+                        }
+                    };
+
+                    // Broadcast the update to all connected clients
+                    clients.forEach(client => {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify(responseMessage));
+                        }
+                    });
+
+                    break;
 
 
 
@@ -1357,9 +1414,9 @@ function broadcastToAllClients(messageObj) {
 
                 case 'showApproval':
                     console.log("📩 Received showApproval message: ", message);
-                
+
                     const approvalMsg = message.msg;
-                
+
                     // Destructure with fallbacks
                     const {
                         ELMxID_Approval = 0,
@@ -1370,25 +1427,20 @@ function broadcastToAllClients(messageObj) {
                         seconds_Approval = approvalMsg.seconds,
                         totalSeconds_Approval = approvalMsg.totalSeconds
                     } = approvalMsg;
-                
+
                     const approvalKey = `${fromUserID_Approval}_${toUserID_Approval}_${totalSeconds_Approval}`;
-                
+
                     // ✅ Ensure ELMxID exists
                     if (!globalELMxArray[ELMxID_Approval]) {
                         globalELMxArray[ELMxID_Approval] = {};
                     }
-                
+
                     // ✅ Ensure approvedDonations is an object
                     if (typeof globalELMxArray[ELMxID_Approval].approvedDonations !== 'object' || globalELMxArray[ELMxID_Approval].approvedDonations === null) {
                         globalELMxArray[ELMxID_Approval].approvedDonations = {};
                     }
-                
-                    // ✅ Optional (remove this if you want to allow multiple approvals with same key)
-                    // if (globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey]) {
-                    //     console.log("✅ Approval already exists. Skipping UI broadcast.");
-                    //     break;
-                    // }
-                
+
+
                     // ✅ Store full approval message safely
                     globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey] = {
                         shown: true,
@@ -1399,10 +1451,10 @@ function broadcastToAllClients(messageObj) {
                         seconds: seconds_Approval,
                         totalSeconds: totalSeconds_Approval
                     };
-                
+
                     // ✅ Debug: show current approvedDonations
                     console.log("✅ Current approvedDonations:", globalELMxArray[ELMxID_Approval].approvedDonations);
-                
+
                     // ✅ Prepare response to send back to clients
                     const showApprovalResponse = {
                         cmd: "returnShowApproval",
@@ -1416,18 +1468,232 @@ function broadcastToAllClients(messageObj) {
                             totalSeconds_Approval
                         }
                     };
-                
+
                     console.log("📤 Sending showApprovalResponse to clients", showApprovalResponse);
-                
+
                     // ✅ Send to all attendees
                     const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
                     sendToWho(wss, ws, recipients, showApprovalResponse);
-                
+
                     break;
-                
 
 
-                    
+
+
+
+                // case 'showThirdingApproval':
+                //     console.log("📩 Received showThirdingApproval message: ", message);
+
+                //     const thirdingMsg = message.msg;
+
+                //     // Destructure with clearly named variables to avoid conflicts
+                //     const {
+                //         ELMxID: thirdingELMxID = 0,
+                //         fromUserID: thirdingFromUserID,
+                //         toUserID: thirdingToUserID,
+                //         timerName: thirdingTimerName,
+                //         minutes: thirdingMinutes,
+                //         seconds: thirdingSeconds,
+                //         totalSeconds: thirdingTotalSeconds,
+                //         selectedTimers: thirdingSelectedTimers = [],
+                //         note: thirdingNote = "Third+ donation – full approval"
+                //     } = thirdingMsg;
+
+                //     const thirdingKey = `${thirdingFromUserID}_${thirdingToUserID}_${thirdingTotalSeconds}`;
+
+                //     // ✅ Ensure the ELMx entry exists
+                //     if (!globalELMxArray[thirdingELMxID]) {
+                //         globalELMxArray[thirdingELMxID] = {};
+                //     }
+
+                //     // ✅ Ensure approvedDonations exists
+                //     if (
+                //         typeof globalELMxArray[thirdingELMxID].approvedDonations !== 'object' ||
+                //         globalELMxArray[thirdingELMxID].approvedDonations === null
+                //     ) {
+                //         globalELMxArray[thirdingELMxID].approvedDonations = {};
+                //     }
+
+                //     // ✅ Store the third+ approval data
+                //     globalELMxArray[thirdingELMxID].approvedDonations[thirdingKey] = {
+                //         shown: true,
+                //         fromUserID: thirdingFromUserID,
+                //         toUserID: thirdingToUserID,
+                //         timerName: thirdingTimerName,
+                //         minutes: thirdingMinutes,
+                //         seconds: thirdingSeconds,
+                //         totalSeconds: thirdingTotalSeconds,
+                //         selectedTimers: thirdingSelectedTimers,
+                //         note: thirdingNote
+                //     };
+
+                //     // ✅ Debug output
+                //     console.log("✅ Updated thirding approvedDonations:", globalELMxArray[thirdingELMxID].approvedDonations);
+
+                //     // ✅ Prepare response message for all attendees
+                //     const showThirdingResponse = {
+                //         cmd: "returnShowThirdingApproval",
+                //         msg: {
+                //             ELMxID: thirdingELMxID,
+                //             fromUserID: thirdingFromUserID,
+                //             toUserID: thirdingToUserID,
+                //             timerName: thirdingTimerName,
+                //             minutes: thirdingMinutes,
+                //             seconds: thirdingSeconds,
+                //             totalSeconds: thirdingTotalSeconds,
+                //             selectedTimers: thirdingSelectedTimers,
+                //             note: thirdingNote
+                //         }
+                //     };
+
+                //     console.log("📤 Sending returnShowThirdingApproval to attendees:", showThirdingResponse);
+
+                //     // ✅ Send to all relevant recipients
+                //     const thirdingRecipients = ["particularSome", globalELMxArray[thirdingELMxID]?.arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, thirdingRecipients, showThirdingResponse);
+
+                //     break;
+
+
+
+                case 'updateThirdingCheckbox':
+                    console.log("📩 Received updateThirdingCheckbox message:", message);
+                  
+                    const checkboxMsg = message.msg;
+                    const {
+                      thirdingcheckingELMxID,
+                      thirdingcheckingFromUserID,
+                      checkboxId,
+                      checked,
+                      checkboxIndex
+                    } = checkboxMsg;
+                  
+                    // if (!thirdingcheckingELMxID || typeof thirdingcheckingFromUserID === "undefined" || typeof checkboxIndex === "undefined") {
+                    //   console.error("❌ Missing required fields in updateThirdingCheckbox:", checkboxMsg);
+                    //   return;
+                    // }
+                  
+                    // Create thirdingKey from existing approvals
+                    const currentApprovals = globalELMxArray[thirdingcheckingELMxID]?.approvedDonations || {};
+                    const matchingKey = Object.keys(currentApprovals).find(key => key.startsWith(`${thirdingcheckingFromUserID}_`));
+                  
+                    // if (!matchingKey) {
+                    //   console.error("❌ No matching thirding approval found for fromUserID:", thirdingcheckingFromUserID);
+                    //   return;
+                    // }
+                  
+                    // Initialize checkboxStates object if not exists
+                    if (!currentApprovals[matchingKey].checkboxStates) {
+                      currentApprovals[matchingKey].checkboxStates = {};
+                    }
+                  
+                    // ✅ Update the checkbox state
+                    currentApprovals[matchingKey].checkboxStates[checkboxIndex] = {
+                      checkboxId,
+                      checked: Boolean(checked),
+                    };
+                  
+                    console.log(`✅ Updated checkbox index ${checkboxIndex} to`, checked);
+                    console.log("📦 Updated checkboxStates:", currentApprovals[matchingKey].checkboxStates);
+                  
+                    // Optionally broadcast the change to others
+                    const checkboxUpdateResponse = {
+                      cmd: "returnUpdatedThirdingCheckbox",
+                      msg: {
+                        thirdingcheckingELMxID,
+                        thirdingcheckingFromUserID,
+                        checkboxId,
+                        checkboxIndex,
+                        checked: Boolean(checked)
+                      }
+                    };
+                  
+                    const ThirdingCheckingRecipients = ["particularSome", globalELMxArray[thirdingcheckingELMxID]?.arrayOfAttendanceIDs];
+                    sendToWho(wss, ws, ThirdingCheckingRecipients, checkboxUpdateResponse);
+                  
+                    break;
+                  
+
+
+                case 'showThirdingApproval':
+    console.log("📩 Received showThirdingApproval message: ", message);
+
+    const thirdingMsg = message.msg;
+
+    // Destructure with clearly named variables to avoid conflicts
+    const {
+        ELMxID: thirdingELMxID = 0,
+        fromUserID: thirdingFromUserID,
+        toUserID: thirdingToUserID,
+        timerName: thirdingTimerName,
+        minutes: thirdingMinutes,
+        seconds: thirdingSeconds,
+        totalSeconds: thirdingTotalSeconds,
+        selectedTimers: thirdingSelectedTimers = [],
+        selectedTimerIDs: thirdingSelectedTimerIDs = [], // ✅ NEW
+        note: thirdingNote = "Third+ donation – full approval"
+    } = thirdingMsg;
+
+    const thirdingKey = `${thirdingFromUserID}_${thirdingToUserID}_${thirdingTotalSeconds}`;
+
+    // ✅ Ensure the ELMx entry exists
+    if (!globalELMxArray[thirdingELMxID]) {
+        globalELMxArray[thirdingELMxID] = {};
+    }
+
+    // ✅ Ensure approvedDonations exists
+    if (
+        typeof globalELMxArray[thirdingELMxID].approvedDonations !== 'object' ||
+        globalELMxArray[thirdingELMxID].approvedDonations === null
+    ) {
+        globalELMxArray[thirdingELMxID].approvedDonations = {};
+    }
+
+    // ✅ Store the third+ approval data
+    globalELMxArray[thirdingELMxID].approvedDonations[thirdingKey] = {
+        shown: true,
+        fromUserID: thirdingFromUserID,
+        toUserID: thirdingToUserID,
+        timerName: thirdingTimerName,
+        minutes: thirdingMinutes,
+        seconds: thirdingSeconds,
+        totalSeconds: thirdingTotalSeconds,
+        selectedTimers: thirdingSelectedTimers,
+        selectedTimerIDs: thirdingSelectedTimerIDs, // ✅ NEW
+        note: thirdingNote
+    };
+
+    // ✅ Debug output
+    console.log("✅ Updated thirding approvedDonations:", globalELMxArray[thirdingELMxID].approvedDonations);
+
+    // ✅ Prepare response message for all attendees
+    const showThirdingResponse = {
+        cmd: "returnShowThirdingApproval",
+        msg: {
+            ELMxID: thirdingELMxID,
+            fromUserID: thirdingFromUserID,
+            toUserID: thirdingToUserID,
+            timerName: thirdingTimerName,
+            minutes: thirdingMinutes,
+            seconds: thirdingSeconds,
+            totalSeconds: thirdingTotalSeconds,
+            selectedTimers: thirdingSelectedTimers,
+            selectedTimerIDs: thirdingSelectedTimerIDs, // ✅ NEW
+            note: thirdingNote
+        }
+    };
+
+    console.log("📤 Sending returnShowThirdingApproval to attendees:", showThirdingResponse);
+
+    // ✅ Send to all relevant recipients
+    const thirdingRecipients = ["particularSome", globalELMxArray[thirdingELMxID]?.arrayOfAttendanceIDs];
+    sendToWho(wss, ws, thirdingRecipients, showThirdingResponse);
+
+    break;
+
+
+
+
 
 
                 // case "sendingremoveApprovalUI":
@@ -1460,15 +1726,15 @@ function broadcastToAllClients(messageObj) {
                 case "sendingremoveApprovalUI":
                     console.log("📩 Received removeshowApproval message: ", message);
                     const unapprovalMsg = message.msg;
-                
+
                     // Rename variables to avoid conflicts with previously declared variables
-                    const { 
-                        ELMxID: receivedELMxID = 0, 
+                    const {
+                        ELMxID: receivedELMxID = 0,
                         fromUserID: receivedFromUserID,  // Renamed fromUserID to receivedFromUserID
                         toUserID: receivedToUserID,      // Renamed toUserID to receivedToUserID
                         totalSeconds: receivedTotalSeconds // Renamed totalSeconds to receivedTotalSeconds
                     } = unapprovalMsg;
-                
+
                     // Use the renamed variables in the response
                     const showunApprovalResponse = {
                         cmd: "returnRemoveApproval",
@@ -1479,18 +1745,18 @@ function broadcastToAllClients(messageObj) {
                             totalSeconds: receivedTotalSeconds  // Using the renamed totalSeconds
                         }
                     };
-                
+
                     console.log("Testing send showunApprovalResponse", showunApprovalResponse);
-                
+
                     // Make sure the recipients list is correct and includes attendees
                     const unrecipients = ["particularSome", globalELMxArray[receivedELMxID]?.arrayOfAttendanceIDs];
                     sendToWho(wss, ws, unrecipients, showunApprovalResponse);
-                
+
                     break;
-                
 
 
-              
+
+
 
                 case 'donateTime':
                     console.log("📩 Received donateTime message: ", message);
@@ -1668,87 +1934,87 @@ function broadcastToAllClients(messageObj) {
 
 
 
-                    
-                    // case 'removeApprovedDonation':
-                    //     if (!message.msg) {
-                    //       console.error("Invalid message format: 'msg' field is missing.");
-                    //       return;
-                    //     }
-                      
-                    //     const { fromUserIDRemoval, toUserIDRemoval, totalSecondsRemoval } = message.msg;
-                    //     const key = `${fromUserIDRemoval}-${toUserIDRemoval}-${totalSecondsRemoval}`;
-                      
-                    //     console.log("removal data", message.msg);
-                    //     if (approvedDonations[key]) {
-                    //       delete approvedDonations[key];
-                    //       console.log(`Donation removed: ${key}`);
-                      
-                    //       clients.forEach(client => {
-                    //         client.send(JSON.stringify({
-                    //           cmd: "updateApprovedDonations",
-                    //           msg: approvedDonations
-                    //         }));
-                    //       });
-                    //     } else {
-                    //       console.log("Donation not found:", key);
-                    //     }
-                    //     break;
-                      
-                    case 'removeApprovedDonation': {
-                        if (!message.msg) {
-                            console.error("Invalid message format: 'msg' field is missing.");
-                            return;
-                        }
-                    
-                        // broadcastToAllClients(removalMsg);
 
-                        const { fromUserID, toUserID, totalSeconds, ELMxID } = message.msg; // <-- IMPORTANT: Add ELMxID here!
-                    
-                        const key = `${fromUserID}_${toUserID}_${totalSeconds}`;
-                    
-                        console.log("removal data", message.msg);
-                        
-                        if (globalELMxArray[ELMxID] && globalELMxArray[ELMxID].approvedDonations && globalELMxArray[ELMxID].approvedDonations[key]) {
-                            delete globalELMxArray[ELMxID].approvedDonations[key];
-                            console.log(`Donation removed: ${key}`);
-                    
-                            clients.forEach(client => {
-                                client.send(JSON.stringify({
-                                    cmd: "updateApprovedDonations",
-                                    msg: globalELMxArray[ELMxID].approvedDonations
-                                }));
-                            });
-                        } else {
-                            console.log("Donation not found:", key);
-                        }
-                        break;
+                // case 'removeApprovedDonation':
+                //     if (!message.msg) {
+                //       console.error("Invalid message format: 'msg' field is missing.");
+                //       return;
+                //     }
+
+                //     const { fromUserIDRemoval, toUserIDRemoval, totalSecondsRemoval } = message.msg;
+                //     const key = `${fromUserIDRemoval}-${toUserIDRemoval}-${totalSecondsRemoval}`;
+
+                //     console.log("removal data", message.msg);
+                //     if (approvedDonations[key]) {
+                //       delete approvedDonations[key];
+                //       console.log(`Donation removed: ${key}`);
+
+                //       clients.forEach(client => {
+                //         client.send(JSON.stringify({
+                //           cmd: "updateApprovedDonations",
+                //           msg: approvedDonations
+                //         }));
+                //       });
+                //     } else {
+                //       console.log("Donation not found:", key);
+                //     }
+                //     break;
+
+                case 'removeApprovedDonation': {
+                    if (!message.msg) {
+                        console.error("Invalid message format: 'msg' field is missing.");
+                        return;
                     }
-                    
-                    
+
+                    // broadcastToAllClients(removalMsg);
+
+                    const { fromUserID, toUserID, totalSeconds, ELMxID } = message.msg; // <-- IMPORTANT: Add ELMxID here!
+
+                    const key = `${fromUserID}_${toUserID}_${totalSeconds}`;
+
+                    console.log("removal data", message.msg);
+
+                    if (globalELMxArray[ELMxID] && globalELMxArray[ELMxID].approvedDonations && globalELMxArray[ELMxID].approvedDonations[key]) {
+                        delete globalELMxArray[ELMxID].approvedDonations[key];
+                        console.log(`Donation removed: ${key}`);
+
+                        clients.forEach(client => {
+                            client.send(JSON.stringify({
+                                cmd: "updateApprovedDonations",
+                                msg: globalELMxArray[ELMxID].approvedDonations
+                            }));
+                        });
+                    } else {
+                        console.log("Donation not found:", key);
+                    }
+                    break;
+                }
 
 
-                    // case 'removeApprovedDonation':
-                    //     // Rename totalSeconds to donationSeconds to avoid conflict
-                    //     const { fromUserID: donorID, toUserID: recipientID, totalSeconds: donationSeconds } = data.msg;
-                    //     const key = `${donorID}-${recipientID}-${donationSeconds}`;
-                        
-                    //     // Check if donation exists, then remove it
-                    //     if (approvedDonations[key]) {
-                    //       delete approvedDonations[key];  // Remove donation from approvedDonations
-                    //       console.log(`Donation removed: ${key}`);
-                          
-                    //       // Optionally, notify other clients that the donation was removed
-                    //       clients.forEach(client => {
-                    //         client.send(JSON.stringify({
-                    //           cmd: "updateApprovedDonations",
-                    //           msg: approvedDonations
-                    //         }));
-                    //       });
-                    //     } else {
-                    //       console.log("Donation not found:", key);
-                    //     }
-                    //     break;
-                      
+
+
+                // case 'removeApprovedDonation':
+                //     // Rename totalSeconds to donationSeconds to avoid conflict
+                //     const { fromUserID: donorID, toUserID: recipientID, totalSeconds: donationSeconds } = data.msg;
+                //     const key = `${donorID}-${recipientID}-${donationSeconds}`;
+
+                //     // Check if donation exists, then remove it
+                //     if (approvedDonations[key]) {
+                //       delete approvedDonations[key];  // Remove donation from approvedDonations
+                //       console.log(`Donation removed: ${key}`);
+
+                //       // Optionally, notify other clients that the donation was removed
+                //       clients.forEach(client => {
+                //         client.send(JSON.stringify({
+                //           cmd: "updateApprovedDonations",
+                //           msg: approvedDonations
+                //         }));
+                //       });
+                //     } else {
+                //       console.log("Donation not found:", key);
+                //     }
+                //     break;
+
                 // case 'getDonationMessages': {
                 //     const ELMxID = message.msg.ELMxID;
 
@@ -1789,53 +2055,107 @@ function broadcastToAllClients(messageObj) {
                 //     ws.send(JSON.stringify(response));
                 //     break;
                 // }
-                
+
 
 
                 case 'getDonationMessages': {
                     const ELMxID = message.msg.ELMxID;
                     const messages = globalELMxArray[ELMxID]?.donateHistory || [];
                     const unapproveusermessage = globalELMxArray[ELMxID]?.approvedDonations || [];
-                  
+
                     // Ensure unapproveusermessage is an array
                     const unapproveMessagesArray = Array.isArray(unapproveusermessage) ? unapproveusermessage : Object.values(unapproveusermessage);
-                  
+
                     console.log("📜 Retrieved unapproveusermessage for ELMxID", ELMxID, ":", unapproveMessagesArray);
                     console.log("📜 Retrieved donateHistory for ELMxID", ELMxID, ":", messages);
-                  
+
                     const response = {
-                      cmd: "donationMessagesList",
-                      msg: {
-                        messages,
-                        unapproveusermessage: unapproveMessagesArray
-                      }
+                        cmd: "donationMessagesList",
+                        msg: {
+                            messages,
+                            unapproveusermessage: unapproveMessagesArray
+                        }
                     };
                     ws.send(JSON.stringify(response));
                     break;
-                  }
+                }
 
+
+                case 'getSelectedTimersState':
+                    const selectedELMxID = message.msg.ELMxID; // Renamed ELMxID to selectedELMxID
+                    const selectedTimerServerID = message.msg.timerServerID; // Renamed timerServerID to selectedTimerServerID
+                  
+                    // Retrieve the selected timers from your data structure (globalELMxArray or equivalent)
+                    const selectedTimersState = globalELMxArray[selectedELMxID]?.selectedTimersState || [];
+                  
+                    // Log the data being sent back to the client for debugging purposes
+                    console.log(`Retrieving selected timers for selectedELMxID ${selectedELMxID}:`, JSON.stringify(selectedTimersState));
+                  
+                    // Send the selected timers data to the client
+                    const returnMessage = {
+                      cmd: "returnselectedTimersUpdate",
+                      msg: {
+                        selectedELMxID: selectedELMxID, // Send back as selectedELMxID
+                        selectedTimers: selectedTimersState
+                      }
+                    };
+                  
+                    ws.send(JSON.stringify(returnMessage));
+                    break;
                   
 
-                
+
+                    case 'removeThirdingApprovedDonation': {
+                        const { ELMxID, fromUserID, toUserID, totalSeconds } = message.msg;
+                    
+                        if (!globalELMxArray[ELMxID]) return;
+                    
+                        const key = `${fromUserID}-${toUserID}-${totalSeconds}`;
+                        if (globalELMxArray[ELMxID].approvedDonations) {
+                            delete globalELMxArray[ELMxID].approvedDonations[key];
+                            console.log(`🗑️ Removed approved donation: ${key}`);
+                        }
+                    
+                        break;
+                    }
+                    
+
+                    case 'sendingThirdingremoveApprovalUI': {
+                        const { ELMxID, fromUserID, toUserID, totalSeconds } = message.msg;
+                    
+                        const broadcastMessage = {
+                            cmd: "sendingThirdingremoveApprovalUI",
+                            msg: { fromUserID, toUserID, totalSeconds }
+                        };
+                    
+                        broadcastToELMxClients(ELMxID, broadcastMessage, ws);
+                        break;
+                    }
+                    
+                    
+  
+
+
+
                 // case 'getApprovedDonations': {
                 //     const ELMxID = message.msg.ELMxID;
-                
+
                 //     const approvedDonations = globalELMxArray[ELMxID]?.approvedDonations || [];
-                
+
                 //     console.log("📜 Retrieved approvedDonations for ELMxID", ELMxID, ":", approvedDonations);
-                
+
                 //     const response = {
                 //         cmd: "approvedDonationsList",
                 //         msg: {
                 //             approvedDonations
                 //         }
                 //     };
-                
+
                 //     ws.send(JSON.stringify(response));
                 //     break;
                 // }
-                
-                
+
+
 
 
                 // case 'getDonationMessages': {
