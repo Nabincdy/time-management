@@ -1700,19 +1700,19 @@ wss.on("connection", (ws) => {
                 //     console.log("📩 Received removeshowApproval message: ", message);
                 //     const unapprovalMsg = message.msg;
                 //     const {
-                //         ELMxID_unApproval = 0,
+                //         ELMxID = 0,
                 //     } = unapprovalMsg;
 
                 //     const showunApprovalResponse = {
                 //         cmd: "returnRemoveApproval",
                 //         msg: {
-                //             ELMxID_unApproval,
+                //             ELMxID,
                 //         }
                 //     };
 
 
                 //     console.log("Testing send showunApprovalResponse", showunApprovalResponse);
-                //     const unrecipients = ["particularSome", globalELMxArray[ELMxID_unApproval]?.arrayOfAttendanceIDs];
+                //     const unrecipients = ["particularSome", globalELMxArray[ELMxID]?.arrayOfAttendanceIDs];
                 //     sendToWho(wss, ws, unrecipients, showunApprovalResponse);
 
                 //     break;
@@ -1721,36 +1721,98 @@ wss.on("connection", (ws) => {
 
 
                 // Handle removal request from a client
-case "sendingremoveApprovalUI":
-    console.log("📩 Received removeshowApproval message: ", message);
-    const unapprovalMsg = message.msg;
+// case "sendingremoveApprovalUI":
+//     console.log("📩 Received removeshowApproval message: ", message);
+//     const unapprovalMsg = message.msg;
   
-    // Rename variables to avoid conflicts with previously declared variables
+//     // Rename variables to avoid conflicts with previously declared variables
+//     const {
+//       ELMxID: receivedELMxID = 0,
+//       fromUserID: receivedFromUserID,
+//       toUserID: receivedToUserID,
+//       totalSeconds: receivedTotalSeconds
+//     } = unapprovalMsg;
+  
+//     // Prepare the response message to send back to all clients
+//     const showunApprovalResponse = {
+//       cmd: "returnRemoveApproval",
+//       msg: {
+//         ELMxID: receivedELMxID,
+//         fromUserID: receivedFromUserID,
+//         toUserID: receivedToUserID,
+//         totalSeconds: receivedTotalSeconds
+//       }
+//     };
+  
+//     console.log("Testing send showunApprovalResponse", showunApprovalResponse);
+  
+//     // Send the removal notification to all clients
+//     const unrecipients = ["particularSome", globalELMxArray[receivedELMxID]?.arrayOfAttendanceIDs];
+//     sendToWho(wss, ws, unrecipients, showunApprovalResponse);
+  
+//     break;
+  
+
+case "sendingremoveApprovalUI": {
+    console.log("📩 Received removeshowApproval message:", message);
+  
+    // 1. Safely extract your fields
     const {
-      ELMxID: receivedELMxID = 0,
-      fromUserID: receivedFromUserID,
-      toUserID: receivedToUserID,
-      totalSeconds: receivedTotalSeconds
-    } = unapprovalMsg;
+      ELMxID: sessionID = 0,
+      fromUserID,
+      toUserID,
+      totalSeconds
+    } = message.msg || {};
   
-    // Prepare the response message to send back to all clients
-    const showunApprovalResponse = {
+    // 2. Compute the key you used when approving
+    const donationKey = `${fromUserID}_${toUserID}_${totalSeconds}`;
+    console.log("🔍 Removal request for key:", donationKey, "in session", sessionID);
+  
+    // 3. Look up the session data
+    const sessionData = globalELMxArray[sessionID];
+    if (!sessionData) {
+      console.warn("⚠️ No session data found for ELMxID:", sessionID);
+      break;
+    }
+  
+    // 4. Delete from approvedDonations if it exists
+    const approved = sessionData.approvedDonations;
+    if (approved && donationKey in approved) {
+      delete approved[donationKey];
+      console.log(`✅ Deleted approvedDonations[${donationKey}]`);
+    } else {
+      console.warn(`⚠️ No approvedDonations["${donationKey}"] to delete.`);
+    }
+  
+    // 5. Build your recipients list.  
+    //    In your existing code you use ["particularSome", arrayOfAttendanceIDs]
+    //    so we’ll do the same—this will send to that group plus everyone in the meeting:
+    const recipients = [
+      "particularSome",
+      sessionData.arrayOfAttendanceIDs   // should be an array of socket IDs
+    ];
+  
+    // 6. Tell all clients to remove the single approval box:
+    const removalUI = {
       cmd: "returnRemoveApproval",
       msg: {
-        ELMxID_unApproval: receivedELMxID,
-        fromUserID: receivedFromUserID,
-        toUserID: receivedToUserID,
-        totalSeconds: receivedTotalSeconds
+        ELMxID:       sessionID,
+        fromUserID,
+        toUserID,
+        totalSeconds
       }
     };
+    sendToWho(wss, ws, recipients, removalUI);
   
-    console.log("Testing send showunApprovalResponse", showunApprovalResponse);
-  
-    // Send the removal notification to all clients
-    const unrecipients = ["particularSome", globalELMxArray[receivedELMxID]?.arrayOfAttendanceIDs];
-    sendToWho(wss, ws, unrecipients, showunApprovalResponse);
+    // 7. Then broadcast the updated approvedDonations map:
+    const updateMsg = {
+      cmd: "updateApprovedDonations",
+      msg: approved
+    };
+    sendToWho(wss, ws, recipients, updateMsg);
   
     break;
+  }
   
     
 
@@ -1994,43 +2056,43 @@ case "sendingremoveApprovalUI":
                 
 
 
-                case 'removeApprovedDonation': 
-    if (!message.msg) {
-        console.error("Invalid message format: 'msg' field is missing.");
-        return;
-    }
+    //             case 'removeApprovedDonation': 
+    // if (!message.msg) {
+    //     console.error("Invalid message format: 'msg' field is missing.");
+    //     return;
+    // }
 
-    // broadcastToAllClients(removalMsg);
+    // // broadcastToAllClients(removalMsg);
 
-    const { 
-        fromUserID: donorID, 
-        toUserID: recipientID, 
-        totalSeconds: donatedDuration, 
-        ELMxID: sessionID 
-    } = message.msg;
+    // const { 
+    //     fromUserID: donorID, 
+    //     toUserID: recipientID, 
+    //     totalSeconds: donatedDuration, 
+    //     ELMxID: sessionID 
+    // } = message.msg;
 
-    const SecondingapprovalKey = `${donorID}_${recipientID}_${donatedDuration}`;
+    // const SecondingapprovalKey = `${donorID}_${recipientID}_${donatedDuration}`;
 
-    console.log("🔍 Removal request received with data:", message.msg);
+    // console.log("🔍 Removal request received with data:", message.msg);
 
-    if (
-        globalELMxArray[sessionID] &&
-        globalELMxArray[sessionID].approvedDonations &&
-        globalELMxArray[sessionID].approvedDonations[SecondingapprovalKey]
-    ) {
-        delete globalELMxArray[sessionID].approvedDonations[SecondingapprovalKey];
-        console.log(`✅ Donation removed: ${SecondingapprovalKey}`);
+    // if (
+    //     globalELMxArray[sessionID] &&
+    //     globalELMxArray[sessionID].approvedDonations &&
+    //     globalELMxArray[sessionID].approvedDonations[SecondingapprovalKey]
+    // ) {
+    //     delete globalELMxArray[sessionID].approvedDonations[SecondingapprovalKey];
+    //     console.log(`✅ Donation removed: ${SecondingapprovalKey}`);
 
-        clients.forEach(client => {
-            client.send(JSON.stringify({
-                cmd: "updateApprovedDonations",
-                msg: globalELMxArray[sessionID].approvedDonations
-            }));
-        });
-    } else {
-        console.warn(`⚠️ Donation not found for key: ${SecondingapprovalKey}`);
-    }
-    break;
+    //     clients.forEach(client => {
+    //         client.send(JSON.stringify({
+    //             cmd: "updateApprovedDonations",
+    //             msg: globalELMxArray[sessionID].approvedDonations
+    //         }));
+    //     });
+    // } else {
+    //     console.warn(`⚠️ Donation not found for key: ${SecondingapprovalKey}`);
+    // }
+    // break;
 
 
 
@@ -2077,6 +2139,37 @@ case "sendingremoveApprovalUI":
                 //     ws.send(JSON.stringify(response));
                 //     break;
                 // }
+
+
+                case "removeApprovedDonation": {
+                    console.log("📩 removeApprovedDonation request:", message.msg);
+                    const {
+                      ELMxID: sessionID = 0,
+                      fromUserID,
+                      toUserID,
+                      totalSeconds
+                    } = message.msg || {};
+                
+                    // Build the same key you used when approving
+                    const key = `${fromUserID}_${toUserID}_${totalSeconds}`;
+                    const session = globalELMxArray[sessionID];
+                    if (session && session.approvedDonations && key in session.approvedDonations) {
+                      delete session.approvedDonations[key];
+                      console.log(`✅ Deleted approvedDonations[${key}] in session ${sessionID}`);
+                    } else {
+                      console.warn(`⚠️ No approvedDonations[${key}] to delete.`);
+                    }
+                
+                    // Tell *all* relevant clients to drop that one box
+                    const removalUI = {
+                      cmd: "returnRemoveApproval",
+                      msg: { ELMxID: sessionID, fromUserID, toUserID, totalSeconds }
+                    };
+                    const recipients = ["particularSome", session.arrayOfAttendanceIDs];
+                    sendToWho(wss, ws, recipients, removalUI);
+                
+                    break;
+                  }
 
 
 
