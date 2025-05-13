@@ -189,6 +189,7 @@ let globalTimerIDsWebsocketObject = {}; //not yet used Feb 13 2025 can delete
 let globalUserIDs = 0;
 let globalUserIDsWebsocketObject = {};
 let globalELMxArray = {};//this object contains each ACTIVE meetings data and it can be operated on from other meetings (ELM) too
+let thirdingCheckboxStatesBySession = {};
 let globalELMxArrayArchived = {};//for old or finished meetings that are no longer active.
 globalELMxArray = {
     "0": { //ELMxID..this is an example instantiation
@@ -297,7 +298,7 @@ globalELMxArray = {
         "donateHistory": "History No Data Found",
         "approvedDonations": "Approval His No Data Found",
         "realUserCheckbox": "Real User Not Found",
-        "thirdingDonationData": "thirding data",
+        "thirdingDonationData": { "realapprovaluser": "" },
 
     } //end ELMxID 1
 };//end globalELMxArray
@@ -1259,157 +1260,7 @@ wss.on("connection", (ws) => {
                     sendToWho(wss, ws, targetAudience, updateVoteResponse);
                     break;
 
-                // case 'showApproval':
-                //     console.log("📩 Received showApproval message: ", message);
 
-
-                //     const approvalMsg = message.msg;
-                //     const {
-                //         ELMxID_Approval = 0,
-                //         fromUserID_Approval = message.msg.fromUserID,
-                //         toUserID_Approval = message.msg.toUserID,
-                //         timerName_Approval = message.msg.timerName,
-                //         minutes_Approval = message.msg.minutes,
-                //         seconds_Approval = message.msg.seconds,
-                //         totalSeconds_Approval = message.msg.totalSeconds
-                //     } = approvalMsg;
-
-
-                //     const showApprovalResponse = {
-                //         cmd: "returnShowApproval",
-                //         msg: {
-                //             ELMxID_Approval,
-                //             fromUserID_Approval,
-                //             toUserID_Approval,
-                //             timerName_Approval,
-                //             minutes_Approval,
-                //             seconds_Approval,
-                //             totalSeconds_Approval
-                //         }
-                //     };
-
-                //     console.log("Testing send showApprovalResponse", showApprovalResponse);
-                //     const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
-                //     sendToWho(wss, ws, recipients, showApprovalResponse);
-
-                //     break;
-
-
-
-                // case 'showApproval':
-                //     console.log("📩 Received showApproval message: ", message);
-
-                //     const approvalMsg = message.msg;
-                //     const {
-                //         ELMxID_Approval = 0,
-                //         fromUserID_Approval = message.msg.fromUserID,
-                //         toUserID_Approval = message.msg.toUserID,
-                //         timerName_Approval = message.msg.timerName,
-                //         minutes_Approval = message.msg.minutes,
-                //         seconds_Approval = message.msg.seconds,
-                //         totalSeconds_Approval = message.msg.totalSeconds
-                //     } = approvalMsg;
-
-                //     // ✅ Create a unique key to track approval
-                //     const approvalKey = `${fromUserID_Approval}_${toUserID_Approval}_${totalSeconds_Approval}`;
-
-                //     // ✅ Ensure globalELMxArray and approvedDonations structure exists
-                //     if (!globalELMxArray[ELMxID_Approval]) {
-                //         globalELMxArray[ELMxID_Approval] = {};
-                //     }
-
-                //     if (!globalELMxArray[ELMxID_Approval].approvedDonations) {
-                //         globalELMxArray[ELMxID_Approval].approvedDonations = {};
-                //     }
-
-                //     // ✅ Check if already approved
-                //     if (globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey]) {
-                //         console.log("✅ Approval already exists. Skipping UI broadcast.");
-                //         break;
-                //     }
-
-                //     // ✅ Store approval as shown (but not yet finalized)
-                //     globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey] = false; // 'false' means shown but not approved yet
-
-                //     // ✅ Prepare and send approval UI to clients
-                //     const showApprovalResponse = {
-                //         cmd: "returnShowApproval",
-                //         msg: {
-                //             ELMxID_Approval,
-                //             fromUserID_Approval,
-                //             toUserID_Approval,
-                //             timerName_Approval,
-                //             minutes_Approval,
-                //             seconds_Approval,
-                //             totalSeconds_Approval
-                //         }
-                //     };
-
-                //     console.log("📤 Sending showApprovalResponse to clients", showApprovalResponse);
-                //     const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
-                //     sendToWho(wss, ws, recipients, showApprovalResponse);
-
-                //     break;
-
-
-                // case 'showApproval':
-                //     console.log("📩 Received showApproval message: ", message);
-
-                //     const approvalMsg = message.msg;
-                //     const {
-                //         ELMxID_Approval = 0,
-                //         fromUserID_Approval = message.msg.fromUserID,
-                //         toUserID_Approval = message.msg.toUserID,
-                //         timerName_Approval = message.msg.timerName,
-                //         minutes_Approval = message.msg.minutes,
-                //         seconds_Approval = message.msg.seconds,
-                //         totalSeconds_Approval = message.msg.totalSeconds
-                //     } = approvalMsg;
-
-                //     const approvalKey = `${fromUserID_Approval}_${toUserID_Approval}_${totalSeconds_Approval}`;
-
-                //     if (!globalELMxArray[ELMxID_Approval]) {
-                //         globalELMxArray[ELMxID_Approval] = {};
-                //     }
-
-                //     if (!globalELMxArray[ELMxID_Approval].approvedDonations) {
-                //         globalELMxArray[ELMxID_Approval].approvedDonations = {};
-                //     }
-
-                //     // if (globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey]) {
-                //     //     console.log("✅ Approval already exists. Skipping UI broadcast.");
-                //     //     break;
-                //     // }
-
-                //     // ✅ Store full approval message
-                //     globalELMxArray[ELMxID_Approval].approvedDonations[approvalKey] = {
-                //         shown: true,
-                //         fromUserID: fromUserID_Approval,
-                //         toUserID: toUserID_Approval,
-                //         timerName: timerName_Approval,
-                //         minutes: minutes_Approval,
-                //         seconds: seconds_Approval,
-                //         totalSeconds: totalSeconds_Approval
-                //     };
-
-                //     const showApprovalResponse = {
-                //         cmd: "returnShowApproval",
-                //         msg: {
-                //             ELMxID_Approval,
-                //             fromUserID_Approval,
-                //             toUserID_Approval,
-                //             timerName_Approval,
-                //             minutes_Approval,
-                //             seconds_Approval,
-                //             totalSeconds_Approval
-                //         }
-                //     };
-
-                //     console.log("📤 Sending showApprovalResponse to clients", showApprovalResponse);
-                //     const recipients = ["particularSome", globalELMxArray[ELMxID_Approval]?.arrayOfAttendanceIDs];
-                //     sendToWho(wss, ws, recipients, showApprovalResponse);
-
-                //     break;
 
 
                 case 'showApproval':
@@ -1481,344 +1332,498 @@ wss.on("connection", (ws) => {
 
 
 
-                // case 'showThirdingApproval':
-                //     console.log("📩 Received showThirdingApproval message: ", message);
 
-                //     const thirdingMsg = message.msg;
+                // case 'updateThirdingCheckbox':
+                //     console.log("📩 Received updateThirdingCheckbox message:", message);
 
-                //     // Destructure with clearly named variables to avoid conflicts
+                //     const checkboxMsg = message.msg;
                 //     const {
-                //         ELMxID: thirdingELMxID = 0,
-                //         fromUserID: thirdingFromUserID,
-                //         toUserID: thirdingToUserID,
-                //         timerName: thirdingTimerName,
-                //         minutes: thirdingMinutes,
-                //         seconds: thirdingSeconds,
-                //         totalSeconds: thirdingTotalSeconds,
-                //         selectedTimers: thirdingSelectedTimers = [],
-                //         note: thirdingNote = "Third+ donation – full approval"
-                //     } = thirdingMsg;
+                //         thirdingcheckingELMxID,
+                //         thirdingcheckingFromUserID,
+                //         checkboxId,
+                //         checked,
+                //         checkboxIndex
+                //     } = checkboxMsg;
 
-                //     const thirdingKey = `${thirdingFromUserID}_${thirdingToUserID}_${thirdingTotalSeconds}`;
+                //     // if (!thirdingcheckingELMxID || typeof thirdingcheckingFromUserID === "undefined" || typeof checkboxIndex === "undefined") {
+                //     //   console.error("❌ Missing required fields in updateThirdingCheckbox:", checkboxMsg);
+                //     //   return;
+                //     // }
 
-                //     // ✅ Ensure the ELMx entry exists
-                //     if (!globalELMxArray[thirdingELMxID]) {
-                //         globalELMxArray[thirdingELMxID] = {};
+                //     // Create thirdingKey from existing approvals
+                //     const currentApprovals = globalELMxArray[thirdingcheckingELMxID]?.approvedDonations || {};
+                //     const matchingKey = Object.keys(currentApprovals).find(key => key.startsWith(`${thirdingcheckingFromUserID}_`));
+
+                //     // if (!matchingKey) {
+                //     //   console.error("❌ No matching thirding approval found for fromUserID:", thirdingcheckingFromUserID);
+                //     //   return;
+                //     // }
+
+                //     // Initialize checkboxStates object if not exists
+                //     if (!currentApprovals[matchingKey].checkboxStates) {
+                //         currentApprovals[matchingKey].checkboxStates = {};
                 //     }
 
-                //     // ✅ Ensure approvedDonations exists
-                //     if (
-                //         typeof globalELMxArray[thirdingELMxID].approvedDonations !== 'object' ||
-                //         globalELMxArray[thirdingELMxID].approvedDonations === null
-                //     ) {
-                //         globalELMxArray[thirdingELMxID].approvedDonations = {};
-                //     }
-
-                //     // ✅ Store the third+ approval data
-                //     globalELMxArray[thirdingELMxID].approvedDonations[thirdingKey] = {
-                //         shown: true,
-                //         fromUserID: thirdingFromUserID,
-                //         toUserID: thirdingToUserID,
-                //         timerName: thirdingTimerName,
-                //         minutes: thirdingMinutes,
-                //         seconds: thirdingSeconds,
-                //         totalSeconds: thirdingTotalSeconds,
-                //         selectedTimers: thirdingSelectedTimers,
-                //         note: thirdingNote
+                //     // ✅ Update the checkbox state
+                //     currentApprovals[matchingKey].checkboxStates[checkboxIndex] = {
+                //         checkboxId,
+                //         checked: Boolean(checked),
                 //     };
 
-                //     // ✅ Debug output
-                //     console.log("✅ Updated thirding approvedDonations:", globalELMxArray[thirdingELMxID].approvedDonations);
+                //     console.log(`✅ Updated checkbox index ${checkboxIndex} to`, checked);
+                //     console.log("📦 Updated checkboxStates:", currentApprovals[matchingKey].checkboxStates);
 
-                //     // ✅ Prepare response message for all attendees
-                //     const showThirdingResponse = {
-                //         cmd: "returnShowThirdingApproval",
+                //     // Optionally broadcast the change to others
+                //     const checkboxUpdateResponse = {
+                //         cmd: "returnUpdatedThirdingCheckbox",
                 //         msg: {
-                //             ELMxID: thirdingELMxID,
-                //             fromUserID: thirdingFromUserID,
-                //             toUserID: thirdingToUserID,
-                //             timerName: thirdingTimerName,
-                //             minutes: thirdingMinutes,
-                //             seconds: thirdingSeconds,
-                //             totalSeconds: thirdingTotalSeconds,
-                //             selectedTimers: thirdingSelectedTimers,
-                //             note: thirdingNote
+                //             thirdingcheckingELMxID,
+                //             thirdingcheckingFromUserID,
+                //             checkboxId,
+                //             checkboxIndex,
+                //             checked: Boolean(checked)
                 //         }
                 //     };
 
-                //     console.log("📤 Sending returnShowThirdingApproval to attendees:", showThirdingResponse);
-
-                //     // ✅ Send to all relevant recipients
-                //     const thirdingRecipients = ["particularSome", globalELMxArray[thirdingELMxID]?.arrayOfAttendanceIDs];
-                //     sendToWho(wss, ws, thirdingRecipients, showThirdingResponse);
+                //     const ThirdingCheckingRecipients = ["particularSome", globalELMxArray[thirdingcheckingELMxID]?.arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, ThirdingCheckingRecipients, checkboxUpdateResponse);
 
                 //     break;
 
+                //             case 'updateThirdingCheckbox':
+                // console.log("📩 Received updateThirdingCheckbox message:", message);
 
+                // const checkboxMsg = message.msg;
+
+                // // ✅ Correct destructuring from actual incoming keys
+                // const {
+                //     ELMxID: thirdingcheckingELMxID,
+                //     fromUserID: thirdingcheckingFromUserID,
+                //     checkboxId,
+                //     checked,
+                //     checkboxIndex
+                // } = checkboxMsg;
+
+                // // ✅ Check if globalELMxArray and required data exist
+                // if (!globalELMxArray[thirdingcheckingELMxID]) {
+                //     console.error("❌ ELMxID not found in globalELMxArray:", thirdingcheckingELMxID);
+                //     return;
+                // }
+
+                // const currentApprovals = globalELMxArray[thirdingcheckingELMxID].approvedDonations || {};
+
+                // // ✅ Find the matching approval key for this user
+                // const matchingKey = Object.keys(currentApprovals).find(key => key.startsWith(`${thirdingcheckingFromUserID}_`));
+
+                // if (!matchingKey) {
+                //     console.error("❌ No matching approval key found for user:", thirdingcheckingFromUserID);
+                //     return;
+                // }
+
+                // // ✅ Safely initialize checkboxStates if needed
+                // if (!currentApprovals[matchingKey].checkboxStates) {
+                //     currentApprovals[matchingKey].checkboxStates = {};
+                // }
+
+                // // ✅ Update the checkbox state
+                // currentApprovals[matchingKey].checkboxStates[checkboxIndex] = {
+                //     checkboxId,
+                //     checked: Boolean(checked),
+                // };
+
+                // console.log(`✅ Updated checkbox index ${checkboxIndex} to`, checked);
+                // console.log("📦 Updated checkboxStates:", currentApprovals[matchingKey].checkboxStates);
+
+                // // ✅ Broadcast the change to other clients
+                // const checkboxUpdateResponse = {
+                //     cmd: "returnUpdatedThirdingCheckbox",
+                //     msg: {
+                //         thirdingcheckingELMxID,
+                //         thirdingcheckingFromUserID,
+                //         checkboxId,
+                //         checkboxIndex,
+                //         checked: Boolean(checked)
+                //     }
+                // };
+
+                // const ThirdingCheckingRecipients = [
+                //     "particularSome",
+                //     globalELMxArray[thirdingcheckingELMxID].arrayOfAttendanceIDs
+                // ];
+
+                // sendToWho(wss, ws, ThirdingCheckingRecipients, checkboxUpdateResponse);
+
+                // break;
 
                 case 'updateThirdingCheckbox':
                     console.log("📩 Received updateThirdingCheckbox message:", message);
-                  
+
                     const checkboxMsg = message.msg;
+
+                    // ✅ Correct destructuring
                     const {
-                      thirdingcheckingELMxID,
-                      thirdingcheckingFromUserID,
-                      checkboxId,
-                      checked,
-                      checkboxIndex
+                        ELMxID: thirdingcheckingELMxID,
+                        fromUserID: thirdingcheckingFromUserID,
+                        checkboxId,
+                        checked,
+                        checkboxIndex
                     } = checkboxMsg;
-                  
-                    // if (!thirdingcheckingELMxID || typeof thirdingcheckingFromUserID === "undefined" || typeof checkboxIndex === "undefined") {
-                    //   console.error("❌ Missing required fields in updateThirdingCheckbox:", checkboxMsg);
-                    //   return;
-                    // }
-                  
-                    // Create thirdingKey from existing approvals
-                    const currentApprovals = globalELMxArray[thirdingcheckingELMxID]?.approvedDonations || {};
-                    const matchingKey = Object.keys(currentApprovals).find(key => key.startsWith(`${thirdingcheckingFromUserID}_`));
-                  
-                    // if (!matchingKey) {
-                    //   console.error("❌ No matching thirding approval found for fromUserID:", thirdingcheckingFromUserID);
-                    //   return;
-                    // }
-                  
-                    // Initialize checkboxStates object if not exists
-                    if (!currentApprovals[matchingKey].checkboxStates) {
-                      currentApprovals[matchingKey].checkboxStates = {};
+
+                    // ✅ Validate ELMxID
+                    if (!globalELMxArray[thirdingcheckingELMxID]) {
+                        console.error("❌ ELMxID not found in globalELMxArray:", thirdingcheckingELMxID);
+                        return;
                     }
-                  
-                    // ✅ Update the checkbox state
+
+                    // ✅ Initialize approvedDonations object if not present
+                    if (!globalELMxArray[thirdingcheckingELMxID].approvedDonations || typeof globalELMxArray[thirdingcheckingELMxID].approvedDonations !== 'object') {
+                        globalELMxArray[thirdingcheckingELMxID].approvedDonations = {};
+                    }
+
+                    const currentApprovals = globalELMxArray[thirdingcheckingELMxID].approvedDonations;
+
+                    // ✅ Get the key for this user's approval
+                    const matchingKey = Object.keys(currentApprovals).find(key => key.startsWith(`${thirdingcheckingFromUserID}_`));
+
+                    if (!matchingKey) {
+                        console.error("❌ No matching approval key found for user:", thirdingcheckingFromUserID);
+                        return;
+                    }
+
+                    // ✅ Ensure checkboxStates exists
+                    if (!currentApprovals[matchingKey].checkboxStates) {
+                        currentApprovals[matchingKey].checkboxStates = {};
+                    }
+
+                    // ✅ Save checkbox state
                     currentApprovals[matchingKey].checkboxStates[checkboxIndex] = {
-                      checkboxId,
-                      checked: Boolean(checked),
+                        checkboxId,
+                        checked: Boolean(checked),
                     };
-                  
+
                     console.log(`✅ Updated checkbox index ${checkboxIndex} to`, checked);
                     console.log("📦 Updated checkboxStates:", currentApprovals[matchingKey].checkboxStates);
-                  
-                    // Optionally broadcast the change to others
-                    const checkboxUpdateResponse = {
-                      cmd: "returnUpdatedThirdingCheckbox",
-                      msg: {
-                        thirdingcheckingELMxID,
-                        thirdingcheckingFromUserID,
+
+                    // ✅ Now store in realapprovaluser
+                    if (
+                        !globalELMxArray[thirdingcheckingELMxID].thirdingDonationData ||
+                        typeof globalELMxArray[thirdingcheckingELMxID].thirdingDonationData !== 'object'
+                    ) {
+                        globalELMxArray[thirdingcheckingELMxID].thirdingDonationData = {};
+                    }
+
+                    if (!globalELMxArray[thirdingcheckingELMxID].thirdingDonationData.realapprovaluser) {
+                        globalELMxArray[thirdingcheckingELMxID].thirdingDonationData.realapprovaluser = {};
+                    }
+
+                    // ✅ Create entry for fromUserID if not exists
+                    if (!globalELMxArray[thirdingcheckingELMxID].thirdingDonationData.realapprovaluser[thirdingcheckingFromUserID]) {
+                        globalELMxArray[thirdingcheckingELMxID].thirdingDonationData.realapprovaluser[thirdingcheckingFromUserID] = {};
+                    }
+
+                    // ✅ Store checkbox state under realapprovaluser
+                    globalELMxArray[thirdingcheckingELMxID].thirdingDonationData.realapprovaluser[thirdingcheckingFromUserID][checkboxIndex] = {
                         checkboxId,
-                        checkboxIndex,
-                        checked: Boolean(checked)
-                      }
+                        checked: Boolean(checked),
                     };
-                  
-                    const ThirdingCheckingRecipients = ["particularSome", globalELMxArray[thirdingcheckingELMxID]?.arrayOfAttendanceIDs];
+
+                    console.log("📥 Stored in realapprovaluser:", globalELMxArray[thirdingcheckingELMxID].thirdingDonationData.realapprovaluser);
+
+                    // ✅ Notify all clients
+                    const checkboxUpdateResponse = {
+                        cmd: "returnUpdatedThirdingCheckbox",
+                        msg: {
+                            thirdingcheckingELMxID,
+                            thirdingcheckingFromUserID,
+                            checkboxId,
+                            checkboxIndex,
+                            checked: Boolean(checked)
+                        }
+                    };
+
+                    const ThirdingCheckingRecipients = [
+                        "particularSome",
+                        globalELMxArray[thirdingcheckingELMxID].arrayOfAttendanceIDs
+                    ];
+
                     sendToWho(wss, ws, ThirdingCheckingRecipients, checkboxUpdateResponse);
-                  
+
                     break;
-                  
 
 
-                case 'showThirdingApproval':
-    console.log("📩 Received showThirdingApproval message: ", message);
+                // case 'getThirdingCheckboxState':
+                //     {
+                //         console.log("📩 Received getThirdingCheckboxState message:", message);
 
-    const thirdingMsg = message.msg;
+                //         const { ELMxID, fromUserID } = message.msg;
 
-    // Destructure with clearly named variables to avoid conflicts
-    const {
-        ELMxID: thirdingELMxID = 0,
-        fromUserID: thirdingFromUserID,
-        toUserID: thirdingToUserID,
-        timerName: thirdingTimerName,
-        minutes: thirdingMinutes,
-        seconds: thirdingSeconds,
-        totalSeconds: thirdingTotalSeconds,
-        selectedTimers: thirdingSelectedTimers = [],
-        selectedTimerIDs: thirdingSelectedTimerIDs = [], // ✅ NEW
-        note: thirdingNote = "Third+ donation – full approval"
-    } = thirdingMsg;
-
-    const thirdingKey = `${thirdingFromUserID}_${thirdingToUserID}_${thirdingTotalSeconds}`;
-
-    // ✅ Ensure the ELMx entry exists
-    if (!globalELMxArray[thirdingELMxID]) {
-        globalELMxArray[thirdingELMxID] = {};
-    }
-
-    // ✅ Ensure approvedDonations exists
-    if (
-        typeof globalELMxArray[thirdingELMxID].approvedDonations !== 'object' ||
-        globalELMxArray[thirdingELMxID].approvedDonations === null
-    ) {
-        globalELMxArray[thirdingELMxID].approvedDonations = {};
-    }
-
-    // ✅ Store the third+ approval data
-    globalELMxArray[thirdingELMxID].approvedDonations[thirdingKey] = {
-        shown: true,
-        fromUserID: thirdingFromUserID,
-        toUserID: thirdingToUserID,
-        timerName: thirdingTimerName,
-        minutes: thirdingMinutes,
-        seconds: thirdingSeconds,
-        totalSeconds: thirdingTotalSeconds,
-        selectedTimers: thirdingSelectedTimers,
-        selectedTimerIDs: thirdingSelectedTimerIDs, // ✅ NEW
-        note: thirdingNote
-    };
-
-    // ✅ Debug output
-    console.log("✅ Updated thirding approvedDonations:", globalELMxArray[thirdingELMxID].approvedDonations);
-
-    // ✅ Prepare response message for all attendees
-    const showThirdingResponse = {
-        cmd: "returnShowThirdingApproval",
-        msg: {
-            ELMxID: thirdingELMxID,
-            fromUserID: thirdingFromUserID,
-            toUserID: thirdingToUserID,
-            timerName: thirdingTimerName,
-            minutes: thirdingMinutes,
-            seconds: thirdingSeconds,
-            totalSeconds: thirdingTotalSeconds,
-            selectedTimers: thirdingSelectedTimers,
-            selectedTimerIDs: thirdingSelectedTimerIDs, // ✅ NEW
-            note: thirdingNote
-        }
-    };
-
-    console.log("📤 Sending returnShowThirdingApproval to attendees:", showThirdingResponse);
-
-    // ✅ Send to all relevant recipients
-    const thirdingRecipients = ["particularSome", globalELMxArray[thirdingELMxID]?.arrayOfAttendanceIDs];
-    sendToWho(wss, ws, thirdingRecipients, showThirdingResponse);
-
-    break;
-
-
-
-
-
-
-                // case "sendingremoveApprovalUI":
-                //     console.log("📩 Received removeshowApproval message: ", message);
-                //     const unapprovalMsg = message.msg;
-                //     const {
-                //         ELMxID = 0,
-                //     } = unapprovalMsg;
-
-                //     const showunApprovalResponse = {
-                //         cmd: "returnRemoveApproval",
-                //         msg: {
-                //             ELMxID,
+                //         // ✅ Validate ELMxID
+                //         if (!globalELMxArray[ELMxID]) {
+                //             console.error("❌ ELMxID not found in globalELMxArray:", ELMxID);
+                //             return;
                 //         }
-                //     };
+
+                //         const currentApprovals = globalELMxArray[ELMxID].approvedDonations;
+
+                //         // ✅ Get the key for this user's approval
+                //         const matchingKey = Object.keys(currentApprovals).find(key => key.startsWith(`${fromUserID}_`));
+
+                //         if (!matchingKey) {
+                //             console.error("❌ No matching approval key found for user:", fromUserID);
+                //             return;
+                //         }
+
+                //         const checkboxStates = currentApprovals[matchingKey].checkboxStates || {};
+
+                //         // ✅ Send the checkbox states back to the client
+                //         const checkboxStateResponse = {
+                //             cmd: "returnThirdingCheckboxState",
+                //             msg: {
+                //                 ELMxID,
+                //                 fromUserID,
+                //                 checkboxStates
+                //             }
+                //         };
+
+                //         // Send the checkbox states to the requesting client
+                //         sendToWho(wss, ws, [message.from], checkboxStateResponse);
+
+                //         break;
+                //     }
+
+                case 'getThirdingCheckboxState': {
+                    console.log("📩 Received getThirdingCheckboxState message:", message);
+
+                    const { ELMxID, fromUserID } = message.msg;
+
+                    // ✅ Validate ELMxID
+                    if (!globalELMxArray[ELMxID]) {
+                        console.error("❌ ELMxID not found in globalELMxArray:", ELMxID);
+                        return;
+                    }
+
+                    const currentApprovals = globalELMxArray[ELMxID].approvedDonations;
+
+                    // ✅ Get the key for this user's approval
+                    const matchingKey = Object.keys(currentApprovals).find(key => key.startsWith(`${fromUserID}_`));
+
+                    if (!matchingKey) {
+                        console.error("❌ No matching approval key found for user:", fromUserID);
+                        return;
+                    }
+
+                    const checkboxStates = currentApprovals[matchingKey].checkboxStates || {};
+
+                    // ✅ Send the checkbox states back to the client
+                    const checkboxStateResponse = {
+                        cmd: "returnThirdingCheckboxState",
+                        msg: {
+                            ELMxID,
+                            fromUserID,
+                            checkboxStates
+                        }
+                    };
+
+                    // Send the checkbox states to the requesting client
+                    sendToWho(wss, ws, [message.from], checkboxStateResponse);
+                    break;
+                }
 
 
-                //     console.log("Testing send showunApprovalResponse", showunApprovalResponse);
-                //     const unrecipients = ["particularSome", globalELMxArray[ELMxID]?.arrayOfAttendanceIDs];
-                //     sendToWho(wss, ws, unrecipients, showunApprovalResponse);
 
+
+
+
+
+
+
+                // case "getCurrentThirdingCheckboxStates":
+                //   const currentCheckboxStates = Object.entries(thirdingCheckboxStates).map(([checkboxId, checked]) => ({
+                //     checkboxId,
+                //     checked
+                //   }));
+
+                //   ws.send(JSON.stringify({
+                //     cmd: "returnAllThirdingCheckboxStates",
+                //     msg: currentCheckboxStates
+                //   }));
+                //   break;
+
+
+                // case "getCurrentThirdingCheckboxStates":
+                //     const currentCheckboxStates = Object.entries(thirdingCheckboxStates).map(([checkboxId, checked]) => ({
+                //         checkboxId,
+                //         checked
+                //     }));
+
+                //     ws.send(JSON.stringify({
+                //         cmd: "returnAllThirdingCheckboxStates",
+                //         msg: currentCheckboxStates
+                //     }));
                 //     break;
 
 
+                // case "getCurrentThirdingCheckboxStates": {
+                //     const sessionID = message.msg?.ELMxID ?? 0;
+
+                //     const checkboxStates = thirdingCheckboxStatesBySession[sessionID] || {};
+
+                //     const currentCheckboxStates = Object.entries(checkboxStates).map(([checkboxId, state]) => ({
+                //         checkboxId,
+                //         checked: state
+                //     }));
+
+                //     ws.send(JSON.stringify({
+                //         cmd: "returnAllThirdingCheckboxStates",
+                //         msg: currentCheckboxStates
+                //     }));
+                //     break;
+                // }
 
 
-                // Handle removal request from a client
-// case "sendingremoveApprovalUI":
-//     console.log("📩 Received removeshowApproval message: ", message);
-//     const unapprovalMsg = message.msg;
-  
-//     // Rename variables to avoid conflicts with previously declared variables
-//     const {
-//       ELMxID: receivedELMxID = 0,
-//       fromUserID: receivedFromUserID,
-//       toUserID: receivedToUserID,
-//       totalSeconds: receivedTotalSeconds
-//     } = unapprovalMsg;
-  
-//     // Prepare the response message to send back to all clients
-//     const showunApprovalResponse = {
-//       cmd: "returnRemoveApproval",
-//       msg: {
-//         ELMxID: receivedELMxID,
-//         fromUserID: receivedFromUserID,
-//         toUserID: receivedToUserID,
-//         totalSeconds: receivedTotalSeconds
-//       }
-//     };
-  
-//     console.log("Testing send showunApprovalResponse", showunApprovalResponse);
-  
-//     // Send the removal notification to all clients
-//     const unrecipients = ["particularSome", globalELMxArray[receivedELMxID]?.arrayOfAttendanceIDs];
-//     sendToWho(wss, ws, unrecipients, showunApprovalResponse);
-  
-//     break;
-  
+                case 'showThirdingApproval':
+                    console.log("📩 Received showThirdingApproval message: ", message);
 
-case "sendingremoveApprovalUI": {
-    console.log("📩 Received removeshowApproval message:", message);
-  
-    // 1. Safely extract your fields
-    const {
-      ELMxID: sessionID = 0,
-      fromUserID,
-      toUserID,
-      totalSeconds
-    } = message.msg || {};
-  
-    // 2. Compute the key you used when approving
-    const donationKey = `${fromUserID}_${toUserID}_${totalSeconds}`;
-    console.log("🔍 Removal request for key:", donationKey, "in session", sessionID);
-  
-    // 3. Look up the session data
-    const sessionData = globalELMxArray[sessionID];
-    if (!sessionData) {
-      console.warn("⚠️ No session data found for ELMxID:", sessionID);
-      break;
-    }
-  
-    // 4. Delete from approvedDonations if it exists
-    const approved = sessionData.approvedDonations;
-    if (approved && donationKey in approved) {
-      delete approved[donationKey];
-      console.log(`✅ Deleted approvedDonations[${donationKey}]`);
-    } else {
-      console.warn(`⚠️ No approvedDonations["${donationKey}"] to delete.`);
-    }
-  
-    // 5. Build your recipients list.  
-    //    In your existing code you use ["particularSome", arrayOfAttendanceIDs]
-    //    so we’ll do the same—this will send to that group plus everyone in the meeting:
-    const recipients = [
-      "particularSome",
-      sessionData.arrayOfAttendanceIDs   // should be an array of socket IDs
-    ];
-  
-    // 6. Tell all clients to remove the single approval box:
-    const removalUI = {
-      cmd: "returnRemoveApproval",
-      msg: {
-        ELMxID:       sessionID,
-        fromUserID,
-        toUserID,
-        totalSeconds
-      }
-    };
-    sendToWho(wss, ws, recipients, removalUI);
-  
-    // 7. Then broadcast the updated approvedDonations map:
-    const updateMsg = {
-      cmd: "updateApprovedDonations",
-      msg: approved
-    };
-    sendToWho(wss, ws, recipients, updateMsg);
-  
-    break;
-  }
-  
-    
+                    const thirdingMsg = message.msg;
+
+                    // Destructure with clearly named variables to avoid conflicts
+                    const {
+                        ELMxID: thirdingELMxID = 0,
+                        fromUserID: thirdingFromUserID,
+                        toUserID: thirdingToUserID,
+                        timerName: thirdingTimerName,
+                        minutes: thirdingMinutes,
+                        seconds: thirdingSeconds,
+                        totalSeconds: thirdingTotalSeconds,
+                        selectedTimers: thirdingSelectedTimers = [],
+                        selectedTimerIDs: thirdingSelectedTimerIDs = [], // ✅ NEW
+                        note: thirdingNote = "Third+ donation – full approval"
+                    } = thirdingMsg;
+
+                    const thirdingKey = `${thirdingFromUserID}_${thirdingToUserID}_${thirdingTotalSeconds}`;
+
+                    // ✅ Ensure the ELMx entry exists
+                    if (!globalELMxArray[thirdingELMxID]) {
+                        globalELMxArray[thirdingELMxID] = {};
+                    }
+
+                    // ✅ Ensure approvedDonations exists
+                    if (
+                        typeof globalELMxArray[thirdingELMxID].approvedDonations !== 'object' ||
+                        globalELMxArray[thirdingELMxID].approvedDonations === null
+                    ) {
+                        globalELMxArray[thirdingELMxID].approvedDonations = {};
+                    }
+
+                    // ✅ Store the third+ approval data
+                    globalELMxArray[thirdingELMxID].approvedDonations[thirdingKey] = {
+                        shown: true,
+                        fromUserID: thirdingFromUserID,
+                        toUserID: thirdingToUserID,
+                        timerName: thirdingTimerName,
+                        minutes: thirdingMinutes,
+                        seconds: thirdingSeconds,
+                        totalSeconds: thirdingTotalSeconds,
+                        selectedTimers: thirdingSelectedTimers,
+                        selectedTimerIDs: thirdingSelectedTimerIDs, // ✅ NEW
+                        note: thirdingNote
+                    };
+
+                    // ✅ Debug output
+                    console.log("✅ Updated thirding approvedDonations:", globalELMxArray[thirdingELMxID].approvedDonations);
+
+                    // ✅ Prepare response message for all attendees
+                    const showThirdingResponse = {
+                        cmd: "returnShowThirdingApproval",
+                        msg: {
+                            ELMxID: thirdingELMxID,
+                            fromUserID: thirdingFromUserID,
+                            toUserID: thirdingToUserID,
+                            timerName: thirdingTimerName,
+                            minutes: thirdingMinutes,
+                            seconds: thirdingSeconds,
+                            totalSeconds: thirdingTotalSeconds,
+                            selectedTimers: thirdingSelectedTimers,
+                            selectedTimerIDs: thirdingSelectedTimerIDs, // ✅ NEW
+                            note: thirdingNote
+                        }
+                    };
+
+                    console.log("📤 Sending returnShowThirdingApproval to attendees:", showThirdingResponse);
+
+                    // ✅ Send to all relevant recipients
+                    const thirdingRecipients = ["particularSome", globalELMxArray[thirdingELMxID]?.arrayOfAttendanceIDs];
+                    sendToWho(wss, ws, thirdingRecipients, showThirdingResponse);
+
+                    break;
 
 
+                case "sendingremoveApprovalUI": {
+                    console.log("📩 Received removeshowApproval message:", message);
 
-                
+                    // 1. Safely extract your fields
+                    const {
+                        ELMxID: sessionID = 0,
+                        fromUserID,
+                        toUserID,
+                        totalSeconds
+                    } = message.msg || {};
+
+                    // 2. Compute the key you used when approving
+                    const donationKey = `${fromUserID}_${toUserID}_${totalSeconds}`;
+                    console.log("🔍 Removal request for key:", donationKey, "in session", sessionID);
+
+                    // 3. Look up the session data
+                    const sessionData = globalELMxArray[sessionID];
+                    if (!sessionData) {
+                        console.warn("⚠️ No session data found for ELMxID:", sessionID);
+                        break;
+                    }
+
+                    // 4. Delete from approvedDonations if it exists
+                    const approved = sessionData.approvedDonations;
+                    if (approved && donationKey in approved) {
+                        delete approved[donationKey];
+                        console.log(`✅ Deleted approvedDonations[${donationKey}]`);
+                    } else {
+                        console.warn(`⚠️ No approvedDonations["${donationKey}"] to delete.`);
+                    }
+
+                    // 5. Build your recipients list.  
+                    //    In your existing code you use ["particularSome", arrayOfAttendanceIDs]
+                    //    so we’ll do the same—this will send to that group plus everyone in the meeting:
+                    const recipients = [
+                        "particularSome",
+                        sessionData.arrayOfAttendanceIDs   // should be an array of socket IDs
+                    ];
+
+                    // 6. Tell all clients to remove the single approval box:
+                    const removalUI = {
+                        cmd: "returnRemoveApproval",
+                        msg: {
+                            ELMxID: sessionID,
+                            fromUserID,
+                            toUserID,
+                            totalSeconds
+                        }
+                    };
+                    sendToWho(wss, ws, recipients, removalUI);
+
+                    // 7. Then broadcast the updated approvedDonations map:
+                    const updateMsg = {
+                        cmd: "updateApprovedDonations",
+                        msg: approved
+                    };
+                    sendToWho(wss, ws, recipients, updateMsg);
+
+                    break;
+                }
+
+
+
+
+
+
 
 
 
@@ -1998,6 +2003,31 @@ case "sendingremoveApprovalUI": {
                     break;
 
 
+                case 'sendDonation': {
+                    const donation = message.msg;
+                    const donationKey = `${donation.fromUserID}_${donation.toUserID}`;
+
+                    if (!globalELMxArray.donationCounts[donationKey]) {
+                        globalELMxArray.donationCounts[donationKey] = 0;
+                    }
+
+                    globalELMxArray.donationCounts[donationKey] += 1;
+
+                    console.log(`🎉 Donation recorded: ${donationKey} = ${globalELMxArray.donationCounts[donationKey]}`);
+
+                    // Optionally notify the sender or others
+                    const confirmMsg = {
+                        cmd: "donationConfirmed",
+                        msg: {
+                            ...donation,
+                            newCount: globalELMxArray.donationCounts[donationKey]
+                        }
+                    };
+
+                    ws.send(JSON.stringify(confirmMsg));
+                    break;
+                }
+
 
 
                 // case 'removeApprovedDonation':
@@ -2053,46 +2083,46 @@ case "sendingremoveApprovalUI": {
                 //         console.log("Donation not found:", key);
                 //     }
                 //     break;
-                
 
 
-    //             case 'removeApprovedDonation': 
-    // if (!message.msg) {
-    //     console.error("Invalid message format: 'msg' field is missing.");
-    //     return;
-    // }
 
-    // // broadcastToAllClients(removalMsg);
+                //             case 'removeApprovedDonation': 
+                // if (!message.msg) {
+                //     console.error("Invalid message format: 'msg' field is missing.");
+                //     return;
+                // }
 
-    // const { 
-    //     fromUserID: donorID, 
-    //     toUserID: recipientID, 
-    //     totalSeconds: donatedDuration, 
-    //     ELMxID: sessionID 
-    // } = message.msg;
+                // // broadcastToAllClients(removalMsg);
 
-    // const SecondingapprovalKey = `${donorID}_${recipientID}_${donatedDuration}`;
+                // const { 
+                //     fromUserID: donorID, 
+                //     toUserID: recipientID, 
+                //     totalSeconds: donatedDuration, 
+                //     ELMxID: sessionID 
+                // } = message.msg;
 
-    // console.log("🔍 Removal request received with data:", message.msg);
+                // const SecondingapprovalKey = `${donorID}_${recipientID}_${donatedDuration}`;
 
-    // if (
-    //     globalELMxArray[sessionID] &&
-    //     globalELMxArray[sessionID].approvedDonations &&
-    //     globalELMxArray[sessionID].approvedDonations[SecondingapprovalKey]
-    // ) {
-    //     delete globalELMxArray[sessionID].approvedDonations[SecondingapprovalKey];
-    //     console.log(`✅ Donation removed: ${SecondingapprovalKey}`);
+                // console.log("🔍 Removal request received with data:", message.msg);
 
-    //     clients.forEach(client => {
-    //         client.send(JSON.stringify({
-    //             cmd: "updateApprovedDonations",
-    //             msg: globalELMxArray[sessionID].approvedDonations
-    //         }));
-    //     });
-    // } else {
-    //     console.warn(`⚠️ Donation not found for key: ${SecondingapprovalKey}`);
-    // }
-    // break;
+                // if (
+                //     globalELMxArray[sessionID] &&
+                //     globalELMxArray[sessionID].approvedDonations &&
+                //     globalELMxArray[sessionID].approvedDonations[SecondingapprovalKey]
+                // ) {
+                //     delete globalELMxArray[sessionID].approvedDonations[SecondingapprovalKey];
+                //     console.log(`✅ Donation removed: ${SecondingapprovalKey}`);
+
+                //     clients.forEach(client => {
+                //         client.send(JSON.stringify({
+                //             cmd: "updateApprovedDonations",
+                //             msg: globalELMxArray[sessionID].approvedDonations
+                //         }));
+                //     });
+                // } else {
+                //     console.warn(`⚠️ Donation not found for key: ${SecondingapprovalKey}`);
+                // }
+                // break;
 
 
 
@@ -2141,35 +2171,78 @@ case "sendingremoveApprovalUI": {
                 // }
 
 
+                // case "removeApprovedDonation": {
+                //     console.log("📩 removeApprovedDonation request:", message.msg);
+                //     const {
+                //         ELMxID: sessionID = 0,
+                //         fromUserID,
+                //         toUserID,
+                //         totalSeconds
+                //     } = message.msg || {};
+
+                //     // Build the same key you used when approving
+                //     const key = `${fromUserID}_${toUserID}_${totalSeconds}`;
+                //     const session = globalELMxArray[sessionID];
+                //     if (session && session.approvedDonations && key in session.approvedDonations) {
+                //         delete session.approvedDonations[key];
+                //         console.log(`✅ Deleted approvedDonations[${key}] in session ${sessionID}`);
+                //     } else {
+                //         console.warn(`⚠️ No approvedDonations[${key}] to delete.`);
+                //     }
+
+                //     // Tell *all* relevant clients to drop that one box
+                //     const removalUI = {
+                //         cmd: "returnRemoveApproval",
+                //         msg: { ELMxID: sessionID, fromUserID, toUserID, totalSeconds }
+                //     };
+                //     const recipients = ["particularSome", session.arrayOfAttendanceIDs];
+                //     sendToWho(wss, ws, recipients, removalUI);
+
+                //     break;
+                // }
+
                 case "removeApprovedDonation": {
                     console.log("📩 removeApprovedDonation request:", message.msg);
                     const {
-                      ELMxID: sessionID = 0,
-                      fromUserID,
-                      toUserID,
-                      totalSeconds
+                        ELMxID: sessionID = 0,
+                        fromUserID,
+                        toUserID,
+                        totalSeconds
                     } = message.msg || {};
-                
-                    // Build the same key you used when approving
+
                     const key = `${fromUserID}_${toUserID}_${totalSeconds}`;
                     const session = globalELMxArray[sessionID];
-                    if (session && session.approvedDonations && key in session.approvedDonations) {
-                      delete session.approvedDonations[key];
-                      console.log(`✅ Deleted approvedDonations[${key}] in session ${sessionID}`);
-                    } else {
-                      console.warn(`⚠️ No approvedDonations[${key}] to delete.`);
+
+                    if (!session) {
+                        console.warn(`⚠️ No session found for sessionID ${sessionID}`);
+                        break;
                     }
-                
-                    // Tell *all* relevant clients to drop that one box
+
+                    // Ensure approvedDonations is an object
+                    if (typeof session.approvedDonations !== "object" || session.approvedDonations === null) {
+                        console.warn(`⚠️ Invalid approvedDonations structure in session ${sessionID}. Found:`, session.approvedDonations);
+                        session.approvedDonations = {}; // Initialize if necessary
+                    }
+
+                    if (key in session.approvedDonations) {
+                        delete session.approvedDonations[key];
+                        console.log(`✅ Deleted approvedDonations[${key}] in session ${sessionID}`);
+                    } else {
+                        console.warn(`⚠️ No approvedDonations[${key}] to delete.`);
+                    }
+
+                    // Notify all relevant clients to remove the approved donation UI
                     const removalUI = {
-                      cmd: "returnRemoveApproval",
-                      msg: { ELMxID: sessionID, fromUserID, toUserID, totalSeconds }
+                        cmd: "returnRemoveApproval",
+                        msg: { ELMxID: sessionID, fromUserID, toUserID, totalSeconds }
                     };
+
                     const recipients = ["particularSome", session.arrayOfAttendanceIDs];
                     sendToWho(wss, ws, recipients, removalUI);
-                
+
                     break;
-                  }
+                }
+
 
 
 
@@ -2218,99 +2291,179 @@ case "sendingremoveApprovalUI": {
                 case 'getSelectedTimersState':
                     const selectedELMxID = message.msg.ELMxID; // Renamed ELMxID to selectedELMxID
                     const selectedTimerServerID = message.msg.timerServerID; // Renamed timerServerID to selectedTimerServerID
-                  
+
                     // Retrieve the selected timers from your data structure (globalELMxArray or equivalent)
                     const selectedTimersState = globalELMxArray[selectedELMxID]?.selectedTimersState || [];
-                  
+
                     // Log the data being sent back to the client for debugging purposes
                     console.log(`Retrieving selected timers for selectedELMxID ${selectedELMxID}:`, JSON.stringify(selectedTimersState));
-                  
+
                     // Send the selected timers data to the client
                     const returnMessage = {
-                      cmd: "returnselectedTimersUpdate",
-                      msg: {
-                        selectedELMxID: selectedELMxID, // Send back as selectedELMxID
-                        selectedTimers: selectedTimersState
-                      }
+                        cmd: "returnselectedTimersUpdate",
+                        msg: {
+                            selectedELMxID: selectedELMxID, // Send back as selectedELMxID
+                            selectedTimers: selectedTimersState
+                        }
                     };
-                  
+
                     ws.send(JSON.stringify(returnMessage));
                     break;
-                  
 
 
-                    case 'removeThirdingApprovedDonation': {
-                        const { ELMxID, fromUserID, toUserID, totalSeconds } = message.msg;
-                    
-                        if (!globalELMxArray[ELMxID]) return;
-                    
-                        const key = `${fromUserID}-${toUserID}-${totalSeconds}`;
-                        if (globalELMxArray[ELMxID].approvedDonations) {
-                            delete globalELMxArray[ELMxID].approvedDonations[key];
-                            console.log(`🗑️ Removed approved donation: ${key}`);
+                // case 'removeThirdingApprovedDonation': {
+                //     const {
+                //         ELMxID,
+                //         fromUserID,
+                //         toUserID,
+                //         totalSeconds
+                //     } = message.msg;
+
+                //     const meetingData = globalELMxArray[ELMxID];
+
+                //     if (!meetingData) {
+                //         console.error(`❌ ELMxID ${ELMxID} not found.`);
+                //         return;
+                //     }
+
+                //     // ✅ 1. Remove from approvedDonations
+                //     if (typeof meetingData.approvedDonations === 'object') {
+                //         const keys = Object.keys(meetingData.approvedDonations);
+                //         const keyToRemove = keys.find(key =>
+                //             key.startsWith(`${fromUserID}_`) &&
+                //             key.includes(`${toUserID}_${totalSeconds}`)
+                //         );
+
+                //         if (keyToRemove) {
+                //             delete meetingData.approvedDonations[keyToRemove];
+                //             console.log(`🗑️ Removed approved donation: ${keyToRemove}`);
+                //         } else {
+                //             console.warn("⚠️ No matching key found in approvedDonations.");
+                //         }
+                //     }
+
+                //     // ✅ 2. Remove from thirdingDonationData.realapprovaluser
+                //     if (
+                //         meetingData.thirdingDonationData &&
+                //         typeof meetingData.thirdingDonationData.realapprovaluser === 'object' &&
+                //         meetingData.thirdingDonationData.realapprovaluser[fromUserID]
+                //     ) {
+                //         delete meetingData.thirdingDonationData.realapprovaluser[fromUserID];
+                //         console.log(`🗑️ Removed realapprovaluser[${fromUserID}]`);
+                //     }
+
+                //     break;
+                // }
+
+
+                case 'removeThirdingApprovedDonation': {
+                    const {
+                        ELMxID,
+                        fromUserID,
+                        toUserID,
+                        totalSeconds
+                    } = message.msg;
+
+                    const meetingData = globalELMxArray[ELMxID];
+
+                    if (!meetingData) {
+                        console.error(`❌ ELMxID ${ELMxID} not found.`);
+                        return;
+                    }
+
+                    // ✅ 1. Remove from approvedDonations
+                    if (typeof meetingData.approvedDonations === 'object') {
+                        const keys = Object.keys(meetingData.approvedDonations);
+                        const keyToRemove = keys.find(key =>
+                            key.startsWith(`${fromUserID}_`) &&
+                            key.includes(`${toUserID}_${totalSeconds}`)
+                        );
+
+                        if (keyToRemove) {
+                            delete meetingData.approvedDonations[keyToRemove];
+                            console.log(`🗑️ Removed approved donation: ${keyToRemove}`);
+                        } else {
+                            console.warn("⚠️ No matching key found in approvedDonations.");
                         }
-                    
-                        break;
                     }
-                    
 
-                    case 'sendingThirdingremoveApprovalUI': {
-                        const { ELMxID, fromUserID, toUserID, totalSeconds } = message.msg;
-                    
-                        const broadcastMessage = {
-                            cmd: "sendingThirdingremoveApprovalUI",
-                            msg: { fromUserID, toUserID, totalSeconds }
-                        };
-                    
-                        broadcastToELMxClients(ELMxID, broadcastMessage, ws);
-                        break;
+                    // ✅ 2. Remove from thirdingDonationData.realapprovaluser
+                    if (
+                        meetingData.thirdingDonationData &&
+                        typeof meetingData.thirdingDonationData.realapprovaluser === 'object' &&
+                        meetingData.thirdingDonationData.realapprovaluser[fromUserID]
+                    ) {
+                        delete meetingData.thirdingDonationData.realapprovaluser[fromUserID];
+                        console.log(`🗑️ Removed realapprovaluser[${fromUserID}]`);
                     }
-                    
-                    
-  
+
+                    // ✅ 3. Broadcast to all clients to remove the UI
+                    const returnRemoveApproval = {
+                        cmd: "returnRemoveApproval",
+                        msg: {
+                            ELMxID,
+                            fromUserID,
+                            toUserID,
+                            totalSeconds
+                        }
+                    };
+
+                    const recipients = ["particularSome", meetingData.arrayOfAttendanceIDs];
+                    sendToWho(wss, ws, recipients, returnRemoveApproval);
+
+                    break;
+                }
 
 
 
-                // case 'getApprovedDonations': {
-                //     const ELMxID = message.msg.ELMxID;
 
-                //     const approvedDonations = globalELMxArray[ELMxID]?.approvedDonations || [];
 
-                //     console.log("📜 Retrieved approvedDonations for ELMxID", ELMxID, ":", approvedDonations);
 
-                //     const response = {
-                //         cmd: "approvedDonationsList",
-                //         msg: {
-                //             approvedDonations
-                //         }
+                // case 'sendingThirdingremoveApprovalUI': {
+                //     const { ELMxID, fromUserID, toUserID, totalSeconds } = message.msg;
+
+                //     const broadcastMessage = {
+                //         cmd: "sendingThirdingremoveApprovalUI",
+                //         msg: { fromUserID, toUserID, totalSeconds }
                 //     };
 
-                //     ws.send(JSON.stringify(response));
+                //     broadcastToELMxClients(ELMxID, broadcastMessage, ws);
                 //     break;
                 // }
+                // case 'sendingThirdingremoveApprovalUI':
+                //     {
+                //         console.log("📩 Received sendingThirdingremoveApprovalUI message: ", message);
 
+                //         // Destructure the necessary properties from the message
+                //         const {
+                //             ELMxID,
+                //             fromUserID,
+                //             toUserID,
+                //             totalSeconds
+                //         } = message.msg;
 
-
-
-                // case 'getDonationMessages': {
-                //     const ELMxID = message.msg.ELMxID;
-
-                //     const messages = globalELMxArray[ELMxID]?.donateHistory || "No donation history found";
-
-                //     // ✅ Print actual data to terminal
-                //     console.log("📜 Retrieved donateHistory for ELMxID", ELMxID, ":", messages);
-
-                //     const response = {
-                //         cmd: "donationMessagesList",
-                //         msg: {
-                //             messages
+                //         // Validate required fields
+                //         if (ELMxID == null || fromUserID == null || toUserID == null || totalSeconds == null) {
+                //             console.error("❌ Invalid sendingThirdingremoveApprovalUI message: missing one or more required fields.");
+                //             break;
                 //         }
-                //     };
 
-                //     ws.send(JSON.stringify(response));
-                //     break;
-                // }
+                //         console.log(`🧹 Broadcasting thirding approval UI removal for ELMxID ${ELMxID}, fromUserID ${fromUserID}, toUserID ${toUserID}, totalSeconds ${totalSeconds}`);
 
+                //         // Check if the specific ELMxID exists in the global array
+                //         if (!globalELMxArray[ELMxID]) {
+                //             console.error(`⚠️ ELMxID ${ELMxID} does not exist.`);
+                //             break;
+                //         }
+
+                //         // You can add logic here to handle UI removal if necessary (this can be specific to your application’s structure)
+                //         // Example: if there is a 'pendingApprovalUI' object or similar structure to clear, you can clear it.
+
+                //         // Log the removal action
+                //         console.log(`🧹 UI removal request from User ${fromUserID} to User ${toUserID} for ${totalSeconds}s`);
+
+                //         break;
+                //     }
 
 
 

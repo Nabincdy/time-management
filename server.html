@@ -1329,10 +1329,12 @@
       <div class="history-content">
         <ul id="donationConsoleOutput"></ul>
         <div id="unapprovedItems"></div>
+        <div id="approvedDonationsOutput"></div>
       </div>
-      <div id="approvedDonationsOutput"></div>
+      <!-- <div id="approvedDonationsOutput"></div> -->
 
       <button onclick="showdonationhistory()">Show Donation History</button>
+<button onclick="getThirdingCheckboxStateFromUI()">Get Checkbox State</button>
 
     </div>
 
@@ -2038,6 +2040,100 @@
     }
 
 
+    // function showThirdingCheckboxStates() {
+    //   const request = {
+    //     cmd: "getCurrentThirdingCheckboxStates",
+    //     msg: {
+    //       ELMxID: 0 // or whatever is appropriate
+    //     }
+    //   };
+
+    //   if (socket.readyState === WebSocket.OPEN) {
+    //     socket.send(JSON.stringify(request));
+    //     console.log("📤 Sent getCurrentThirdingCheckboxStates request immediately");
+    //   } else {
+    //     socket.addEventListener("open", function () {
+    //       socket.send(JSON.stringify(request));
+    //       console.log("📤 Sent getCurrentThirdingCheckboxStates request after socket opened");
+    //     }, { once: true });
+    //   }
+    // }
+
+//   function getThirdingCheckboxStateFromUI() {
+//   const checkbox = document.querySelector(".thirding-toggle-checkbox");
+//   if (!checkbox) {
+//     console.error("❌ No thirding checkbox found in DOM to extract data.");
+//     return;
+//   }
+
+//   const ELMxID = checkbox.getAttribute("data-elmxid");
+//   const fromUserID = checkbox.getAttribute("data-fromuserid");
+
+//   if (!ELMxID || !fromUserID) {
+//     console.error("❌ Missing ELMxID or fromUserID on checkbox.");
+//     return;
+//   }
+
+//   const checkboxStateRequest = {
+//     cmd: "getThirdingCheckboxState",
+//     msg: {
+//       ELMxID: Number(ELMxID),
+//       fromUserID: fromUserID
+//     }
+//   };
+
+//   if (socket.readyState === WebSocket.OPEN) {
+//     socket.send(JSON.stringify(checkboxStateRequest));
+//     console.log("📤 Sent getThirdingCheckboxState request", checkboxStateRequest);
+//   } else {
+//     socket.addEventListener("open", function () {
+//       socket.send(JSON.stringify(checkboxStateRequest));
+//       console.log("📤 Sent getThirdingCheckboxState request after socket opened", checkboxStateRequest);
+//     }, { once: true });
+//   }
+// }
+
+
+
+function getThirdingCheckboxStateFromUI() {
+  const checkbox = document.querySelector(".thirding-toggle-checkbox");
+  if (!checkbox) {
+    console.error("❌ No thirding checkbox found in DOM to extract data.");
+    return;
+  }
+
+  const ELMxID = checkbox.getAttribute("data-elmxid");
+  const fromUserID = checkbox.getAttribute("data-fromuserid");
+  const checkboxId = checkbox.id;
+  const checked = checkbox.checked;  // ✅ Get whether the checkbox is checked or not
+
+  if (!ELMxID || !fromUserID || !checkboxId) {
+    console.error("❌ Missing ELMxID, fromUserID, or checkboxId on checkbox.");
+    return;
+  }
+
+  const checkboxStateRequest = {
+    cmd: "getThirdingCheckboxState",
+    msg: {
+      ELMxID: Number(ELMxID),
+      fromUserID: fromUserID,
+      checkboxId: checkboxId,
+      checked: checked // ✅ Pass the checked state
+    }
+  };
+
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(checkboxStateRequest));
+    console.log("📤 Sent getThirdingCheckboxState request", checkboxStateRequest);
+  } else {
+    socket.addEventListener("open", function () {
+      socket.send(JSON.stringify(checkboxStateRequest));
+      console.log("📤 Sent getThirdingCheckboxState request after socket opened", checkboxStateRequest);
+    }, { once: true });
+  }
+}
+
+
 
     // function showSelectedTimers() {
     //   let timerServerID = "yourTimerID"; // Define this somewhere if needed
@@ -2120,27 +2216,7 @@
     }
 
 
-    // function renderApprovedDonations(approvedDonations) {
-    //   const approvedDonationsContainer = document.getElementById('approvedDonationsOutput'); // Make sure you have this div in your HTML
 
-    //   approvedDonationsContainer.innerHTML = ""; // Clear previous output
-
-    //   if (approvedDonations.length === 0) {
-    //     approvedDonationsContainer.innerHTML = "<p>No approved donations found.</p>";
-    //     return;
-    //   }
-
-    //   approvedDonations.forEach((donation, index) => {
-    //     const donationItem = document.createElement('div');
-    //     donationItem.classList.add('approved-donation-item');
-    //     donationItem.innerHTML = `
-    //         <p><strong>Donation #${index + 1}</strong></p>
-    //         <p>${JSON.stringify(donation)}</p>
-    //         <hr>
-    //     `;
-    //     approvedDonationsContainer.appendChild(donationItem);
-    //   });
-    // }
 
     // Renders approved donations
     function renderApprovedDonations(approvedDonations) {
@@ -2172,44 +2248,310 @@
 
 
     // Show pending approval
-    //   function showPendingApproval(data) {
-    //     console.log("show pending approval check data ", data);
 
-    //     const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
 
-    //     const fromName = getUsernameByID(data.fromUserID);
-    //     const toName = getUsernameByID(data.toUserID);
+
+    // Reusable helper function to generate the unique approval element ID
+
+
+    function getApprovalElementID(data) {
+      // return `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+      return `approval-0-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+
+    }
+
+    // Reusable function to notify server to remove the approval UI
+    function sendRemoveApprovalUI(data) {
+      socket.send(JSON.stringify({
+        cmd: "sendingremoveApprovalUI",
+        msg: {
+          ELMxID: data.ELMxID,
+          fromUserID: data.fromUserID,
+          toUserID: data.toUserID,
+          totalSeconds: data.totalSeconds
+        }
+      }));
+    }
+
+    function renderApprovalUI(data) {
+      const uniqueApprovalID = getApprovalElementID(data);
+
+      // Avoid duplicates
+      if (document.getElementById(uniqueApprovalID)) {
+        console.log("⛔ Approval UI already exists, skipping...");
+        return;
+      }
+
+      const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
+      const fromName = getUsernameByID(data.fromUserID) || `User ${data.fromUserID}`;
+      const toName = getUsernameByID(data.toUserID) || `User ${data.toUserID}`;
+
+      const container = document.createElement("div");
+      container.id = uniqueApprovalID;
+      container.className = 'approval-item';
+
+      container.innerHTML = `
+    <div class="approval-details">
+      <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
+    </div>
+    <div class="buttons-container">
+      <select class="approver-dropdown">${approverOptions}</select>
+      <button class="approve-btn">Approve</button>
+      <button class="remove-btn">Remove</button>
+    </div>
+  `;
+
+      // Append to the main approval list
+      document.getElementById("unapprovedItems").appendChild(container);
+
+      // Approve button handler
+      container.querySelector(".approve-btn").addEventListener("click", () => {
+        const approverID = container.querySelector(".approver-dropdown").value;
+        if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
+          alert("Invalid approver.");
+          return;
+        }
+
+        sendDonation(data, parseInt(approverID));
+        container.remove();
+
+        if (typeof donationInProgress !== 'undefined') {
+          donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
+        }
+
+        sendRemoveApprovalUI(data);
+      });
+
+      // Remove button handler
+      // container.querySelector(".remove-btn").addEventListener("click", () => {
+      //   if (confirm("Are you sure you want to remove this pending approval?")) {
+      //     container.remove();
+      //     sendRemoveApprovalUI(data);
+      //   }
+      // });
+
+      container.querySelector(".remove-btn").addEventListener("click", () => {
+        if (confirm("Are you sure you want to remove this pending approval?")) {
+          container.remove();
+          sendRemoveApprovalUI(data);
+
+          // TEMP DEBUG: Force trigger locally
+          removeApprovalBox(data);
+        }
+      });
+
+    }
+
+    // Function to handle a single juuj approval UI (manually triggered or from WebSocket)
+    function showPendingApproval(data) {
+      console.log("🟦 showPendingApproval triggered:", data);
+      renderApprovalUI(data);
+    }
+
+    // Function to handle batch approval rendering (e.g., on reconnect or bulk update)
+    // function handleShowApproval(msg) {
+    //   console.log("🔵 handleShowApproval received:", msg);
+    //   const approvalList = document.getElementById('unapprovedItems');
+    //   if (!approvalList) {
+    //     console.error("⚠️ 'unapprovedItems' container not found.");
+    //     return;
+    //   }
+
+    //   approvalList.innerHTML = ''; // Clear existing
+    //   const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
+
+    //   console.log("approvalDataArray" + JSON.stringify(approvalDataArray));
+
+    //   for (const approvalData of approvalDataArray) {
+    //     renderApprovalUI(approvalData);
+    //   }
+    // }
+
+
+
+    function handleShowApproval(msg) {
+      console.log("🔵 handleShowApproval received:", msg);
+      const approvalList = document.getElementById('unapprovedItems');
+      if (!approvalList) {
+        console.error("⚠️ 'unapprovedItems' container not found.");
+        return;
+      }
+
+      approvalList.innerHTML = ''; // Clear existing
+      const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
+
+      console.log("approvalDataArray", JSON.stringify(approvalDataArray));
+
+      for (const approvalData of approvalDataArray) {
+        const isThirding = approvalData.note?.toLowerCase().includes("third") || Array.isArray(approvalData.selectedTimers);
+
+        if (isThirding) {
+          // Ensure ELMxID exists or generate a fallback if missing
+          if (!approvalData.ELMxID) {
+            // approvalData.ELMxID = `${Date.now()}-${approvalData.fromUserID}-${approvalData.toUserID}`;
+            approvalData.ELMxID = 0;
+          }
+          showThirdingApprovalUI(approvalData);
+        } else {
+          renderApprovalUI(approvalData);
+        }
+      }
+    }
+
+
+
+    // WebSocket listener for removing approval UI on all clients
+    socket.on('returnRemoveApproval', (data) => {
+      console.log("📩 Received returnRemoveApproval message:", data);
+      removeApprovalBox(data.msg);
+    });
+
+    // Helper to remove an approval element from DOM based on consistent ID
+
+
+    // function removeApprovalBox(data) {
+    //   const approvalID = getApprovalElementID(data);
+    //   console.log("🧩 Trying to remove approval box with ID:", approvalID);
+
+    //   const approvalElement = document.getElementById(approvalID);
+    //   if (approvalElement) {
+    //     approvalElement.remove();
+    //     console.log("✅ Approval box removed:", approvalID);
+    //   } else {
+    //     console.warn("⚠️ Approval box not found:", approvalID);
+
+    //     // Debugging existing elements
+    //     document.querySelectorAll('[id^="approval-"]').forEach(el => {
+    //       console.log("🔍 Existing element:", el.id);
+    //     });
+    //   }
+    // }
+
+    function removeApprovalBox(data) {
+      const approvalID = getApprovalElementID(data);
+      console.log("Generated approval ID:", approvalID);
+
+      const approvalElement = document.getElementById(approvalID);
+      if (approvalElement) {
+        approvalElement.remove();
+        console.log("✅ Approval box removed:", approvalID);
+      } else {
+        console.warn("⚠️ Approval box not found:", approvalID);
+
+        // Debugging existing elements
+        document.querySelectorAll('[id^="approval-"]').forEach(el => {
+          console.log("🔍 Existing element:", el.id);
+        });
+      }
+    }
+
+
+
+
+
+
+
+    // thirding code 
+
+
+    // function showThirdingApprovalUI(data) {
+    //     console.log("📋 showThirdingApprovalUI called with data:", data);
+
+    //     if (
+    //       typeof data.ELMxID === "undefined" ||
+    //       typeof data.fromUserID === "undefined" ||
+    //       typeof data.toUserID === "undefined" ||
+    //       typeof data.totalSeconds === "undefined"
+    //     ) {
+    //       console.error("❌ Missing required data fields:", data);
+    //       return;
+    //     }
+
+    //     const uniqueApprovalID = `thirding-approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+    //     if (document.getElementById(uniqueApprovalID)) {
+    //       console.log("⛔ Thirding approval UI already exists, skipping.");
+    //       return;
+    //     }
+
+    //     const fromUserIDStr = String(data.fromUserID);
+    //     const toUserIDStr = String(data.toUserID);
+    //     const fromName = getUsernameByID(data.fromUserID) || "Unknown";
+    //     const toName = getUsernameByID(data.toUserID) || "Unknown";
+
+    //     const selectedTimers = Array.isArray(data.selectedTimers) ? data.selectedTimers : [];
+
+    //     const selectedListHTML = selectedTimers.length > 0
+    //       ? selectedTimers.map((title, index) => {
+    //         // const checkboxId = `checkbox-${data.ELMxID}-${index}`;
+    //         const checkboxId = `checkbox-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}-${index}`;
+    //         return `
+    //         <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
+    //           name="thirding-selected-${fromUserIDStr}" value="${title}" data-elmxid="${data.ELMxID}"
+    //           data-fromuserid="${data.fromUserID}" data-checkboxindex="${index}" />
+    //         <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
+    //       `;
+    //       }).join("")
+    //       : "<p><em>No timers selected.</em></p>";
+
+    //     const minutes = data.minutes ?? 0;
+    //     const seconds = data.seconds ?? 0;
+    //     const note = data.note ?? "";
 
     //     const container = document.createElement("div");
-
-    //     // Make the ID truly unique
-    //     const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
     //     container.id = uniqueApprovalID;
 
     //     container.innerHTML = `
-    //   <div class="pending-approval">
-    //     <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
-    //     <select class="approver-dropdown">${approverOptions}</select>
+    //   <div class="pending-approval thirding-approval"
+    //     style="border: 1px solid #ccc; padding: 10px; margin-bottom: 12px; background-color: #f9f9f9;">
+    //     <p><strong>🔐 Third+ Approval:</strong> ${fromName} ➜ ${toName} (${minutes} min ${seconds} sec)</p>
+    //     <p><em>${note}</em></p>
+
+    //     <div style="margin: 8px 0;">
+    //       <strong>Selected Timers:</strong>
+    //       ${selectedListHTML}
+    //     </div>
+
     //     <button class="approve-btn">Approve</button>
-    //     <button class="remove-btn">Remove</button> 
+    //     <button class="remove-btn" style="margin-left: 6px;">Remove</button>
     //   </div>
     // `;
 
-    //     // Approve button click
+    //     container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
+    //       checkbox.addEventListener("change", () => {
+    //         const checkboxId = checkbox.id;
+    //         const checked = checkbox.checked;
+    //         const ELMxID = checkbox.getAttribute("data-elmxid");
+    //         const fromUserID = checkbox.getAttribute("data-fromuserid");
+    //         const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
+
+    //         socket.send(JSON.stringify({
+    //           cmd: "updateThirdingCheckbox",
+    //           msg: {
+    //             ELMxID,
+    //             fromUserID,
+    //             checkboxId,
+    //             checked,
+    //             checkboxIndex
+    //           }
+    //         }));
+    //       });
+    //     });
+
     //     container.querySelector(".approve-btn").addEventListener("click", () => {
-    //       const approverID = container.querySelector(".approver-dropdown").value;
-    //       if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-    //         alert("Invalid approver.");
+    //       const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
+    //       const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
+    //       if (!allChecked) {
+    //         alert("Please ensure all timer checkboxes are selected before approving.");
     //         return;
     //       }
 
-    //       sendDonation(data, parseInt(approverID));
+    //       sendDonation(data);
+    //       container.remove();
 
-    //       container.remove(); // Remove this box locally
+    //       donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
 
-    //       // Notify other browsers to remove it too
     //       socket.send(JSON.stringify({
-    //         cmd: "sendingremoveApprovalUI",
+    //         cmd: "sendingThirdingremoveApprovalUI",
     //         msg: {
     //           ELMxID: data.ELMxID,
     //           fromUserID: data.fromUserID,
@@ -2219,14 +2561,12 @@
     //       }));
     //     });
 
-    //     // Remove button click
     //     container.querySelector(".remove-btn").addEventListener("click", () => {
-    //       if (confirm("Are you sure you want to remove this pending approval?")) {
-    //         container.remove(); // Remove this box locally
+    //       if (confirm("Are you sure you want to remove this thirding approval of Thirding?")) {
+    //         container.remove();
 
-    //         // First: Tell server to **remove from memory** (VERY IMPORTANT)
     //         socket.send(JSON.stringify({
-    //           cmd: "removeApprovedDonation",
+    //           cmd: "removeThirdingApprovedDonation",
     //           msg: {
     //             ELMxID: data.ELMxID,
     //             fromUserID: data.fromUserID,
@@ -2235,16 +2575,8 @@
     //           }
     //         }));
 
-    //         console.log("❌ Manual removal of approval sent to server:", {
-    //           ELMxID: data.ELMxID,
-    //           fromUserID: data.fromUserID,
-    //           toUserID: data.toUserID,
-    //           totalSeconds: data.totalSeconds
-    //         });
-
-    //         // Second: Also notify other browsers to remove from their UI
     //         socket.send(JSON.stringify({
-    //           cmd: "sendingremoveApprovalUI",
+    //           cmd: "sendingThirdingremoveApprovalUI",
     //           msg: {
     //             ELMxID: data.ELMxID,
     //             fromUserID: data.fromUserID,
@@ -2258,91 +2590,51 @@
     //     document.getElementById("unapprovedItems").appendChild(container);
     //   }
 
-  //   function showPendingApproval(data) {
-  //     console.log("show pending approval check data ", data);
 
-  //     const uniqueApprovalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+    //   // Get username by ID
+    //   function getUsernameByID(userID) {
+    //     const input = document.querySelector(`[data-id="${userID}-1"]`);
+    //     return input ? input.value.trim() || `User ${userID}` : `User ${userID}`;
+    //   }
 
-  //     // Prevent duplicate UI elements
-  //     if (document.getElementById(uniqueApprovalID)) {
-  //       console.log("⛔ Approval UI already shown, skipping duplicate.");
-  //       return;
-  //     }
+    //   function sendDonation(data, approverID = null) {
+    //     const payload = {
+    //       cmd: "donateTime",
+    //       msg: {
+    //         ELMxID: 0, // Always include the ELMxID
+    //         fromUserID: data.fromUserID,
+    //         toUserID: data.toUserID,
+    //         timerName: data.timerName,
+    //         minutes: data.minutes,
+    //         seconds: data.seconds,
+    //         totalSeconds: data.totalSeconds
+    //       }
+    //     };
 
-  //     const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
-  //     const fromName = getUsernameByID(data.fromUserID);
-  //     const toName = getUsernameByID(data.toUserID);
+    //     // Add approver info if provided
+    //     if (approverID) {
+    //       payload.msg.approvedByID = approverID;
+    //       payload.msg.approvedByName = getUsernameByID(approverID);
+    //     }
 
-  //     const container = document.createElement("div");
-  //     container.id = uniqueApprovalID;
+    //     // Send the donation information to the server
+    //     socket.send(JSON.stringify(payload));
+    //     console.log("Donation sent via WebSocket:", payload);
 
-  //     container.innerHTML = `
-  //   <div class="pending-approval">
-  //     <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
-  //     <select class="approver-dropdown">${approverOptions}</select>
-  //     <button class="approve-btn">Approve</button>
-  //     <button class="remove-btn">Remove</button> 
-  //   </div>
-  // `;
+    //     // After donation is sent, notify the server to remove the approved donation
+    //     const removalPayload = {
+    //       cmd: "removeApprovedDonation",
+    //       msg: {
+    //         ELMxID: 0, // <-- Make sure to include ELMxID here also
+    //         fromUserID: data.fromUserID,
+    //         toUserID: data.toUserID,
+    //         totalSeconds: data.totalSeconds
+    //       }
+    //     };
 
-  //     // Approve button
-  //     container.querySelector(".approve-btn").addEventListener("click", () => {
-  //       const approverID = container.querySelector(".approver-dropdown").value;
-  //       if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-  //         alert("Invalid approver.");
-  //         return;
-  //       }
-
-  //       sendDonation(data, parseInt(approverID));
-  //       container.remove();
-
-  //       // Reset the donation in progress flag
-  //       donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
-
-  //       socket.send(JSON.stringify({
-  //         cmd: "sendingremoveApprovalUI",
-  //         msg: {
-  //           ELMxID: data.ELMxID,
-  //           fromUserID: data.fromUserID,
-  //           toUserID: data.toUserID,
-  //           totalSeconds: data.totalSeconds
-  //         }
-  //       }));
-  //     });
-
-  //     // Remove button
-  //     container.querySelector(".remove-btn").addEventListener("click", () => {
-  //       if (confirm("Are you sure you want to remove this pending approval?")) {
-  //         container.remove();
-
-  //         socket.send(JSON.stringify({
-  //           cmd: "removeApprovedDonation",
-  //           msg: {
-  //             ELMxID: data.ELMxID,
-  //             fromUserID: data.fromUserID,
-  //             toUserID: data.toUserID,
-  //             totalSeconds: data.totalSeconds
-  //           }
-  //         }));
-
-  //         socket.send(JSON.stringify({
-  //           cmd: "sendingremoveApprovalUI",
-  //           msg: {
-  //             ELMxID: data.ELMxID,
-  //             fromUserID: data.fromUserID,
-  //             toUserID: data.toUserID,
-  //             totalSeconds: data.totalSeconds
-  //           }
-  //         }));
-  //       }
-  //     });
-
-  //     document.getElementById("unapprovedItems").appendChild(container);
-  //   }
-
-
-
-
+    //     socket.send(JSON.stringify(removalPayload));
+    //     console.log("Approved donation removal requested:", removalPayload);
+    //   }
 
     //   function showThirdingApprovalUI(data) {
     //   console.log("📋 showThirdingApprovalUI called with data:", data);
@@ -2372,13 +2664,14 @@
 
     //   const selectedListHTML = selectedTimers.length > 0
     //     ? selectedTimers.map((title, index) => {
-    //         const checkboxId = `checkbox-${data.ELMxID}-${index}`;
-    //         return `
-    //           <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
-    //     name="thirding-selected-${fromUserIDStr}" value="${title}" />
-    //   <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
-    //          `;
-    //       }).join("")
+    //       const checkboxId = `checkbox-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}-${index}`;
+    //       return `
+    //         <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
+    //           name="thirding-selected-${fromUserIDStr}" value="${title}" data-elmxid="${data.ELMxID}"
+    //           data-fromuserid="${data.fromUserID}" data-checkboxindex="${index}" />
+    //         <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
+    //       `;
+    //     }).join("")
     //     : "<p><em>No timers selected.</em></p>";
 
     //   const minutes = data.minutes ?? 0;
@@ -2387,6 +2680,8 @@
 
     //   const container = document.createElement("div");
     //   container.id = uniqueApprovalID;
+
+    //   container.className = 'pending-approval thirding-approval'; // Add a common class to style similarly to `renderApprovalUI`
 
     //   container.innerHTML = `
     //     <div class="pending-approval thirding-approval"
@@ -2399,11 +2694,35 @@
     //         ${selectedListHTML}
     //       </div>
 
-    //       <button class="approve-btn">Approve</button> 
+    //       <button class="approve-btn">Approve</button>
     //       <button class="remove-btn" style="margin-left: 6px;">Remove</button>
     //     </div>
     //   `;
 
+    //   // Handle timer checkboxes
+    //   container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
+    //     checkbox.addEventListener("change", () => {
+    //       const checkboxId = checkbox.id;
+    //       const checked = checkbox.checked;
+    //       const ELMxID = checkbox.getAttribute("data-elmxid");
+    //             // const ELMxID = 0;
+    //       const fromUserID = checkbox.getAttribute("data-fromuserid");
+    //       const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
+
+    //       socket.send(JSON.stringify({
+    //         cmd: "updateThirdingCheckbox",
+    //         msg: {
+    //           ELMxID,
+    //           fromUserID,
+    //           checkboxId,
+    //           checked,
+    //           checkboxIndex
+    //         }
+    //       }));
+    //     });
+    //   });
+
+    //   // Approve button handler
     //   container.querySelector(".approve-btn").addEventListener("click", () => {
     //     const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
     //     const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
@@ -2417,6 +2736,9 @@
 
     //     donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
 
+
+    //     console.log("sendingThirdingremoveApprovalUI" + data);
+
     //     socket.send(JSON.stringify({
     //       cmd: "sendingThirdingremoveApprovalUI",
     //       msg: {
@@ -2428,9 +2750,12 @@
     //     }));
     //   });
 
+    //   // Remove button handler
     //   container.querySelector(".remove-btn").addEventListener("click", () => {
-    //     if (confirm("Are you sure you want to remove this thirding approval?")) {
+    //     if (confirm("Are you sure you want to remove this thirding approval of Thirding?")) {
     //       container.remove();
+
+    //       console.log("thirding testing data", data);
 
     //       socket.send(JSON.stringify({
     //         cmd: "removeThirdingApprovedDonation",
@@ -2454,384 +2779,248 @@
     //     }
     //   });
 
+    //   // Append to the main unapproved items list
     //   document.getElementById("unapprovedItems").appendChild(container);
     // }
 
-  
+    // // Get username by ID
+    // function getUsernameByID(userID) {
+    //   const input = document.querySelector(`[data-id="${userID}-1"]`);
+    //   return input ? input.value.trim() || `User ${userID}` : `User ${userID}`;
+    // }
 
+    // function sendDonation(data, approverID = null) {
+    //   const payload = {
+    //     cmd: "donateTime",
+    //     msg: {
+    //       ELMxID: 0, // Always include the ELMxID
+    //       fromUserID: data.fromUserID,
+    //       toUserID: data.toUserID,
+    //       timerName: data.timerName,
+    //       minutes: data.minutes,
+    //       seconds: data.seconds,
+    //       totalSeconds: data.totalSeconds
+    //     }
+    //   };
 
-
-
-    // function handleShowApproval(msg) {
-    //   console.log("🔵 handleShowApproval received:", msg);
-
-    //   const approvalList = document.getElementById('unapprovedItems');
-    //   if (!approvalList) {
-    //     console.error("⚠️ 'approvalList' element not found!");
-    //     return;
+    //   // Add approver info if provided
+    //   if (approverID) {
+    //     payload.msg.approvedByID = approverID;
+    //     payload.msg.approvedByName = getUsernameByID(approverID);
     //   }
 
-    //   approvalList.innerHTML = ''; // Clear previous list
+    //   // Send the donation information to the server
+    //   socket.send(JSON.stringify(payload));
+    //   console.log("Donation sent via WebSocket:", payload);
 
-    //   // If msg is an object (not array), convert it to an array
-    //   const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
+    //   // After donation is sent, notify the server to remove the approved donation
+    //   const removalPayload = {
+    //     cmd: "removeApprovedDonation",
+    //     msg: {
+    //       ELMxID: 0, // <-- Make sure to include ELMxID here also
+    //       fromUserID: data.fromUserID,
+    //       toUserID: data.toUserID,
+    //       totalSeconds: data.totalSeconds
+    //     }
+    //   };
 
-    //   const ELMxID = 0;
-    //   // Loop over each approval
-    //   for (const approvalData of approvalDataArray) {
-    //     const {
-    //       fromUserID,
-    //       toUserID,
-    //       timerName,
-    //       minutes,
-    //       seconds,
-    //       totalSeconds,
-    //       ELMxID // Ensure ELMxID is included
-    //     } = approvalData;
-
-    //     const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
-
-    //     const item = document.createElement('div');
-    //     item.className = 'approval-item';
-
-    //     // Construct the unique ID
-    //     const approvalID = `approval-${ELMxID}-${fromUserID}-${toUserID}-${totalSeconds}`;
-    //     item.id = approvalID; // Set the ID here
-
-    //     item.innerHTML = `
-    //       <div class="approval-details">
-    //         <p><strong>User ${fromUserID}</strong> ➜
-    //         <strong>User ${toUserID}</strong> (Timer: <em>${minutes}m ${seconds}s</em>)</p>
-    //       </div>
-    //       <div class="buttons-container">
-    //                 <select class="approver-dropdown">${approverOptions}</select>
-    //         <button class="approve-btn">Approve</button>
-    //         <button class="remove-btn">Remove</button>
-    //       </div>
-    //     `;
-
-    //     approvalList.appendChild(item);
-
-    //     const approveButton = item.querySelector('.approve-btn');
-    //     const removeButton = item.querySelector('.remove-btn');
-
-    //     approveButton.addEventListener('click', () => {
-    //       const approverID = item.querySelector('.approver-dropdown').value;
-    //       if (!approverID || approverID == fromUserID || approverID == toUserID) {
-    //         alert("Invalid approver.");
-    //         return;
-    //       }
-
-    //       sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
-    //       item.remove(); // Remove the item after approval
-    //     });
-
-    //     removeButton.addEventListener('click', () => {
-    //       const removalPayload = {
-    //         cmd: "removeApprovedDonation",
-    //         msg: {
-    //           ELMxID: ELMxID, // If you have dynamic ELMxID, replace 0 accordingly
-    //           fromUserID: fromUserID,
-    //           toUserID: toUserID,
-    //           totalSeconds: totalSeconds
-    //         }
-    //       };
-
-    //       socket.send(JSON.stringify(removalPayload));
-    //       console.log("❌ Manual removal requested:", removalPayload);
-
-    //       item.remove(); // Remove the item immediately from UI
-    //     });
-    //   }
+    //   socket.send(JSON.stringify(removalPayload));
+    //   console.log("Approved donation removal requested:", removalPayload);
     // }
 
 
-    // function handleShowApproval(msg) {
-    //   console.log("🔵 handleShowApproval received:", msg);
+    //     // Render donation messages
+    //     function renderDonationMessages(messages) {
+    //       console.log("📦 Messages received in renderDonationMessages:", messages);
 
-    //   const approvalList = document.getElementById('unapprovedItems');
-    //   if (!approvalList) {
-    //     console.error("⚠️ 'approvalList' element not found!");
-    //     return;
-    //   }
-
-    //   approvalList.innerHTML = ''; // Clear previous list
-
-    //   // If msg is an object (not array), convert it to an array
-    //   const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
-
-    //   // ❌ DO NOT declare `const ELMxID = 0;` here
-
-    //   // Loop over each approval
-    //   for (const approvalData of approvalDataArray) {
-    //     const {
-    //       fromUserID,
-    //       toUserID,
-    //       timerName,
-    //       minutes,
-    //       seconds,
-    //       totalSeconds,
-    //       ELMxID // ✅ Real ELMxID from server
-    //     } = approvalData;
-
-    //     const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
-
-    //     const item = document.createElement('div');
-    //     item.className = 'approval-item';
-
-    //     // Construct the unique ID
-    //     const approvalID = `approval-${ELMxID}-${fromUserID}-${toUserID}-${totalSeconds}`;
-    //     item.id = approvalID; // Set the ID here
-
-    //     item.innerHTML = `
-    //   <div class="approval-details">
-    //     <p><strong>User ${fromUserID}</strong> ➜
-    //     <strong>User ${toUserID}</strong> (Timer: <em>${minutes}m ${seconds}s</em>)</p>
-    //   </div>
-    //   <div class="buttons-container">
-    //     <select class="approver-dropdown">${approverOptions}</select>
-    //     <button class="approve-btn">Approve</button>
-    //     <button class="remove-btn">Remove</button>
-    //   </div>
-    // `;
-
-    //     approvalList.appendChild(item);
-
-    //     const approveButton = item.querySelector('.approve-btn');
-    //     const removeButton = item.querySelector('.remove-btn');
-
-    //     approveButton.addEventListener('click', () => {
-    //       const approverID = item.querySelector('.approver-dropdown').value;
-    //       if (!approverID || approverID == fromUserID || approverID == toUserID) {
-    //         alert("Invalid approver.");
+    //       const output = document.getElementById("donationConsoleOutput");
+    //       if (!output) {
+    //         console.error("❌ Element with ID 'donationConsoleOutput' not found.");
     //         return;
     //       }
 
-    //       sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
-    //       item.remove(); // Remove the item after approval
-    //     });
+    //       output.innerHTML = "";
 
-    //     removeButton.addEventListener('click', () => {
-    //       const removalPayload = {
-    //         cmd: "removeApprovedDonation",
-    //         msg: {
-    //           ELMxID: ELMxID, // ✅ Correct ELMxID
-    //           fromUserID: fromUserID,
-    //           toUserID: toUserID,
-    //           totalSeconds: totalSeconds
+    //       if (!messages || messages.length === 0) {
+    //         const li = document.createElement("li");
+    //         li.textContent = "No donation history found.";
+    //         output.appendChild(li);
+    //         return;
+    //       }
+
+    //       messages.forEach((entry, index) => {
+    //         console.log(`🔹 Entry ${index + 1}:`, entry);
+
+    //         const {
+    //           timerName,
+    //           donatedMinutes,
+    //           donatedSeconds,
+    //           recipientName,
+    //           toUserID,
+    //           donationCount,
+    //           approvedByName
+    //         } = entry;
+
+    //         let messageText = `${timerName || "Timer"} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
+    //         // if (donationCount) {
+    //         //   messageText += ` (Donated ${donationCount} ${donationCount === 1 ? "time" : "times"})`;
+    //         // }
+
+    //         if (donationCount > 1) {
+    //           messageText += ` (Donated ${donationCount} ${donationCount === 1 ? "time" : "times"})`;
+    //           }
+
+    //         if (approvedByName) {
+    //           messageText += ` ✅ Approved by ${approvedByName}`;
     //         }
-    //       };
 
-    //       socket.send(JSON.stringify(removalPayload));
-    //       console.log("❌ Manual removal requested:", removalPayload);
 
-    //       item.remove(); // Remove the item immediately from UI
-    //     });
-    //   }
-    // }
+    //         const li = document.createElement("li");
+    //         li.textContent = `${index + 1}. ${messageText}`;
 
-//     function handleShowApproval(msg) {
-//   console.log("🔵 handleShowApproval received:", msg);
+    //         if (donationCount && donationCount > 1) {
+    //           li.style.backgroundColor = "#ffcccc";
+    //           li.style.padding = "5px";
+    //           li.style.borderRadius = "4px";
+    //         }
 
-//   const approvalList = document.getElementById('unapprovedItems');
-//   if (!approvalList) {
-//     console.error("⚠️ 'approvalList' element not found!");
-//     return;
-//   }
+    //         output.appendChild(li);
+    //       });
+    //     }
 
-//   approvalList.innerHTML = ''; // Clear previous list
 
-//   const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
 
-//   for (const approvalData of approvalDataArray) {
-//     const {
-//       fromUserID,
-//       toUserID,
-//       timerName,
-//       minutes,
-//       seconds,
-//       totalSeconds,
-//       ELMxID
-//     } = approvalData;
-
-//     const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
-
-//     const item = document.createElement('div');
-//     item.className = 'approval-item';
-
-//     const approvalID = `approval-${ELMxID}-${fromUserID}-${toUserID}-${totalSeconds}`;
-//     item.id = approvalID;
-
-//     item.innerHTML = `
-//       <div class="approval-details">
-//         <p><strong>User ${fromUserID}</strong> ➜
-//         <strong>User ${toUserID}</strong> (Timer: <em>${minutes}m ${seconds}s</em>)</p>
-//       </div>
-//       <div class="buttons-container">
-//         <select class="approver-dropdown">${approverOptions}</select>
-//         <button class="approve-btn">Approve</button>
-//         <button class="remove-seconding-btn">Remove</button>
-//       </div>
-//     `;
-
-//     approvalList.appendChild(item);
-
-//     const approveButton = item.querySelector('.approve-btn');
-//     const removeButton = item.querySelector('.remove-seconding-btn');
-
-//     approveButton.addEventListener('click', () => {
-//       const approverID = item.querySelector('.approver-dropdown').value;
-//       if (!approverID || approverID == fromUserID || approverID == toUserID) {
-//         alert("Invalid approver.");
-//         return;
-//       }
-
-//       sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
-//       item.remove();
-
-//       // Notify server to remove this approval
-//       socket.send(JSON.stringify({
-//         cmd: "sendingremoveApprovalUI",
-//         msg: {
-//           ELMxID: ELMxID,
-//           fromUserID: fromUserID,
-//           toUserID: toUserID,
-//           totalSeconds: totalSeconds
-//         }
-//       }));
-//     });
-
-//     removeButton.addEventListener('click', () => {
-//       if (confirm("Are you sure you want to remove this pending approval?")) {
-//         item.remove();
-
-//         socket.send(JSON.stringify({
-//           cmd: "sendingremoveApprovalUI",
-//           msg: {
-//             ELMxID: ELMxID,
-//             fromUserID: fromUserID,
-//             toUserID: toUserID,
-//             totalSeconds: totalSeconds
-//           }
-//         }));
-
-        
-//         console.log("❌ Manual removal requested:", {
-//           ELMxID,
-//           fromUserID,
-//           toUserID,
-//           totalSeconds
-//         });
-//       }
-//     });
+//     function handleRemoveThirdingApprovalUI(msg) {
+//   const uniqueApprovalID = `thirding-approval-${msg.ELMxID}-${msg.fromUserID}-${msg.toUserID}-${msg.totalSeconds}`;
+//   const element = document.getElementById(uniqueApprovalID);
+//   if (element) {
+//     element.remove();
+//     console.log(`✅ Removed thirding approval UI: ${uniqueApprovalID}`);
+//   } else {
+//     console.warn(`⚠️ Tried to remove non-existent approval UI: ${uniqueApprovalID}`);
 //   }
 // }
 
 
 
-//     function removeApprovalBox(data) {
-//       const approvalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-//       console.log("Trying to remove approval box with ID:", approvalID);  // Log the ID
+//     function showThirdingApprovalUI(data) {
+//       console.log("📋 showThirdingApprovalUI called with data:", data);
 
-//       const approvalElement = document.getElementById(approvalID);
-
-//       if (approvalElement) {
-//         approvalElement.remove();
-//         console.log("✅ Approval box removed:", approvalID);
-//       } else {
-//         console.log("⚠️ Approval box not found:", approvalID);
-//       }
-//     }
-
-
-// function handleShowApproval(msg) {
-//   console.log("🔵 handleShowApproval received:", msg);
-//   const approvalList = document.getElementById('unapprovedItems');
-//   if (!approvalList) {
-//     console.error("⚠️ 'approvalList' element not found!");
-//     return;
-//   }
-
-//   approvalList.innerHTML = ''; // Clear previous list
-
-//   const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
-
-//   for (const approvalData of approvalDataArray) {
-//     const {
-//       fromUserID,
-//       toUserID,
-//       timerName,
-//       minutes,
-//       seconds,
-//       totalSeconds,
-//       ELMxID
-//     } = approvalData;
-
-//     const approverOptions = getUserOptions(null, [fromUserID.toString(), toUserID.toString()]);
-
-//     const item = document.createElement('div');
-//     item.className = 'approval-item';
-
-//     const approvalID = `approval-${ELMxID}-${fromUserID}-${toUserID}-${totalSeconds}`;
-//     item.id = approvalID;
-
-//     item.innerHTML = `
-//       <div class="approval-details">
-//         <p><strong>User ${fromUserID}</strong> ➜
-//         <strong>User ${toUserID}</strong> (Timer: <em>${minutes}m ${seconds}s</em>)</p>
-//       </div>
-//       <div class="buttons-container">
-//         <select class="approver-dropdown">${approverOptions}</select>
-//         <button class="approve-btn">Approve</button>
-//         <button class="remove-seconding-btn">Remove</button>
-//       </div>
-//     `;
-
-//     approvalList.appendChild(item);
-
-//     const approveButton = item.querySelector('.approve-btn');
-//     const removeButton = item.querySelector('.remove-seconding-btn');
-
-//     approveButton.addEventListener('click', () => {
-//       const approverID = item.querySelector('.approver-dropdown').value;
-//       if (!approverID || approverID == fromUserID || approverID == toUserID) {
-//         alert("Invalid approver.");
+//       if (
+//         typeof data.ELMxID === "undefined" ||
+//         typeof data.fromUserID === "undefined" ||
+//         typeof data.toUserID === "undefined" ||
+//         typeof data.totalSeconds === "undefined"
+//       ) {
+//         console.error("❌ Missing required data fields:", data);
 //         return;
 //       }
 
-//       sendDonation({ fromUserID, toUserID, timerName, minutes, seconds, totalSeconds }, parseInt(approverID));
-//       item.remove();
+//       const uniqueApprovalID = `thirding-approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+//       if (document.getElementById(uniqueApprovalID)) {
+//         console.log("⛔ Thirding approval UI already exists, skipping.");
+//         return;
+//       }
 
-//       // Notify server to remove this approval
-//       socket.send(JSON.stringify({
-//         cmd: "sendingremoveApprovalUI",
-//         msg: {
-//           ELMxID: ELMxID,
-//           fromUserID: fromUserID,
-//           toUserID: toUserID,
-//           totalSeconds: totalSeconds
+//       const fromUserIDStr = String(data.fromUserID);
+//       const toUserIDStr = String(data.toUserID);
+//       const fromName = getUsernameByID(data.fromUserID) || "Unknown";
+//       const toName = getUsernameByID(data.toUserID) || "Unknown";
+
+//       const selectedTimers = Array.isArray(data.selectedTimers) ? data.selectedTimers : [];
+
+//       const selectedListHTML = selectedTimers.length > 0
+//         ? selectedTimers.map((title, index) => {
+//           const checkboxId = `checkbox-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}-${index}`;
+//           return `
+//           <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
+//             name="thirding-selected-${fromUserIDStr}" value="${title}" data-elmxid="${data.ELMxID}"
+//             data-fromuserid="${data.fromUserID}" data-checkboxindex="${index}" />
+//           <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
+//         `;
+//         }).join("")
+//         : "<p><em>No timers selected.</em></p>";
+
+//       const minutes = data.minutes ?? 0;
+//       const seconds = data.seconds ?? 0;
+//       const note = data.note ?? "";
+
+//       const container = document.createElement("div");
+//       container.id = uniqueApprovalID;
+//       container.className = 'pending-approval thirding-approval';
+
+//       container.innerHTML = `
+//     <div class="pending-approval thirding-approval"
+//       style="border: 1px solid #ccc; padding: 10px; margin-bottom: 12px; background-color: #f9f9f9;">
+//       <p><strong>🔐 Third+ Approval:</strong> ${fromName} ➜ ${toName} (${minutes} min ${seconds} sec)</p>
+//       <p><em>${note}</em></p>
+
+//       <div style="margin: 8px 0;">
+//         <strong>Selected Timers:</strong>
+//         ${selectedListHTML}
+//       </div>
+
+//       <button class="approve-btn">Approve</button>
+//       <button class="remove-btn" style="margin-left: 6px;">Remove</button>
+//     </div>
+//   `;
+
+//       // Handle timer checkboxes
+//       container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
+//         checkbox.addEventListener("change", () => {
+//           const checkboxId = checkbox.id;
+//           const checked = checkbox.checked;
+//           const ELMxID = checkbox.getAttribute("data-elmxid");
+//           const fromUserID = checkbox.getAttribute("data-fromuserid");
+//           const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
+
+//           socket.send(JSON.stringify({
+//             cmd: "updateThirdingCheckbox",
+//             msg: {
+//               ELMxID,
+//               fromUserID,
+//               checkboxId,
+//               checked,
+//               checkboxIndex
+//             }
+//           }));
+//         });
+//       });
+
+//       // Approve button handler
+//       container.querySelector(".approve-btn").addEventListener("click", () => {
+//         const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
+//         const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
+//         if (!allChecked) {
+//           alert("Please ensure all timer checkboxes are selected before approving.");
+//           return;
 //         }
-//       }));
-//     });
 
-//     removeButton.addEventListener('click', () => {
-//       if (confirm("Are you sure you want to remove this pending approval?")) {
-//         item.remove();
+//         sendDonation(data);
+//         container.remove();
 
-//         console.log("helo wor");
-//         // Notify server to remove this approval
+//         donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
+
 //         socket.send(JSON.stringify({
-//           cmd: "sendingremoveApprovalUI",
+//           cmd: "sendingThirdingremoveApprovalUI",
 //           msg: {
-//             ELMxID: 0,
-//             fromUserID: fromUserID,
-//             toUserID: toUserID,
-//             totalSeconds: totalSeconds
+//             ELMxID: data.ELMxID,
+//             fromUserID: data.fromUserID,
+//             toUserID: data.toUserID,
+//             totalSeconds: data.totalSeconds
 //           }
 //         }));
+//       });
 
-//         socket.send(JSON.stringify({
-//             cmd: "removeApprovedDonation",
+//       // Remove button handler
+//       container.querySelector(".remove-btn").addEventListener("click", () => {
+//         if (confirm("Are you sure you want to remove this thirding approval of Thirding?")) {
+//           container.remove();
+
+//           console.log("thirding testing data", data);
+
+//           socket.send(JSON.stringify({
+//             cmd: "removeThirdingApprovedDonation",
 //             msg: {
 //               ELMxID: data.ELMxID,
 //               fromUserID: data.fromUserID,
@@ -2839,62 +3028,311 @@
 //               totalSeconds: data.totalSeconds
 //             }
 //           }));
+
+//           socket.send(JSON.stringify({
+//             cmd: "sendingThirdingremoveApprovalUI",
+//             msg: {
+//               ELMxID: data.ELMxID,
+//               fromUserID: data.fromUserID,
+//               toUserID: data.toUserID,
+//               totalSeconds: data.totalSeconds
+//             }
+//           }));
+//         }
+//       });
+
+//       // Append to unapproved items list
+//       const parent = document.getElementById("unapprovedItems");
+//       if (parent) {
+//         parent.appendChild(container);
+//       } else {
+//         console.error("❌ Element with ID 'unapprovedItems' not found.");
 //       }
-//     });
-//   }
-// }
-
-// // Listen for the removal event broadcast from the server
-// socket.on('returnRemoveApproval', (data) => {
-//   console.log("📩 Received returnRemoveApproval message:", data);
-//   removeApprovalBox(data.msg);
-
-//   if (data.msg && typeof data.msg.ELMxID !== "undefined") {
-//     const removeID = data.msg.ELMxID;
-//     const element = document.getElementById(`approval-${removeID}`);
-
-//     if (element) {
-//       element.remove();
-//       console.log(`✅ Removed approval UI for ELMxID: ${removeID}`);
-//     } else {
-//       console.warn(`⚠️ No element found with ID approval-${removeID}`);
 //     }
+
+//     // Get username by ID
+//     function getUsernameByID(userID) {
+//       const input = document.querySelector(`[data-id="${userID}-1"]`);
+//       return input ? input.value.trim() || `User ${userID}` : `User ${userID}`;
+//     }
+
+//     // Send time donation
+//     function sendDonation(data, approverID = null) {
+//       const payload = {
+//         cmd: "donateTime",
+//         msg: {
+//           ELMxID: 0,
+//           fromUserID: data.fromUserID,
+//           toUserID: data.toUserID,
+//           timerName: data.timerName,
+//           minutes: data.minutes,
+//           seconds: data.seconds,
+//           totalSeconds: data.totalSeconds
+//         }
+//       };
+
+//       if (approverID) {
+//         payload.msg.approvedByID = approverID;
+//         payload.msg.approvedByName = getUsernameByID(approverID);
+//       }
+
+//       socket.send(JSON.stringify(payload));
+//       console.log("Donation sent via WebSocket:", payload);
+
+//       const removalPayload = {
+//         cmd: "removeApprovedDonation",
+//         msg: {
+//           ELMxID: 0,
+//           fromUserID: data.fromUserID,
+//           toUserID: data.toUserID,
+//           totalSeconds: data.totalSeconds
+//         }
+//       };
+
+//       socket.send(JSON.stringify(removalPayload));
+//       console.log("Approved donation removal requested:", removalPayload);
+//     }
+
+//     // Render past donation messages
+//     function renderDonationMessages(messages) {
+//       console.log("📦 Messages received in renderDonationMessages:", messages);
+
+//       const output = document.getElementById("donationConsoleOutput");
+//       if (!output) {
+//         console.error("❌ Element with ID 'donationConsoleOutput' not found.");
+//         return;
+//       }
+
+//       output.innerHTML = "";
+
+//       if (!messages || messages.length === 0) {
+//         const li = document.createElement("li");
+//         li.textContent = "No donation history found.";
+//         output.appendChild(li);
+//         return;
+//       }
+
+//       messages.forEach((entry, index) => {
+//         console.log(`🔹 Entry ${index + 1}:`, entry);
+
+//         const {
+//           timerName,
+//           donatedMinutes,
+//           donatedSeconds,
+//           recipientName,
+//           toUserID,
+//           donationCount,
+//           approvedByName
+//         } = entry;
+
+//         let messageText = `${timerName || "Timer"} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
+
+//         if (donationCount > 1) {
+//           messageText += ` (Donated ${donationCount} ${donationCount === 1 ? "time" : "times"})`;
+//         }
+
+//         if (approvedByName) {
+//           messageText += ` ✅ Approved by ${approvedByName}`;
+//         }
+
+//         const li = document.createElement("li");
+//         li.textContent = `${index + 1}. ${messageText}`;
+
+//         if (donationCount && donationCount > 1) {
+//           li.style.backgroundColor = "#ffcccc";
+//           li.style.padding = "5px";
+//           li.style.borderRadius = "4px";
+//         }
+
+//         output.appendChild(li);
+//       });
+//     }
+//aaaaaaa
+
+// function handleRemoveThirdingApprovalUI(msg) {
+  
+//       // return `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+//     // `approval-0-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+//   const uniqueApprovalID = `approval-0-${msg.fromUserID}-${msg.toUserID}-${msg.totalSeconds}`;
+
+//   // const uniqueApprovalID = `thirding-approval-${msg.ELMxID}-${msg.fromUserID}-${msg.toUserID}-${msg.totalSeconds}`;
+//   const element = document.getElementById(uniqueApprovalID);
+//   if (element) {
+//     element.remove();
+//     console.log(`✅ Removed thirding approval UI: ${uniqueApprovalID}`);
 //   } else {
-//     console.warn("❌ Missing or invalid ELMxID in returnRemoveApproval:", data);
-//   }
-// });
-
-// // Function to remove the approval box
-// function removeApprovalBox(data) {
-//   const approvalID = `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-//   console.log("Trying to remove approval box with ID:", approvalID);  // Log the ID
-
-//   const approvalElement = document.getElementById(approvalID);
-
-//   if (approvalElement) {
-//     approvalElement.remove();
-//     console.log("✅ Approval box removed:", approvalID);
-//   } else {
-//     console.log("⚠️ Approval box not found:", approvalID);
+//     console.warn(`⚠️ Tried to remove non-existent approval UI: ${uniqueApprovalID}`);
 //   }
 // }
 
-
-// Reusable helper function to generate the unique approval element ID
-
-
-function getApprovalElementID(data) {
-  // return `approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-    return `approval-0-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-
+function handleRemoveThirdingApprovalUI(msg) {
+  const uniqueApprovalID = `approval-0-${msg.fromUserID}-${msg.toUserID}-${msg.totalSeconds}`;
+  
+  // Remove the element from the current DOM
+  const element = document.getElementById(uniqueApprovalID);
+  if (element) {
+    element.remove();
+    console.log(`✅ Removed thirding approval UI: ${uniqueApprovalID}`);
+  } else {
+    console.warn(`⚠️ Tried to remove non-existent approval UI: ${uniqueApprovalID}`);
+  }
 }
 
-// Reusable function to notify server to remove the approval UI
-function sendRemoveApprovalUI(data) {
-  socket.send(JSON.stringify({
-    cmd: "sendingremoveApprovalUI",
+
+function showThirdingApprovalUI(data) {
+  console.log("📋 showThirdingApprovalUI called with data:", data);
+
+  if (
+    typeof data.ELMxID === "undefined" ||
+    typeof data.fromUserID === "undefined" ||
+    typeof data.toUserID === "undefined" ||
+    typeof data.totalSeconds === "undefined"
+  ) {
+    console.error("❌ Missing required data fields:", data);
+    return;
+  }
+
+  const uniqueApprovalID = `approval-0-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
+  if (document.getElementById(uniqueApprovalID)) {
+    console.log("⛔ Thirding approval UI already exists, skipping.");
+    return;
+  }
+
+  const fromName = getUsernameByID(data.fromUserID) || "Unknown";
+  const toName = getUsernameByID(data.toUserID) || "Unknown";
+  const selectedTimers = Array.isArray(data.selectedTimers) ? data.selectedTimers : [];
+
+  const selectedListHTML = selectedTimers.length > 0
+    ? selectedTimers.map((title, index) => {
+        const checkboxId = `checkbox-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}-${index}`;
+        return `
+          <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
+            name="thirding-selected-${data.fromUserID}" value="${title}" data-elmxid="${data.ELMxID}"
+            data-fromuserid="${data.fromUserID}" data-checkboxindex="${index}" />
+          <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
+        `;
+      }).join("")
+    : "<p><em>No timers selected.</em></p>";
+
+  const minutes = data.minutes ?? 0;
+  const seconds = data.seconds ?? 0;
+  const note = data.note ?? "";
+
+  const container = document.createElement("div");
+  container.id = uniqueApprovalID;
+  container.className = 'pending-approval thirding-approval';
+
+  container.innerHTML = `
+    <div class="pending-approval thirding-approval"
+      style="border: 1px solid #ccc; padding: 10px; margin-bottom: 12px; background-color: #f9f9f9;">
+      <p><strong>🔐 Third+ Approval:</strong> ${fromName} ➜ ${toName} (${minutes} min ${seconds} sec)</p>
+      <p><em>${note}</em></p>
+      <div style="margin: 8px 0;">
+        <strong>Selected Timers:</strong>
+        ${selectedListHTML}
+      </div>
+      <button class="approve-btn">Approve</button>
+      <button class="remove-btn" style="margin-left: 6px;">Remove</button>
+    </div>
+  `;
+
+  // Handle checkbox updates
+  container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      const checkboxId = checkbox.id;
+      const checked = checkbox.checked;
+      const ELMxID = checkbox.getAttribute("data-elmxid");
+      const fromUserID = checkbox.getAttribute("data-fromuserid");
+      const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
+
+      socket.send(JSON.stringify({
+        cmd: "updateThirdingCheckbox",
+        msg: {
+          ELMxID,
+          fromUserID,
+          checkboxId,
+          checked,
+          checkboxIndex
+        }
+      }));
+    });
+  });
+
+  // Approve button handler
+  container.querySelector(".approve-btn").addEventListener("click", () => {
+    const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
+    const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
+    if (!allChecked) {
+      alert("Please ensure all timer checkboxes are selected before approving.");
+      return;
+    }
+
+    sendDonation(data);
+    container.remove();
+
+    donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
+
+    // No need to send "sendingThirdingremoveApprovalUI" anymore
+  });
+
+  // Remove button handler
+  container.querySelector(".remove-btn").addEventListener("click", () => {
+    if (confirm("Are you sure you want to remove this thirding approval of Thirding?")) {
+      container.remove();
+      console.log("Removing thirding approval data", data);
+
+      socket.send(JSON.stringify({
+        cmd: "removeThirdingApprovedDonation",
+        msg: {
+          ELMxID: data.ELMxID,
+          fromUserID: data.fromUserID,
+          toUserID: data.toUserID,
+          totalSeconds: data.totalSeconds
+        }
+      }));
+    }
+  });
+
+  const parent = document.getElementById("unapprovedItems");
+  if (parent) {
+    parent.appendChild(container);
+  } else {
+    console.error("❌ Element with ID 'unapprovedItems' not found.");
+  }
+}
+
+function getUsernameByID(userID) {
+  const input = document.querySelector(`[data-id="${userID}-1"]`);
+  return input ? input.value.trim() || `User ${userID}` : `User ${userID}`;
+}
+
+function sendDonation(data, approverID = null) {
+  const payload = {
+    cmd: "donateTime",
     msg: {
-      ELMxID: data.ELMxID,
+      ELMxID: 0,
+      fromUserID: data.fromUserID,
+      toUserID: data.toUserID,
+      timerName: data.timerName,
+      minutes: data.minutes,
+      seconds: data.seconds,
+      totalSeconds: data.totalSeconds
+    }
+  };
+
+  if (approverID) {
+    payload.msg.approvedByID = approverID;
+    payload.msg.approvedByName = getUsernameByID(approverID);
+  }
+
+  socket.send(JSON.stringify(payload));
+  console.log("Donation sent via WebSocket:", payload);
+
+  // Now also request backend to clear it from approved list
+  socket.send(JSON.stringify({
+    cmd: "removeApprovedDonation",
+    msg: {
+      ELMxID: 0,
       fromUserID: data.fromUserID,
       toUserID: data.toUserID,
       totalSeconds: data.totalSeconds
@@ -2902,386 +3340,51 @@ function sendRemoveApprovalUI(data) {
   }));
 }
 
-// Common approval UI renderer (used by both showPendingApproval and handleShowApproval)
-function renderApprovalUI(data) {
-  const uniqueApprovalID = getApprovalElementID(data);
+function renderDonationMessages(messages) {
+  console.log("📦 Messages received in renderDonationMessages:", messages);
 
-  // Avoid duplicates
-  if (document.getElementById(uniqueApprovalID)) {
-    console.log("⛔ Approval UI already exists, skipping...");
+  const output = document.getElementById("donationConsoleOutput");
+  if (!output) {
+    console.error("❌ Element with ID 'donationConsoleOutput' not found.");
     return;
   }
 
-  const approverOptions = getUserOptions(null, [data.fromUserID.toString(), data.toUserID.toString()]);
-  const fromName = getUsernameByID(data.fromUserID) || `User ${data.fromUserID}`;
-  const toName = getUsernameByID(data.toUserID) || `User ${data.toUserID}`;
+  output.innerHTML = "";
 
-  const container = document.createElement("div");
-  container.id = uniqueApprovalID;
-  container.className = 'approval-item';
+  if (!messages || messages.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "No donation history found.";
+    output.appendChild(li);
+    return;
+  }
 
-  container.innerHTML = `
-    <div class="approval-details">
-      <p><strong>${fromName} ➜ ${toName}</strong> (${data.minutes} min ${data.seconds} sec)</p>
-    </div>
-    <div class="buttons-container">
-      <select class="approver-dropdown">${approverOptions}</select>
-      <button class="approve-btn">Approve</button>
-      <button class="remove-btn">Remove</button>
-    </div>
-  `;
+  messages.forEach((entry, index) => {
+    const {
+      timerName,
+      donatedMinutes,
+      donatedSeconds,
+      recipientName,
+      toUserID,
+      donationCount,
+      approvedByName
+    } = entry;
 
-  // Append to the main approval list
-  document.getElementById("unapprovedItems").appendChild(container);
+    let messageText = `${timerName || "Timer"} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
+    if (donationCount > 1) messageText += ` (Donated ${donationCount} times)`;
+    if (approvedByName) messageText += ` ✅ Approved by ${approvedByName}`;
 
-  // Approve button handler
-  container.querySelector(".approve-btn").addEventListener("click", () => {
-    const approverID = container.querySelector(".approver-dropdown").value;
-    if (!approverID || approverID == data.fromUserID || approverID == data.toUserID) {
-      alert("Invalid approver.");
-      return;
+    const li = document.createElement("li");
+    li.textContent = `${index + 1}. ${messageText}`;
+
+    if (donationCount && donationCount > 1) {
+      li.style.backgroundColor = "#ffcccc";
+      li.style.padding = "5px";
+      li.style.borderRadius = "4px";
     }
 
-    sendDonation(data, parseInt(approverID));
-    container.remove();
-
-    if (typeof donationInProgress !== 'undefined') {
-      donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
-    }
-
-    sendRemoveApprovalUI(data);
+    output.appendChild(li);
   });
-
-  // Remove button handler
-  // container.querySelector(".remove-btn").addEventListener("click", () => {
-  //   if (confirm("Are you sure you want to remove this pending approval?")) {
-  //     container.remove();
-  //     sendRemoveApprovalUI(data);
-  //   }
-  // });
-
-  container.querySelector(".remove-btn").addEventListener("click", () => {
-  if (confirm("Are you sure you want to remove this pending approval?")) {
-    container.remove();
-    sendRemoveApprovalUI(data);
-
-    // TEMP DEBUG: Force trigger locally
-    removeApprovalBox(data);
-  }
-});
-
 }
-
-// Function to handle a single pending approval UI (manually triggered or from WebSocket)
-function showPendingApproval(data) {
-  console.log("🟦 showPendingApproval triggered:", data);
-  renderApprovalUI(data);
-}
-
-// Function to handle batch approval rendering (e.g., on reconnect or bulk update)
-function handleShowApproval(msg) {
-  console.log("🔵 handleShowApproval received:", msg);
-  const approvalList = document.getElementById('unapprovedItems');
-  if (!approvalList) {
-    console.error("⚠️ 'unapprovedItems' container not found.");
-    return;
-  }
-
-  approvalList.innerHTML = ''; // Clear existing
-  const approvalDataArray = Array.isArray(msg) ? msg : Object.values(msg);
-
-  for (const approvalData of approvalDataArray) {
-    renderApprovalUI(approvalData);
-  }
-}
-
-// WebSocket listener for removing approval UI on all clients
-socket.on('returnRemoveApproval', (data) => {
-  console.log("📩 Received returnRemoveApproval message:", data);
-  removeApprovalBox(data.msg);
-});
-
-// Helper to remove an approval element from DOM based on consistent ID
-// function removeApprovalBox(data) {
-//   const approvalID = getApprovalElementID(data);
-//   console.log("Trying to remove approval box with ID:", approvalID);
-
-//   const approvalElement = document.getElementById(approvalID);
-//   if (approvalElement) {
-//     approvalElement.remove();
-//     console.log("✅ Approval box removed:", approvalID);
-//   } else {
-//     console.warn("⚠️ Approval box not found:", approvalID);
-//   }
-// }
-
-function removeApprovalBox(data) {
-  const approvalID = getApprovalElementID(data);
-  console.log("🧩 Trying to remove approval box with ID:", approvalID);
-
-  const approvalElement = document.getElementById(approvalID);
-  if (approvalElement) {
-    approvalElement.remove();
-    console.log("✅ Approval box removed:", approvalID);
-  } else {
-    console.warn("⚠️ Approval box not found:", approvalID);
-
-    // Debugging existing elements
-    document.querySelectorAll('[id^="approval-"]').forEach(el => {
-      console.log("🔍 Existing element:", el.id);
-    });
-  }
-}
-
-
-
-
-
-// thirding code 
-
-
-  function showThirdingApprovalUI(data) {
-      console.log("📋 showThirdingApprovalUI called with data:", data);
-
-      if (
-        typeof data.ELMxID === "undefined" ||
-        typeof data.fromUserID === "undefined" ||
-        typeof data.toUserID === "undefined" ||
-        typeof data.totalSeconds === "undefined"
-      ) {
-        console.error("❌ Missing required data fields:", data);
-        return;
-      }
-
-      const uniqueApprovalID = `thirding-approval-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}`;
-      if (document.getElementById(uniqueApprovalID)) {
-        console.log("⛔ Thirding approval UI already exists, skipping.");
-        return;
-      }
-
-      const fromUserIDStr = String(data.fromUserID);
-      const toUserIDStr = String(data.toUserID);
-      const fromName = getUsernameByID(data.fromUserID) || "Unknown";
-      const toName = getUsernameByID(data.toUserID) || "Unknown";
-
-      const selectedTimers = Array.isArray(data.selectedTimers) ? data.selectedTimers : [];
-
-      const selectedListHTML = selectedTimers.length > 0
-        ? selectedTimers.map((title, index) => {
-          // const checkboxId = `checkbox-${data.ELMxID}-${index}`;
-          const checkboxId = `checkbox-${data.ELMxID}-${data.fromUserID}-${data.toUserID}-${data.totalSeconds}-${index}`;
-          return `
-          <input type="checkbox" id="${checkboxId}" class="thirding-toggle-checkbox"
-            name="thirding-selected-${fromUserIDStr}" value="${title}" data-elmxid="${data.ELMxID}"
-            data-fromuserid="${data.fromUserID}" data-checkboxindex="${index}" />
-          <label for="${checkboxId}" class="thirding-lable">🕒 ${title}</label>
-        `;
-        }).join("")
-        : "<p><em>No timers selected.</em></p>";
-
-      const minutes = data.minutes ?? 0;
-      const seconds = data.seconds ?? 0;
-      const note = data.note ?? "";
-
-      const container = document.createElement("div");
-      container.id = uniqueApprovalID;
-
-      container.innerHTML = `
-    <div class="pending-approval thirding-approval"
-      style="border: 1px solid #ccc; padding: 10px; margin-bottom: 12px; background-color: #f9f9f9;">
-      <p><strong>🔐 Third+ Approval:</strong> ${fromName} ➜ ${toName} (${minutes} min ${seconds} sec)</p>
-      <p><em>${note}</em></p>
-
-      <div style="margin: 8px 0;">
-        <strong>Selected Timers:</strong>
-        ${selectedListHTML}
-      </div>
-
-      <button class="approve-btn">Approve</button>
-      <button class="remove-btn" style="margin-left: 6px;">Remove</button>
-    </div>
-  `;
-
-      container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
-        checkbox.addEventListener("change", () => {
-          const checkboxId = checkbox.id;
-          const checked = checkbox.checked;
-          const ELMxID = checkbox.getAttribute("data-elmxid");
-          const fromUserID = checkbox.getAttribute("data-fromuserid");
-          const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
-
-          socket.send(JSON.stringify({
-            cmd: "updateThirdingCheckbox",
-            msg: {
-              ELMxID,
-              fromUserID,
-              checkboxId,
-              checked,
-              checkboxIndex
-            }
-          }));
-        });
-      });
-
-      container.querySelector(".approve-btn").addEventListener("click", () => {
-        const timerCheckboxes = container.querySelectorAll(".thirding-toggle-checkbox");
-        const allChecked = Array.from(timerCheckboxes).every(cb => cb.checked);
-        if (!allChecked) {
-          alert("Please ensure all timer checkboxes are selected before approving.");
-          return;
-        }
-
-        sendDonation(data);
-        container.remove();
-
-        donationInProgress[`${data.fromUserID}-${data.toUserID}`] = false;
-
-        socket.send(JSON.stringify({
-          cmd: "sendingThirdingremoveApprovalUI",
-          msg: {
-            ELMxID: data.ELMxID,
-            fromUserID: data.fromUserID,
-            toUserID: data.toUserID,
-            totalSeconds: data.totalSeconds
-          }
-        }));
-      });
-
-      container.querySelector(".remove-btn").addEventListener("click", () => {
-        if (confirm("Are you sure you want to remove this thirding approval of Thirding?")) {
-          container.remove();
-
-          socket.send(JSON.stringify({
-            cmd: "removeThirdingApprovedDonation",
-            msg: {
-              ELMxID: data.ELMxID,
-              fromUserID: data.fromUserID,
-              toUserID: data.toUserID,
-              totalSeconds: data.totalSeconds
-            }
-          }));
-
-          socket.send(JSON.stringify({
-            cmd: "sendingThirdingremoveApprovalUI",
-            msg: {
-              ELMxID: data.ELMxID,
-              fromUserID: data.fromUserID,
-              toUserID: data.toUserID,
-              totalSeconds: data.totalSeconds
-            }
-          }));
-        }
-      });
-
-      document.getElementById("unapprovedItems").appendChild(container);
-    }
-
-
-    // Get username by ID
-    function getUsernameByID(userID) {
-      const input = document.querySelector(`[data-id="${userID}-1"]`);
-      return input ? input.value.trim() || `User ${userID}` : `User ${userID}`;
-    }
-
-    function sendDonation(data, approverID = null) {
-      const payload = {
-        cmd: "donateTime",
-        msg: {
-          ELMxID: 0, // Always include the ELMxID
-          fromUserID: data.fromUserID,
-          toUserID: data.toUserID,
-          timerName: data.timerName,
-          minutes: data.minutes,
-          seconds: data.seconds,
-          totalSeconds: data.totalSeconds
-        }
-      };
-
-      // Add approver info if provided
-      if (approverID) {
-        payload.msg.approvedByID = approverID;
-        payload.msg.approvedByName = getUsernameByID(approverID);
-      }
-
-      // Send the donation information to the server
-      socket.send(JSON.stringify(payload));
-      console.log("Donation sent via WebSocket:", payload);
-
-      // After donation is sent, notify the server to remove the approved donation
-      const removalPayload = {
-        cmd: "removeApprovedDonation",
-        msg: {
-          ELMxID: 0, // <-- Make sure to include ELMxID here also
-          fromUserID: data.fromUserID,
-          toUserID: data.toUserID,
-          totalSeconds: data.totalSeconds
-        }
-      };
-
-      socket.send(JSON.stringify(removalPayload));
-      console.log("Approved donation removal requested:", removalPayload);
-    }
-
-
-    // Render donation messages
-    function renderDonationMessages(messages) {
-      console.log("📦 Messages received in renderDonationMessages:", messages);
-
-      const output = document.getElementById("donationConsoleOutput");
-      if (!output) {
-        console.error("❌ Element with ID 'donationConsoleOutput' not found.");
-        return;
-      }
-
-      output.innerHTML = "";
-
-      if (!messages || messages.length === 0) {
-        const li = document.createElement("li");
-        li.textContent = "No donation history found.";
-        output.appendChild(li);
-        return;
-      }
-
-      messages.forEach((entry, index) => {
-        console.log(`🔹 Entry ${index + 1}:`, entry);
-
-        const {
-          timerName,
-          donatedMinutes,
-          donatedSeconds,
-          recipientName,
-          toUserID,
-          donationCount,
-          approvedByName
-        } = entry;
-
-        let messageText = `${timerName || "Timer"} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
-        // if (donationCount) {
-        //   messageText += ` (Donated ${donationCount} ${donationCount === 1 ? "time" : "times"})`;
-        // }
-
-        if (donationCount > 1) {
-          messageText += ` (Donated ${donationCount} ${donationCount === 1 ? "time" : "times"})`;
-          }
-
-        if (approvedByName) {
-          messageText += ` ✅ Approved by ${approvedByName}`;
-        }
-
-
-        const li = document.createElement("li");
-        li.textContent = `${index + 1}. ${messageText}`;
-
-        if (donationCount && donationCount > 1) {
-          li.style.backgroundColor = "#ffcccc";
-          li.style.padding = "5px";
-          li.style.borderRadius = "4px";
-        }
-
-        output.appendChild(li);
-      });
-    }
-
 
   </script>
 
@@ -3405,6 +3508,8 @@ function removeApprovalBox(data) {
           console.log("🟠 unapproveusermessage:", unapproveusermessage);
           renderDonationMessages(messages);
           handleShowApproval(unapproveusermessage);  // Pass correct data
+          // handleShowThirdingApproval(data.msg);
+
           break;
 
 
@@ -3455,6 +3560,25 @@ function removeApprovalBox(data) {
           titleInputField.value = timerNewName;
 
           break;
+
+
+
+
+        case "removeThirdingApprovalUI": 
+          const { ELMxIDThirding, fromUserID, toUserID, totalSeconds } = data.msg;
+
+          console.log("removeThirdingApprovalUI"+ removeThirdingApprovalUI);
+          const uniqueApprovalID = `thirding-approval-${ELMxIDThirding}-${fromUserID}-${toUserID}-${totalSeconds}`;
+          const approvalEl = document.getElementById(uniqueApprovalID);
+          if (approvalEl) {
+            approvalEl.remove();
+            console.log("🗑️ Thirding approval UI removed:", uniqueApprovalID);
+          }
+          break;
+        
+
+
+
 
         case "returnedFromServerManualSetTime":
           //input  msg: { ELMxID: 0, timerNewTitleID: '', timerNewName: 'Mark' } }
@@ -3541,38 +3665,95 @@ function removeApprovalBox(data) {
 
         //   break;
 
-  //       case "returnRemoveApproval":
-  // console.log("📩 Received returnRemoveApproval message:", data);
-  // removeApprovalBox(data.msg);
+        //       case "returnRemoveApproval":
+        // console.log("📩 Received returnRemoveApproval message:", data);
+        // removeApprovalBox(data.msg);
 
-  // if (data.msg && typeof data.msg.ELMxID !== "undefined") {
-  //   const removeID = data.msg.ELMxID;
-  //   const element = document.getElementById(`approval-${removeID}`);
-  //   if (element) {
-  //     element.remove();
-  //     console.log(`✅ Removed approval UI for ELMxID: ${removeID}`);
-  //   } else {
-  //     console.warn(`⚠️ No element found with ID approval-${removeID}`);
-  //   }
-  // } else {
-  //   console.warn("❌ Missing or invalid ELMxID in returnRemoveApproval:", data);
-  // }
+        // if (data.msg && typeof data.msg.ELMxID !== "undefined") {
+        //   const removeID = data.msg.ELMxID;
+        //   const element = document.getElementById(`approval-${removeID}`);
+        //   if (element) {
+        //     element.remove();
+        //     console.log(`✅ Removed approval UI for ELMxID: ${removeID}`);
+        //   } else {
+        //     console.warn(`⚠️ No element found with ID approval-${removeID}`);
+        //   }
+        // } else {
+        //   console.warn("❌ Missing or invalid ELMxID in returnRemoveApproval:", data);
+        // }
 
-  // break;
+        // break;
 
 
 
-  case "returnRemoveApproval":
-  console.log("📩 Received returnRemoveApproval message:", data);
-  removeApprovalBox(data.msg);
-  break;
+        case "returnRemoveApproval":
+          console.log("📩 Received returnRemoveApproval message:", data);
+          removeApprovalBox(data.msg);
+          break;
 
-  
+
+
+        // case "returnUpdatedThirdingCheckbox":
+        //   console.log("📩 Received returnUpdatedThirdingCheckbox message:", data);
+
+        //   break;
 
         case "returnUpdatedThirdingCheckbox":
-          console.log("📩 Received returnUpdatedThirdingCheckbox message:", data);
+          console.log("📩 Received returnUpdatedThirdingCheckbox:", data);
+
+          const {
+            thirdingcheckingELMxID,
+            thirdingcheckingFromUserID,
+            checkboxId,
+            checkboxIndex,
+            checked
+          } = data.msg;
+
+          // Find the checkbox element in the DOM
+          const checkboxElement = document.getElementById(checkboxId);
+
+          if (!checkboxElement) {
+            console.warn(`⚠️ Checkbox element with ID ${checkboxId} not found in DOM.`);
+            return;
+          }
+
+          // Update the checkbox UI state
+          checkboxElement.checked = checked;
+
+          // Optionally highlight the checkbox briefly for visual feedback
+          checkboxElement.classList.add("highlight-checkbox");
+          setTimeout(() => {
+            checkboxElement.classList.remove("highlight-checkbox");
+          }, 1000);
 
           break;
+
+          case "returnUpdatedThirdingCheckbox":
+ console.log("📥 Received checkbox state:", data.msg);
+
+        const { checkboxStates } = data.msg;
+
+        // Update the checkboxes based on the retrieved state
+        for (const [checkboxIndex, state] of Object.entries(checkboxStates)) {
+            const checkbox = document.getElementById(state.checkboxId);
+            if (checkbox) {
+                checkbox.checked = state.checked;
+            }
+        }
+          break;
+
+        // case "returnAllThirdingCheckboxStates":
+        //   console.log("✅ Restoring checkbox states from server...", data);
+        //   data.msg.forEach(({ checkboxId, checked }) => {
+        //     const el = document.getElementById(checkboxId);
+        //     if (el) {
+        //       el.checked = checked;
+        //     } else {
+        //       console.warn(`⚠️ Checkbox not found for ID: ${checkboxId}`);
+        //     }
+        //   });
+        //   break;
+
 
 
         case "returnShowApproval":
@@ -3593,30 +3774,6 @@ function removeApprovalBox(data) {
           showPendingApproval(remapped);
           // handleShowApproval(remapped);
           break;
-
-
-
-
-        // case "returnShowThirdingApproval":
-        //   const originalThird = data.msg;
-        //   const remappedThird = {
-        //     fromUserID: originalThird.fromUserID_Approval,
-        //     toUserID: originalThird.toUserID_Approval,
-        //     minutes: originalThird.minutes_Approval,
-        //     seconds: originalThird.seconds_Approval,
-        //     totalSeconds: originalThird.totalSeconds_Approval,
-        //     timerName: originalThird.timerName_Approval,
-        //     selectedTimers: originalThird.selectedTimers_Approval || [],
-        //     note: originalThird.note_Approval || "",
-        //     ELMxID: originalThird.ELMxID_Approval
-        //   };
-
-        //   console.log("📥 Showing Thirding Approval UI:", remappedThird);
-        //   showThirdingApprovalUI(remappedThird);
-        //   break;
-
-
-
 
 
 
@@ -3671,6 +3828,27 @@ function removeApprovalBox(data) {
           break;
 
 
+
+
+
+
+
+          case "returnThirdingCheckboxState": {
+    console.log("📩 Received checkbox state:", message.msg);
+
+    const { ELMxID, fromUserID, checkboxStates } = message.msg;
+
+    // Loop through the checkboxStates and update the UI accordingly
+    for (const checkboxId in checkboxStates) {
+      const checkbox = document.getElementById(checkboxId);
+      if (checkbox) {
+        const checked = checkboxStates[checkboxId];
+        checkbox.checked = checked;  // Update the checkbox checked state
+        console.log(`✅ Updated checkbox state for ${checkboxId}: ${checked}`);
+      }
+    }
+    break;
+  }
 
 
         case "returnedFromServerResetTimerAsc":
@@ -4260,7 +4438,7 @@ function removeApprovalBox(data) {
             break;
           }
 
-          const isRepeated = donationCount > 1; // ✅ Use count from backend
+          const isRepeated = donationCount > 1; // ✅ Use count from backendf
 
           // 🧾 Build donation message
           let donationMessage = `${timerName || "Timer"} Donated ${donatedMinutes}m ${donatedSeconds}s to ${recipientName || toUserID}`;
@@ -6660,320 +6838,9 @@ function removeApprovalBox(data) {
         window.citizenObserver.observe(citizenCountElement, { childList: true, subtree: true });
       }
 
-      // function attachDonateButton(cardElement, fromUserID, timerName) {
-      //   const donateBtn = cardElement.querySelector(".donate-btn");
-      //   donateBtn?.addEventListener("click", () => {
-      //     const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
-      //     const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
-      //     const recipientSelect = cardElement.querySelector("select");
-
-      //     const donateMinutes = parseInt(minutesInput?.value || "0");
-      //     const donateSeconds = parseInt(secondsInput?.value || "0");
-      //     const toUserID = parseInt(recipientSelect?.value);
-      //     const totalSeconds = donateMinutes * 60 + donateSeconds;
-
-      //     if (!toUserID || totalSeconds <= 0) {
-      //       alert("Please select a recipient and enter valid time to donate.");
-      //       return;
-      //     }
-
-      //     const donationKey = `${fromUserID}_${toUserID}`;
-      //     donationCounts[donationKey] = (donationCounts[donationKey] || 0) + 1;
-
-      //     const donationData = {
-      //       fromUserID,
-      //       toUserID,
-      //       timerName,
-      //       minutes: donateMinutes,
-      //       seconds: donateSeconds,
-      //       totalSeconds
-      //     };
-
-      //     if (donationCounts[donationKey] > 1) {
-      //       // alert("You have already donated 1 times. Approval required from another user.");
-      //       console.log("donationData", donationData);
-      //       socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
-
-      //     } else {
-      //       sendDonation(donationData);
-      //     }
-      //   });
-      // }
 
 
-
-      // function attachDonateButton(cardElement, fromUserID, timerName) {
-      //   const donateBtn = cardElement.querySelector(".donate-btn");
-      //   donateBtn?.addEventListener("click", async () => {
-      //     const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
-      //     const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
-      //     const recipientSelect = cardElement.querySelector("select");
-
-      //     const donateMinutes = parseInt(minutesInput?.value || "0");
-      //     const donateSeconds = parseInt(secondsInput?.value || "0");
-      //     const toUserID = parseInt(recipientSelect?.value);
-      //     const totalSeconds = donateMinutes * 60 + donateSeconds;
-
-      //     if (!toUserID || totalSeconds <= 0) {
-      //       alert("Please select a recipient and enter valid time to donate.");
-      //       return;
-      //     }
-
-      //     const donationData = {
-      //       fromUserID,
-      //       toUserID,
-      //       timerName,
-      //       minutes: donateMinutes,
-      //       seconds: donateSeconds,
-      //       totalSeconds
-      //     };
-
-      //     // 🛑 NEW: Ask server about previous donation count
-      //     checkDonationCount(fromUserID, toUserID).then((previousDonationCount) => {
-      //       console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
-
-      //       if (previousDonationCount >= 1) {
-      //         console.log("🛡️ Approval required before donating again:", donationData);
-      //         socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
-      //       } else {
-      //         console.log("🚀 First donation, sending directly:", donationData);
-      //         sendDonation(donationData);
-      //       }
-
-
-      //     }).catch((err) => {
-      //       console.error("❌ Failed to check donation count:", err);
-      //     });
-      //   });
-      // }
-
-      //       function attachDonateButton(cardElement, fromUserID, timerName) {
-      //   const donateBtn = cardElement.querySelector(".donate-btn");
-
-      //   // Prevent multiple listeners
-      //   if (donateBtn.dataset.listenerAttached === "true") return;
-      //   donateBtn.dataset.listenerAttached = "true";
-
-      //   donateBtn.addEventListener("click", async () => {
-      //     const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
-      //     const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
-      //     const recipientSelect = cardElement.querySelector("select");
-
-      //     const donateMinutes = parseInt(minutesInput?.value || "0");
-      //     const donateSeconds = parseInt(secondsInput?.value || "0");
-      //     const toUserID = parseInt(recipientSelect?.value);
-      //     const totalSeconds = donateMinutes * 60 + donateSeconds;
-
-      //     if (!toUserID || totalSeconds <= 0) {
-      //       alert("Please select a recipient and enter valid time to donate.");
-      //       return;
-      //     }
-
-      //     const donationData = {
-      //       fromUserID,
-      //       toUserID,
-      //       timerName,
-      //       minutes: donateMinutes,
-      //       seconds: donateSeconds,
-      //       totalSeconds
-      //     };
-
-      //     // Ask server about previous donation count
-      //     try {
-      //       const previousDonationCount = await checkDonationCount(fromUserID, toUserID);
-      //       console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
-
-      //       if (previousDonationCount >= 1) {
-      //         console.log("🛡️ Approval required before donating again:", donationData);
-      //         socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
-      //       } else {
-      //         console.log("🚀 First donation, sending directly:", donationData);
-      //         sendDonation(donationData);
-      //       }
-      //     } catch (err) {
-      //       console.error("❌ Failed to check donation count:", err);
-      //     }
-      //   });
-      // }
-
-
-
-      // // Track donation in progress to prevent multiple approvals
-      // const donationInProgress = {};
-
-      // function attachDonateButton(cardElement, fromUserID, timerName) {
-      //   const donateBtn = cardElement.querySelector(".donate-btn");
-
-      //   // Prevent multiple listeners
-      //   if (donateBtn.dataset.listenerAttached === "true") return;
-      //   donateBtn.dataset.listenerAttached = "true";
-
-      //   donateBtn.addEventListener("click", async () => {
-      //     const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
-      //     const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
-      //     const recipientSelect = cardElement.querySelector("select");
-
-      //     const donateMinutes = parseInt(minutesInput?.value || "0");
-      //     const donateSeconds = parseInt(secondsInput?.value || "0");
-      //     const toUserID = parseInt(recipientSelect?.value);
-      //     const totalSeconds = donateMinutes * 60 + donateSeconds;
-
-      //     if (!toUserID || totalSeconds <= 1) {
-      //       alert("Please select a recipient and enter valid time to donate.");
-      //       return;
-      //     }
-
-      //     // If donation is already in progress, do not show approval again
-      //     // if (donationInProgress[`${fromUserID}-${toUserID}`]) {
-      //     //   alert("Donation already in progress. Please wait for approval.");
-      //     //   return;
-      //     // }
-
-      //     const donationData = {
-      //       fromUserID,
-      //       toUserID,
-      //       timerName,
-      //       minutes: donateMinutes,
-      //       seconds: donateSeconds,
-      //       totalSeconds
-      //     };
-
-      //     const thirdingDataDonation = {
-
-      //     };
-
-      //     // Track donation in progress
-      //     donationInProgress[`${fromUserID}-${toUserID}`] = true;
-
-      //     // Ask server about previous donation count
-      //     try {
-      //       const previousDonationCount = await checkDonationCount(fromUserID, toUserID);
-      //       console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
-
-      //              if (previousDonationCount === 1) {
-      //         // 🟡 Second donation — send for approval
-      //         console.log("🛡️ Second donation detected, sending showSecendingApproval");
-      //         socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
-      //       } else if (previousDonationCount >= 2) {
-      //         // 🔒 Third+ donation — fallback to full approval
-      //         console.log("🔐 Third+ donation, sending full approval request");
-      //         socket.send(JSON.stringify({ cmd: "showThirdingApproval", msg: thirdingDataDonation }));
-      //       } else {
-      //         // ✅ First donation — send directly
-      //         console.log("🚀 First donation, sending directly:", donationData);
-      //         sendDonation(donationData);
-      //       }
-
-      //       // if (previousDonationCount >= 1) {
-      //       //   console.log("🛡️ Approval required before donating again:", donationData);
-      //       //   socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
-      //       // } else {
-      //       //   console.log("🚀 First donation, sending directly:", donationData);
-      //       //   sendDonation(donationData);
-      //       // }
-      //     } catch (err) {
-      //       console.error("❌ Failed to check donation count:", err);
-      //       donationInProgress[`${fromUserID}-${toUserID}`] = false; // Reset on error
-      //     }
-      //   });
-      // }
-
-      // Track donation in progress to prevent multiple approvals
-      // const donationInProgress = {};
-
-      // function attachDonateButton(cardElement, fromUserID, timerName) {
-      //   const donateBtn = cardElement.querySelector(".donate-btn");
-
-      //   // Prevent multiple listeners
-      //   if (donateBtn.dataset.listenerAttached === "true") return;
-      //   donateBtn.dataset.listenerAttached = "true";
-
-      //   donateBtn.addEventListener("click", async () => {
-      //     const minutesInput = cardElement.querySelector("input[type='number']:nth-child(1)");
-      //     const secondsInput = cardElement.querySelector("input[type='number']:nth-child(2)");
-      //     const recipientSelect = cardElement.querySelector("select");
-
-      //     const donateMinutes = parseInt(minutesInput?.value || "0");
-      //     const donateSeconds = parseInt(secondsInput?.value || "0");
-      //     const toUserID = parseInt(recipientSelect?.value);
-      //     const totalSeconds = donateMinutes * 60 + donateSeconds;
-
-      //     if (!toUserID || totalSeconds <= 1) {
-      //       alert("Please select a recipient and enter valid time to donate.");
-      //       return;
-      //     }
-
-      //     // Build list of selected checkbox titles (checkboxes with .timer-checkbox class)
-      //     const selectedTitles = [];
-      //     const timerComponents = document.querySelectorAll('.timer-checkbox');
-
-      //     timerComponents.forEach((checkbox) => {
-      //       if (checkbox.checked) {
-      //         const timerComponent = checkbox.closest('div');
-      //         const titleInput = timerComponent.querySelector('.timer-title');
-      //         let title = titleInput?.value.trim();
-
-      //         if (!title) {
-      //           const dataId = titleInput?.getAttribute('data-id') || '';
-      //           const newTimerID = dataId.split('-')[0];
-      //           title = `User-${newTimerID}`;
-      //         }
-
-      //         selectedTitles.push(title);
-      //       }
-      //     });
-
-      //     // Main donation payload
-      //     const donationData = {
-      //       fromUserID,
-      //       toUserID,
-      //       timerName,
-      //       minutes: donateMinutes,
-      //       seconds: donateSeconds,
-      //       totalSeconds
-      //     };
-
-      //     // Third+ donation full approval payload
-      //     const thirdingDataDonation = {
-      //       fromUserID,
-      //       toUserID,
-      //       timerName,
-      //       minutes: donateMinutes,
-      //       seconds: donateSeconds,
-      //       totalSeconds,
-      //       selectedTimers: selectedTitles,
-
-      //       note: "Third+ donation – full approval"
-      //     };
-
-      //     // Track donation in progress
-      //     donationInProgress[`${fromUserID}-${toUserID}`] = true;
-
-      //     try {
-      //       const previousDonationCount = await checkDonationCount(fromUserID, toUserID);
-      //       console.log(`🧮 Previous donation count from ${fromUserID} to ${toUserID}:`, previousDonationCount);
-
-      //       if (previousDonationCount === 1) {
-      //         // 🟡 Second donation — send for approval
-      //         console.log("🛡️ Second donation detected, sending showApproval");
-      //         socket.send(JSON.stringify({ cmd: "showApproval", msg: donationData }));
-      //       } else if (previousDonationCount >= 2) {
-      //         // 🔒 Third+ donation — full approval with extra data
-      //         console.log("🔐 Third+ donation, sending showThirdingApproval:", thirdingDataDonation);
-      //         socket.send(JSON.stringify({ cmd: "showThirdingApproval", msg: thirdingDataDonation }));
-      //       } else {
-      //         // ✅ First donation — send directly
-      //         console.log("🚀 First donation, sending directly:", donationData);
-      //         sendDonation(donationData);
-      //       }
-      //     } catch (err) {
-      //       console.error("❌ Failed to check donation count:", err);
-      //       donationInProgress[`${fromUserID}-${toUserID}`] = false; // Reset on error
-      //     }
-      //   });
-      // }
-
-
+      //working 1
       const donationInProgress = {};
 
       function attachDonateButton(cardElement, fromUserID, timerName) {
@@ -7441,6 +7308,8 @@ function removeApprovalBox(data) {
       synchronizeScreenDraw();
       showSelectedTimers();
       showdonationhistory();
+      showThirdingCheckboxStates();
+      getThirdingCheckboxStateFromUI();
 
       const timerList = document.getElementById("timerList");
       const addTimerBtn = document.getElementById("addTimerBtn");
