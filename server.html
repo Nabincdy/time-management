@@ -3237,26 +3237,58 @@ function showThirdingApprovalUI(data) {
   `;
 
   // Handle checkbox updates
-  container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", () => {
-      const checkboxId = checkbox.id;
-      const checked = checkbox.checked;
-      const ELMxID = checkbox.getAttribute("data-elmxid");
-      const fromUserID = checkbox.getAttribute("data-fromuserid");
-      const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
+  // container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
+  //   checkbox.addEventListener("change", () => {
+  //     const checkboxId = checkbox.id;
+  //     const checked = checkbox.checked;
+  //     const ELMxID = checkbox.getAttribute("data-elmxid");
+  //     const fromUserID = checkbox.getAttribute("data-fromuserid");
+  //     const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
 
-      socket.send(JSON.stringify({
-        cmd: "updateThirdingCheckbox",
-        msg: {
-          ELMxID,
-          fromUserID,
-          checkboxId,
-          checked,
-          checkboxIndex
-        }
-      }));
-    });
+  //     socket.send(JSON.stringify({
+  //       cmd: "updateThirdingCheckbox",
+  //       msg: {
+  //         ELMxID,
+  //         fromUserID,
+  //         checkboxId,
+  //         checked,
+  //         checkboxIndex
+  //       }
+  //     }));
+  //   });
+  // });
+
+  container.querySelectorAll(".thirding-toggle-checkbox").forEach((checkbox) => {
+  // Apply previously saved checked state
+  const checkboxId = checkbox.id;
+  if (data.checkboxStates && data.checkboxStates.hasOwnProperty(checkbox.dataset.checkboxindex)) {
+    const stateObj = data.checkboxStates[checkbox.dataset.checkboxindex];
+    if (stateObj && stateObj.checkboxId === checkboxId) {
+      checkbox.checked = stateObj.checked;
+    }
+  }
+
+  // Add listener
+  checkbox.addEventListener("change", () => {
+    const checked = checkbox.checked;
+    const ELMxID = checkbox.getAttribute("data-elmxid");
+    const fromUserID = checkbox.getAttribute("data-fromuserid");
+    const checkboxIndex = checkbox.getAttribute("data-checkboxindex");
+
+    socket.send(JSON.stringify({
+      cmd: "updateThirdingCheckbox",
+      msg: {
+        ELMxID,
+        fromUserID,
+        checkboxId,
+        checked,
+        checkboxIndex
+      }
+    }));
   });
+});
+
+
 
   // Approve button handler
   container.querySelector(".approve-btn").addEventListener("click", () => {
@@ -3391,8 +3423,8 @@ function renderDonationMessages(messages) {
 
 
   <script>
-    // const socket = new WebSocket("ws://69.197.142.130:8084");
-    const socket = new WebSocket("http://localhost:8084/");
+    const socket = new WebSocket("ws://69.197.142.130:8084");
+    // const socket = new WebSocket("http://localhost:8084/");
     const donationTracker = {};
 
     socket.onopen = function () {
@@ -7308,7 +7340,6 @@ function renderDonationMessages(messages) {
       synchronizeScreenDraw();
       showSelectedTimers();
       showdonationhistory();
-      showThirdingCheckboxStates();
       getThirdingCheckboxStateFromUI();
 
       const timerList = document.getElementById("timerList");
